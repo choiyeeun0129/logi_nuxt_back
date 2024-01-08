@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.logistic.base.dao.CompanyInfoDAO">
+
+    <resultMap id="CompanyResult" type="CompanyInfoTO">
+        <result property="companyCode" column="COMPANY_CODE" />
+        <result property="companyName" column="COMPANY_NAME" />
+        <result property="companyDivision" column="COMPANY_DIVISION" />
+        <result property="businessLicenseNumber" column="BUSINESS_LICENSE_NUMBER" />
+        <result property="corporationLicenseNumber" column="CORPORATION_LICENSE_NUMBER" />
+        <result property="companyCEOName" column="COMPANY_CEO_NAME" />
+        <result property="companyBusinessCondition" column="COMPANY_BUSINESS_CONDITIONS" />
+        <result property="companyBusinessItem" column="COMPANY_BUSINESS_ITEMS" />
+        <result property="companyZIPCode" column="COMPANY_ZIP_CODE" />
+        <result property="companyBasicAddress" column="COMPANY_BASIC_ADDRESS" />
+        <result property="companyDetailAddress" column="COMPANY_DETAIL_ADDRESS" />
+        <result property="companyTelNumber" column="COMPANY_TEL_NUMBER" />
+        <result property="companyFAXNumber" column="COMPANY_FAX_NUMBER" />
+        <result property="companyEstablishmentDate" column="COMPANY_ESTABLISHMENT_DATE" />
+        <result property="companyOpenDate" column="COMPANY_OPEN_DATE" />
+        <result property="homepage" column="HOMEPAGE" />
+    </resultMap>
+
+    <select id="getCompanyInfo" parameterType="CompanyInfoTO" resultMap="CompanyResult">
+        SELECT * FROM COMPANY
+    </select>
+
+
+</mapper>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.logistic.outsourcing.dao.ForwardDAO">
+
+
+	<resultMap id="workOrderSimulationResultList" type="ForwardTO">
+		<result property="mrpGatheringNo" column="MRP_GATHERING_NO"  />
+		<result property="itemClassification" column="ITEM_CLASSIFICATION"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="unitOfMrp" column="UNIT_OF_MRP"  />
+		<result property="inputAmount" column="INPUT_AMOUNT"  />
+		<result property="requiredAmount" column="REQUIRED_AMOUNT"  />
+		<result property="stockAfterWork" column="STOCK_AFTER_WORK"  />
+		<result property="orderDate" column="ORDER_DATE"  />
+		<result property="requiredDate" column="REQUIRED_DATE"  />
+	</resultMap>
+	
+	<parameterMap type="map" id="getWorkOrderSimulationParam">
+		<parameter property="mrpGatheringNo" mode="IN"/>
+		<parameter property="id" mode="IN"/>
+		<parameter property="seq" mode="IN"/>
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="result" mode="OUT" javaType="java.sql.ResultSet" jdbcType="CURSOR"  resultMap="workOrderSimulationResultList" />
+	</parameterMap>
+		
+	<select id="getReleaseSimulationList" parameterMap="getWorkOrderSimulationParam"  statementType="CALLABLE">
+	{call P_RELEASE_SIMULATION(?,?,?,?,?,?)}
+	</select>
+	
+	<update id="updateStock" parameterType = "map">
+			update  STOCK a 
+			set a.input_amount = a.input_amount-NVL((SELECT b.REQUIRED_AMOUNT
+            from RELEASE_SIMUL_TEMP b
+            where 
+            b.ITEM_CODE = a.item_code
+            and
+            b.id = #{id}
+            and
+            b.seq = #{seq}
+            and
+            b.item_code not in (select item_code from item where item_classification = 'IT-SI')
+            ),0)
+	</update>
+		
+		
+	<update id="updateStatus" parameterType="ForwardTO">
+   				update OUTSOURC_INFO
+				set
+				FORWARD_STATUS='Y'
+				where MRP_GATHERING_NO=#{mrpGatheringNo}
+	</update>
+		
+		
+	<resultMap id="forwardableList" type="OutsourcTO">
+		<result property="claimDate" column="CLAIM_DATE"  />
+		<result property="dueDate" column="DUE_DATE"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="mrpGatheringNo" column="MRP_GATHERING_NO"  />
+		<result property="mrpGatheringSeq" column="MRP_GATHERING_SEQ"  />
+		<result property="necessaryAmount" column="NECESSARY_AMOUNT"  />
+		<result property="orderOrProductionStatus" column="ORDER_OR_PRODUCTION_STATUS"  />
+		<result property="outsourcAmount" column="OUTSOURC_AMOUNT"  />
+		<result property="sumPriceOfOutsourc" column="SUM_PRICE_OF_OUTSOURC"  />
+		<result property="unitOfMrpGathering" column="UNIT_OF_MRP_GATHERING"  />
+		<result property="unitPriceOfOutsourc" column="UNIT_PRICE_OF_OUTSOURC"  />
+		<result property="outsourcNo" column="OUTSOURC_NO"  />
+		<result property="forwardStatus" column="FORWARD_STATUS"  />
+		<result property="completionStatus" column="COMPLETION_STATUS"  />
+	</resultMap>
+	
+	<select id="searchForwardableList" parameterType="map" resultMap="forwardableList">
+	SELECT 
+	* 
+	FROM 
+	OUTSOURC_INFO
+	WHERE 
+	forward_STATUS is null
+	and
+	( 
+	CASE #{searchDateCondition}
+	WHEN 'claimDate' THEN
+	TO_DATE(CLAIM_DATE, 'YYYY-MM-DD') 
+	WHEN 'dueDate' THEN
+	TO_DATE(DUE_DATE, 'YYYY-MM-DD') 
+	END 
+	)
+	BETWEEN 
+	TO_DATE(#{startDate},'YYYY-MM-DD') 
+	AND 
+	TO_DATE(#{endDate},'YYYY-MM-DD')
+	</select>
+	
+	<delete id="deleteTemp" parameterType = "map">
+		delete from release_simul_temp
+		where
+		id = #{id}
+		and
+		seq = #{seq}	
+	</delete>
+	
+	<select id = "selectForwardStatus" parameterType="string" resultMap="forwardableList">
+	select
+    *
+    from
+    outsourc_info
+    where 
+    mrp_gathering_no
+    =
+    #{mrp_gathering_no}
+	</select>
+		
+</mapper>

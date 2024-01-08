@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:33 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.base.dao.AccWorkplaceDAO">
+
+    <select id="selectWorkplace" parameterType="String" resultType="kr.co.seoulit.erp.account.base.to.WorkplaceBean">
+    
+      		  SELECT * 
+			  FROM WORKPLACE 
+			  WHERE WORKPLACE_CODE = #{workplaceCode}
+        
+    </select>
+    
+    <insert id="insertWorkplace" parameterType="kr.co.seoulit.erp.account.base.to.WorkplaceBean">
+    
+        INSERT INTO WORKPLACE (WORKPLACE_CODE,COMPANY_CODE,WORKPLACE_NAME, BUSINESS_LICENSE_NUMBER, 
+							   CORPORATION_LICENSE_NUMBER, WORKPLACE_CEO_NAME, WORKPLACE_BUSINESS_CONDITIONS, 
+							   WORKPLACE_BUSINESS_ITEMS, WORKPLACE_TEL_NUMBER, WORKPLACE_FAX_NUMBER, 
+							   WORKPLACE_BASIC_ADDRESS, APPROVAL_STATUS) 
+		VALUES(#{workplaceCode}, #{companyCode}, #{workplaceName}, #{businessLicense}, #{corporationLicence},
+			   #{workplaceCeoName}, #{businessConditions}, #{businessItems}, #{workplaceTelNumber}, 
+			   #{workplaceFaxNumber}, #{workplaceBasicAddress}, #{approvalStatus})
+        
+    </insert>
+    
+    <select id="selectAllWorkplaceList" resultType="kr.co.seoulit.erp.account.base.to.WorkplaceBean">
+    
+      		  SELECT WORKPLACE_CODE as workplacecode,
+    			     COMPANY_CODE as companycode,
+      				 WORKPLACE_NAME as workplacename,
+      				 BUSINESS_LICENSE_NUMBER as businesslicense,
+     				 CORPORATION_LICENSE_NUMBER as corporationlicence,
+  				     WORKPLACE_CEO_NAME as workplaceceoname,
+     				 WORKPLACE_BUSINESS_CONDITIONS as businessconditions,
+      				 WORKPLACE_BUSINESS_ITEMS as businessitems,
+      				 WORKPLACE_TEL_NUMBER as workplacetelnumber,
+      				 WORKPLACE_FAX_NUMBER as workplacefaxnumber,
+   				     WORKPLACE_BASIC_ADDRESS as workplacebasicaddress,
+     			     APPROVAL_STATUS as approvalstatus
+		   	 FROM   WORKPLACE 
+        
+    </select>
+    
+    <update id="updateWorkplaceAccount" parameterType="Map">
+    
+        UPDATE WORKPLACE
+		SET APPROVAL_STATUS = #{status}
+		WHERE WORKPLACE_CODE = #{code}
+        
+    </update>
+    
+    <delete id="deleteWorkplace" parameterType="String">
+    
+        DELETE FROM WORKPLACE
+		WHERE WORKPLACE_CODE = #{code}
+        
+    </delete>
+    
+</mapper>

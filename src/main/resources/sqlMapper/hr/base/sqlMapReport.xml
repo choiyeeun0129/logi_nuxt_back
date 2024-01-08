@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.hr.base.dao.ReportDAO">
+
+  <resultMap type="kr.co.seoulit.erp.hr.base.to.ReportTO" id="reportResult">
+			<result property="empName" column="EMP_NAME" />
+			<result property="hiredate" column="HIREDATE" />
+			<result property="occupation" column="OCCUPATION" />
+			<result property="employmentType" column="EMPLOYMENT_TYPE" />
+			<result property="position" column="POSITION" />
+			<result property="address" column="ADDRESS" />
+			<result property="detailAddress" column="DETAIL_ADDRESS" />
+			<result property="deptName" column="DEPT_NAME" />
+			
+			</resultMap>
+			<select id="selectReport" resultMap="reportResult">
+			<![CDATA[
+			SELECT E.EMP_NAME 
+			, TO_CHAR(W.HIREDATE,'YYYY')||'년 ' ||TO_CHAR(W.HIREDATE, 'MON')||TO_CHAR(W.HIREDATE,'DD')||'일' HIREDATE 
+			, W.OCCUPATION
+			, W.EMPLOYMENT_TYPE 
+			, P.POSITION 
+			, E.ADDRESS 
+			, E.DETAIL_ADDRESS 
+			, T.DEPT_NAME 
+			  FROM EMP E
+			, WORK_INFO W
+			, DEPT T
+			, POSITION P 
+			  WHERE E.EMP_CODE=W.EMP_CODE
+			  AND E.DEPT_CODE=T.DEPT_CODE
+			  AND E.POSITION_CODE=P.POSITION_CODE
+			  AND E.EMP_CODE = #{empCode}
+			  ]]>
+		</select>
+		
+			
+		</mapper>
+	
+	
+	

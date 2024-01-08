@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.attendance.dao.RestAttdDAO">
+	 
+	
+	 
+	 <resultMap type="kr.co.seoulit.erp.hr.attendance.to.RestAttdTO" id="restAttdResult">
+		<result property="empCode" column="EMP_CODE" />
+		<result property="empName" column="EMP_NAME" />
+		<result property="restAttdCode" column="REST_ATTD_CODE" />
+		<result property="restTypeCode" column="REST_TYPE_CODE" />
+		<result property="restTypeName" column="REST_TYPE_NAME" />
+		<result property="requestDate" column="REQUEST_DATE" />
+		<result property="startDate" column="START_DATE" />
+		<result property="endDate" column="END_DATE" />
+		<result property="numberOfDays" column="NUMBER_OF_DAYS" />
+		<result property="cost" column="COST" />
+		<result property="cause" column="CAUSE" />
+		<result property="applovalStatus" column="APPLOVAL_STATUS" />
+		<result property="rejectCause" column="REJECT_CAUSE" />
+		<result property="startTime" column="START_TIME" />
+		<result property="endTime" column="END_TIME" />
+		<result property="detailCodeNumber" column="DETAIL_CODE_NUMBER" />
+		<result property="detailCodeName" column="DETAIL_CODE_NAME" />
+		
+	</resultMap>
+
+
+	
+	<!--****************************************************2020-08-26 김준서 ******************************************** -->
+	<select id="selectRestAttdList" resultMap="restAttdResult" parameterType="map">
+		SELECT R.EMP_CODE 
+		, E.EMP_NAME 
+		, R.REST_ATTD_CODE 
+		, R.REST_TYPE_CODE 
+		, R.REST_TYPE_NAME 
+		, TO_CHAR(R.REQUEST_DATE, 'YYYY-MM-DD') REQUEST_DATE 
+		, TO_CHAR(R.START_DATE, 'YYYY-MM-DD') START_DATE
+		, TO_CHAR(R.END_DATE, 'YYYY-MM-DD') END_DATE 
+		, R.NUMBER_OF_DAYS 
+		, R.COST
+		, R.CAUSE
+		, R.APPLOVAL_STATUS 
+		, R.REJECT_CAUSE
+		, R.START_TIME
+		, R.END_TIME 
+		FROM REST_ATTD R 
+		, EMPLOYEE_BASIC E 
+		WHERE R.EMP_CODE = #{empCode}
+		AND R.REQUEST_DATE BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD') 
+		AND TO_DATE(#{endDate},'YYYY-MM-DD') 
+		AND R.EMP_CODE = E.EMP_CODE 
+	</select>
+	<!--****************************************************2020-08-26 김준서 ******************************************** -->
+		
+	<!--**************************************************** 결재승인관리 시작 2020-08-28 김준서  ******************************************** -->
+	<select id="selectRestAttdListByDept" resultMap="restAttdResult" parameterType="map">
+		SELECT R.EMP_CODE 
+		, E.EMP_NAME
+		, R.REST_ATTD_CODE
+		, R.REST_TYPE_CODE
+		, R.REST_TYPE_NAME
+		, TO_CHAR(R.REQUEST_DATE, 'YYYY-MM-DD') REQUEST_DATE
+		, TO_CHAR(R.START_DATE, 'YYYY-MM-DD') START_DATE
+		, TO_CHAR(R.END_DATE, 'YYYY-MM-DD') END_DATE
+		, R.NUMBER_OF_DAYS
+		, R.COST
+		, R.CAUSE
+		, R.APPLOVAL_STATUS
+		, R.REJECT_CAUSE
+		, R.START_TIME
+		, R.END_TIME 
+		FROM REST_ATTD R
+		, EMPLOYEE_BASIC E 
+		WHERE E.DEPT_CODE = #{deptCode}
+		AND R.REQUEST_DATE BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD') 
+		AND TO_DATE(#{endDate},'YYYY-MM-DD') 
+		AND R.EMP_CODE = E.EMP_CODE 
+	</select>
+	<!--**************************************************** 결재승인관리 종료 2020-08-28 김준서 ******************************************** -->
+	
+	<select id="selectRestAttdListByAllDept" resultMap="restAttdResult" parameterType="string">
+		SELECT R.EMP_CODE 
+		, E.EMP_NAME
+		, R.REST_ATTD_CODE
+		, R.REST_TYPE_CODE
+		, R.REST_TYPE_NAME
+		, TO_CHAR(R.REQUEST_DATE, 'YYYY-MM-DD') REQUEST_DATE
+		, TO_CHAR(R.START_DATE, 'YYYY-MM-DD') START_DATE
+		, TO_CHAR(R.END_DATE, 'YYYY-MM-DD') END_DATE
+		, R.NUMBER_OF_DAYS
+		, R.COST
+		, R.CAUSE
+		, R.APPLOVAL_STATUS
+		, R.REJECT_CAUSE
+		, R.START_TIME
+		, R.END_TIME 
+		FROM REST_ATTD R
+		, EMP E 
+		WHERE R.REQUEST_DATE = TO_DATE(#{applyDay},'YYYY-MM-DD') 
+		AND R.EMP_CODE = E.EMP_CODE 
+	</select>
+
+	
+	<select id="selectRestAttdListByToday" resultMap="restAttdResult" parameterType="map">
+		SELECT R.EMP_CODE 
+		, E.EMP_NAME
+		, R.REST_ATTD_CODE
+		, R.REST_TYPE_CODE
+		, R.REST_TYPE_NAME 
+		, TO_CHAR(R.REQUEST_DATE, 'YYYY-MM-DD') REQUEST_DATE 
+		, TO_CHAR(R.START_DATE, 'YYYY-MM-DD') START_DATE
+		, TO_CHAR(R.END_DATE, 'YYYY-MM-DD') END_DATE
+		, R.NUMBER_OF_DAYS
+		, R.COST
+		, R.CAUSE
+		, R.APPLOVAL_STATUS
+		, R.REJECT_CAUSE
+		, R.START_TIME
+		, R.END_TIME 
+		FROM REST_ATTD R
+		, EMP E 
+		WHERE R.EMP_CODE = #{empCode} 
+		AND R.START_DATE = to_DATE(#{toDay},'YYYY-MM-DD') 
+		AND R.END_DATE = to_DATE(#{toDay},'YYYY-MM-DD')
+		AND R.APPLOVAL_STATUS = '승인' 
+		AND R.EMP_CODE = E.EMP_CODE 
+		AND R.REST_TYPE_CODE != 'ASC008'
+	</select>
+	
+	
+	
+	<!--****************************************************2020-08-25김준서 ******************************************** -->
+		<insert id="insertRestAttd" parameterType="map" >
+		<![CDATA[
+		INSERT INTO REST_ATTD VALUES (
+		  #{empCode}
+		, REST_ATTD_CODE_SEQ.NEXTVAL
+		, #{restTypeCode}
+		, #{restTypeName}
+		, TO_DATE(#{requestDate},'YY/MM/DD')
+		, TO_DATE(#{startDate},'YY/MM/DD')
+		, TO_DATE(#{endDate},'YY/MM/DD')
+		, #{cause}
+		, #{applovalStatus}
+		, #{rejectCause}
+		, TO_NUMBER(#{cost})
+		, TO_NUMBER(#{startTime})
+		, TO_NUMBER(#{endTime})
+		, TO_NUMBER(#{numberOfDays})
+		)
+		]]>
+	</insert>
+<!--****************************************************2020-08-25김준서 ******************************************** -->
+		
+		
+		
+		
+	<!--**************************************************** 결재승인관리 시작 2020-08-27 김준서 ******************************************** -->
+	<update id="updateRestAttd" parameterType="map">
+			<![CDATA[
+		UPDATE REST_ATTD SET
+		CAUSE = #{cause,jdbcType=VARCHAR}
+		, APPLOVAL_STATUS = #{applovalStatus,jdbcType=VARCHAR}
+		, REJECT_CAUSE = #{rejectCause,jdbcType=VARCHAR}
+		WHERE EMP_CODE = #{empCode,jdbcType=VARCHAR}
+		AND REST_ATTD_CODE = #{restAttdCode,jdbcType=VARCHAR}
+		]]>
+	</update>
+<!--**************************************************** 결재승인관리 종료 2020-08-27 김준서 ******************************************** -->
+	
+	<delete id="deleteRestAttd" parameterType="kr.co.seoulit.erp.hr.attendance.to.RestAttdTO">
+		DELETE FROM REST_ATTD 
+		WHERE EMP_CODE = #{empCode}
+		AND REST_ATTD_CODE = #{restAttdCode}
+	</delete> 
+	
+	<!--****************************************************2020-08-26 김준서 ******************************************** -->
+	<select id="selectRestAttdListCode" resultMap="restAttdResult" parameterType="map">
+		SELECT R.EMP_CODE
+		, E.EMP_NAME
+		, R.REST_ATTD_CODE
+		, R.REST_TYPE_CODE 
+		, R.REST_TYPE_NAME 
+		, TO_CHAR(R.REQUEST_DATE, 'YYYY-MM-DD') REQUEST_DATE
+		, TO_CHAR(R.START_DATE, 'YYYY-MM-DD') START_DATE
+		, TO_CHAR(R.END_DATE, 'YYYY-MM-DD') END_DATE
+		, R.NUMBER_OF_DAYS
+		, R.COST
+		, R.CAUSE 
+		, R.APPLOVAL_STATUS
+		, R.REJECT_CAUSE 
+		, R.START_TIME
+		, R.END_TIME 
+		FROM REST_ATTD R 
+		, EMPLOYEE_BASIC E 
+		WHERE R.EMP_CODE = #{empCode}
+		AND R.REQUEST_DATE BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD')
+		AND TO_DATE(#{endDate},'YYYY-MM-DD') 
+		AND R.REST_TYPE_CODE = #{code}
+		AND R.EMP_CODE = E.EMP_CODE 
+	</select>
+	<!--****************************************************2020-08-26 김준서 ******************************************** -->
+	
+	
+		<select id="selectRestDatailCodeName" resultMap="restAttdResult" >
+		SELECT 
+		
+		DETAIL_CODE_NAME
+		
+		FROM DETAIL_CODE
+		
+		WHERE DETAIL_CODE_NUMBER LIKE 'ADC%'
+		
+		
+	</select>
+</mapper>
+
+

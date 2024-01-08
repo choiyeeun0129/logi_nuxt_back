@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:31 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.statement.dao.DetailTrialBalanceDAO">
+
+<!-- ///////////////////////// 2020-08-24 김진호 수정 /////////////////////////// -->
+   <resultMap id="detaillTrialBalanceResult" type="kr.co.seoulit.erp.account.statement.to.DetailTrialBalanceBean"> 
+      <result property="lev" column="lev"/>
+      <result property="accountInnerCode" column="accountinnercode"/>
+      <result property="debitsSum" column="debitssum"/>
+      <result property="exceptCashDebits" column="exceptcashdebits"/>
+      <result property="cashDebits" column="cashdebits"/>
+      <result property="accountName" column="accountname"/>
+      <result property="cashCredits" column="cashcredits"/>
+      <result property="exceptCashCredits" column="exceptcashcredits"/>
+      <result property="creditsSum" column="creditssum"/>
+   </resultMap>
+
+   <select id="selectDetailTrialBalance" parameterType="Map" resultMap="detaillTrialBalanceResult">
+<![CDATA[
+   SELECT lev, 
+      accountinnercode, 
+      debitssum, 
+      exceptcashdebits, 
+      cashdebits, 
+      LPAD(' ', ( LEV - 1 ) * 4) || NVL(A1.ACCOUNT_NAME, '합계') AS accountname, 
+      cashcredits, 
+      exceptcashcredits, 
+      creditssum 
+      FROM   ACCOUNT A1, 
+      (SELECT 
+              CASE 
+                WHEN ACCOUNT_CODE IS NOT NULL THEN 3 
+                WHEN APPEND_CODE IS NOT NULL THEN 2 
+                WHEN PARENT_CODE IS NOT NULL THEN 1 
+              END AS lev, 
+             
+              CASE 
+                WHEN ACCOUNT_CODE IS NOT NULL THEN ACCOUNT_CODE 
+                WHEN APPEND_CODE IS NOT NULL THEN APPEND_CODE 
+                WHEN PARENT_CODE IS NOT NULL THEN PARENT_CODE 
+              END AS accountinnercode, 
+             
+              PARENT_CODE, 
+              APPEND_CODE, 
+              ACCOUNT_CODE, 
+              SUM(DEBITS_SUM)           AS debitssum, 
+              SUM(EXCEPT_CASH_DEBITS)   AS exceptcashdebits, 
+              SUM(CASH_DEBITS)          AS cashdebits, 
+              SUM(CASH_CREDITS)         AS cashcredits, 
+              SUM(EXCEPT_CASH_CREDITS)  AS exceptcashcredits, 
+              SUM(CREDITS_SUM)          AS creditssum 
+       FROM   (SELECT 
+                  A1.ACCOUNT_INNER_CODE AS PARENT_CODE, 
+                      A2.ACCOUNT_INNER_CODE AS APPEND_CODE, 
+                      A3.ACCOUNT_CODE       AS ACCOUNT_CODE, 
+                      J1.DEBITS             AS DEBITS_SUM, 
+                   
+                      CASE 
+                        WHEN J1.DEBITS = 0 
+                        THEN 0 
+                        ELSE J1.DEBITS - J2.CASH_DEBITS 
+                      END                   AS EXCEPT_CASH_DEBITS, 
+                   
+                      CASE 
+                        WHEN J1.DEBITS = 0 
+                        THEN 0 
+                        ELSE J2.CASH_DEBITS 
+                      END                   AS CASH_DEBITS, 
+                   
+                      CASE 
+                        WHEN J1.CREDITS = 0 
+                        THEN 0 
+                        ELSE J2.CASH_CREDITS 
+                      END                   AS CASH_CREDITS, 
+                   
+                      CASE 
+                        WHEN J1.CREDITS = 0 
+                        THEN 0 
+                        ELSE J1.CREDITS - J2.CASH_CREDITS 
+                      END                   AS EXCEPT_CASH_CREDITS, 
+                   
+                      J1.CREDITS            AS CREDITS_SUM 
+               FROM   ACCOUNT A1, 
+                      ACCOUNT A2, 
+                      ACCOUNT A3, 
+                      (SELECT J.SLIP_NO             AS SLIP_NO, 
+                              J.ACCOUNT_INNER_CODE  AS ACCOUNT_CODE, 
+                              J.LEFT_DEBTOR_PRICE   AS DEBITS, 
+                              J.RIGHT_CREDITS_PRICE AS CREDITS 
+                       FROM   JOURNAL J, 
+                              ACCOUNT A, 
+                              SLIP S 
+                       WHERE  J.SLIP_NO = S.SLIP_NO 
+                              AND J.ACCOUNT_INNER_CODE = A.ACCOUNT_INNER_CODE 
+                              AND S.SLIP_STATUS = '승인' 
+                              AND S.REPORTING_DATE BETWEEN #{fromDate} AND #{toDate} 
+                              AND J.ACCOUNT_INNER_CODE != '0101') J1, 
+                      (SELECT SLIP_NO, 
+                              LEFT_DEBTOR_PRICE   AS CASH_CREDITS, 
+                              RIGHT_CREDITS_PRICE AS CASH_DEBITS 
+                       FROM   JOURNAL 
+                       WHERE  ACCOUNT_INNER_CODE = '0101') J2 
+               WHERE  J1.SLIP_NO = J2.SLIP_NO 
+                      AND J1.ACCOUNT_CODE = A3.ACCOUNT_INNER_CODE 
+                      AND A3.PARENT_ACCOUNT_INNER_CODE = A2.ACCOUNT_INNER_CODE(+) 
+                      AND A2.PARENT_ACCOUNT_INNER_CODE = A1.ACCOUNT_INNER_CODE(+)
+               ) 
+       GROUP  BY ROLLUP ( PARENT_CODE, APPEND_CODE, ACCOUNT_CODE )) A2 
+      WHERE  A1.ACCOUNT_INNER_CODE(+) = A2.accountinnercode 
+      ORDER  BY SUBSTR(accountinnercode, 1, 4), 
+         SUBSTR(accountinnercode, 6) DESC NULLS LAST
+        ]]> 
+   </select>
+<!-- ///////////////////////// 2020-08-24 김진호 끝 /////////////////////////// -->
+
+</mapper>

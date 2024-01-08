@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.logistic.production.dao.WorkOrderDAO">
+
+	
+	<resultMap id="workOrderableMrpResult" type="workOrderableMrpListTO">
+		<result property="mrpNo" column="MRP_NO"  />
+		<result property="mpsNo" column="MPS_NO"  />
+		<result property="mrpGatheringNo" column="MRP_GATHERING_NO"  />
+		<result property="itemClassification" column="ITEM_CLASSIFICATION"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="unitOfMrp" column="UNIT_OF_MRP"  />
+		<result property="requiredAmount" column="REQUIRED_AMOUNT"  />
+		<result property="orderDate" column="ORDER_DATE"  />
+		<result property="requiredDate" column="REQUIRED_DATE"  />
+	</resultMap>
+	
+	<parameterMap type="map" id="getWorkOrderableMrpParam">
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="result" mode="OUT" javaType="java.sql.ResultSet" jdbcType="CURSOR" resultMap="workOrderableMrpResult" />
+	</parameterMap>
+	
+	<select id="getWorkOrderableMrpList" parameterMap="getWorkOrderableMrpParam" statementType="CALLABLE">
+	{call P_WORK_ORDERABLE_MRP_LIST(?,?,?)}
+	</select>
+	
+	
+	
+	
+	<resultMap id="workOrderSimulationResultList" type="workOrderSimulationTO">
+		<result property="mrpNo" column="MRP_NO"  />
+		<result property="mpsNo" column="MPS_NO"  />
+		<result property="mrpGatheringNo" column="MRP_GATHERING_NO"  />
+		<result property="itemClassification" column="ITEM_CLASSIFICATION"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="unitOfMrp" column="UNIT_OF_MRP"  />
+		<result property="inputAmount" column="INPUT_AMOUNT"  />
+		<result property="requiredAmount" column="REQUIRED_AMOUNT"  />
+		<result property="stockAfterWork" column="STOCK_AFTER_WORK"  />
+		<result property="orderDate" column="ORDER_DATE"  />
+		<result property="requiredDate" column="REQUIRED_DATE"  />
+	</resultMap>
+	
+	<parameterMap type="map" id="getWorkOrderSimulationParam">
+		<parameter property="mrpNo" mode="IN"/>
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="result" mode="OUT" javaType="java.sql.ResultSet" jdbcType="CURSOR"  resultMap="workOrderSimulationResultList" />
+	</parameterMap>
+	
+	<select id="getWorkOrderSimulationList" parameterMap="getWorkOrderSimulationParam"  statementType="CALLABLE">
+	{call P_WORK_ORDER_SIMULATION(?,?,?,?)}
+	</select>
+	
+		<parameterMap type="map" id="workOrderParameter">
+			<parameter property="mrpGatheringNo" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN" />
+			<parameter property="workPlaceCode" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN" />
+			<parameter property="productionProcess" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN" />
+			<parameter property="ERROR_CODE" javaType="java.lang.Integer" jdbcType="DECIMAL" mode="OUT" />
+			<parameter property="ERROR_MSG" javaType="java.lang.String" jdbcType="VARCHAR" mode="OUT" />			
+		</parameterMap>
+		
+		<select id="workOrder" parameterMap="workOrderParameter" statementType="CALLABLE">
+			<![CDATA[
+			{call P_WORK_ORDER(?,?,?,?,?)}
+			]]>
+		</select>
+
+	<resultMap id="workOrderSimulationListA" type="workOrderInfoTO">
+		<result property="workOrderNo" column="WORK_ORDER_NO"  />
+		<result property="mrpNo" column="MRP_NO"  />
+		<result property="mpsNo" column="MPS_NO"  />
+		<result property="mrpGatheringNo" column="MRP_GATHERING_NO"  />
+		<result property="itemClassification" column="ITEM_CLASSIFICATION"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="unitOfMrp" column="UNIT_OF_MRP"  />
+		<result property="requiredAmount" column="REQUIRED_AMOUNT"  />
+		<result property="workSiteCode" column="PRODUCTION_PROCESS_CODE"  />
+		<result property="workStieName" column="PRODUCTION_PROCESS_NAME"  />
+		<result property="productionProcessCode" column="WORK_SITE_CODE"  />
+		<result property="productionProcessName" column="WORK_SITE_NAME"  />
+		<result property="inspectionStatus" column="INSPECTION_STATUS"  />
+		<result property="productionStatus" column="PRODUCTION_STATUS"  />
+		<result property="completionStatus" column="COMPLETION_STATUS"  />
+	</resultMap>
+	
+	<select id="selectWorkOrderInfoList" resultMap="workOrderSimulationListA">
+select
+*
+from work_order_info
+where
+operation_completed is null
+	</select>
+	
+	<parameterMap type="map" id="workOrderCompletionParam">
+		<parameter property="workOrderNo" mode="IN"/>
+		<parameter property="actualCompletionAmount" mode="IN"/>
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+	</parameterMap>
+	
+	<select id="workOrderCompletion" parameterMap="workOrderCompletionParam" statementType="CALLABLE">
+	{call P_WORK_ORDER_COMPLETION(?,?,?,?)}
+	</select>
+	
+	
+	<resultMap id="ProductionPerformanceInfoList" type="productionPerformanceInfoTO">
+		<result property="workOrderCompletionDate" column="WORK_ORDER_COMPLETION_DATE"  />
+		<result property="workOrderNo" column="WORK_ORDER_NO"  />
+		<result property="mpsNo" column="MPS_NO"  />
+		<result property="contractDetailNo" column="CONTRACT_DETAIL_NO"  />
+		<result property="itemClassification" column="ITEM_CLASSIFICATION"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="unit" column="UNIT"  />
+		<result property="workOrderAmount" column="WORK_ORDER_AMOUNT"  />
+		<result property="actualCompletionAmount" column="ACTUAL_COMPLETION_AMOUNT"  />
+		<result property="workSuccessRate" column="WORK_SUCCESS_RATE"  />
+	</resultMap>
+	
+	<select id="selectProductionPerformanceInfoList" resultMap="ProductionPerformanceInfoList">
+	SELECT *
+	FROM PRODUCTION_PERFORMANCE
+	order by work_order_completion_date,work_order_no desc
+	</select>
+	
+	
+	
+	
+	<resultMap id="workSiteSimulationListB" type="workSiteSimulationTO">
+		<result property="workOrderNo" column="WORK_ORDER_NO"  />
+		<result property="mrpNo" column="MRP_NO"  />
+		<result property="mpsNo" column="MPS_NO"  />
+		<result property="workSieteName" column="WORK_SITE_NAME"  />
+		<result property="wdItem" column="WD_ITEM"  />
+		<result property="parentItemCode" column="PARENT_ITEM_CODE"  />
+		<result property="parentItemName" column="PARENT_ITEM_NAME"  />
+		<result property="itemClassIfication" column="ITEM_CLASSIFICATION"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="requiredAmount" column="REQUIRED_AMOUNT"  />
+	</resultMap>
+	
+	<parameterMap type="map" id="selectWorkSiteSituationParam">
+		<parameter property="workOrderNo" mode="IN"/>
+		<parameter property="workSiteCourse" mode="IN"/>
+		<parameter property="itemClassIfication" mode="IN"/>
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="result" mode="OUT" javaType="java.sql.ResultSet" jdbcType="CURSOR" resultMap="workSiteSimulationListB" />
+	</parameterMap>
+	
+	<select id="selectWorkSiteSituation" parameterMap="selectWorkSiteSituationParam" statementType="CALLABLE">
+	{call P_WORK_SITE_SITUATION(?,?,?,?,?,?)}
+	</select>
+	
+	
+	<parameterMap type="map" id="updateWorkCompletionStatusParam">
+		<parameter property="workOrderNo" mode="IN"/>
+		<parameter property="itemCode" mode="IN"/>
+		<parameter property="itemCodeList" mode="IN"/>
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+	</parameterMap>
+	
+	<select id="updateWorkCompletionStatus" parameterMap="updateWorkCompletionStatusParam" statementType="CALLABLE">
+	{call P_WORK_SITE_COMPLETION(?,?,?,?,?)}
+	</select>
+	
+	
+	
+	<resultMap id="workSiteLog" type="workSiteLogTO">
+		<result property="workOrderNo" column="WORK_ORDER_NO"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="progress" column="REAESON"  />
+		<result property="workSiteName" column="WORK_SITE_NAME"  />
+		<result property="workDate" column="WORK_DATE"  />
+		<result property="productionProcessCode" column="PRODUCTION_PROCESS_CODE"  />
+		<result property="productionProcessName" column="PRODUCTION_PROCESS_NAME"  />
+	</resultMap>
+	
+	<select id="workSiteLogList" parameterType="String" resultMap="workSiteLog">
+	select * from work_site_log where WORK_DATE LIKE TO_DATE(#{workSiteLogDate},'YYYY-MM-DD') order by work_date
+	</select>
+	
+	
+</mapper>

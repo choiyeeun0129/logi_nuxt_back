@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.salary.dao.BaseSalaryDAO">
+
+
+	
+	<resultMap type="kr.co.seoulit.erp.hr.salary.to.BaseSalaryTO" id="baseSalaryResult">
+		<result property="positionCode" column="POSITION_CODE" />
+		<result property="positionName" column="POSITION_NAME" />
+		<result property="baseSalary" column="BASE_SALARY" />
+		<result property="hobongRatio" column="HOBONG_RATIO" />
+		<result property="deptName" column="DEPT_NAME" />
+	</resultMap>
+<!-- //****************************************************2020-08-28 63기 손유찬 ********************************* ********************** -->
+	<select id="selectBaseSalaryList" resultMap="baseSalaryResult">
+		SELECT 
+		p.POSITION_CODE
+   		, d.DEPT_NAME
+   		, p.DEPT_CODE
+		, p.POSITION_NAME
+		, p.BASE_SALARY
+		, p.HOBONG_RATIO
+		FROM POSITION p , DEPARTMENT d
+    WHERE p.DEPT_CODE = d.DEPT_CODE
+    ORDER BY DEPT_NAME,	POSITION_CODE
+	</select>
+	
+	<update id="updateBaseSalary" parameterType="kr.co.seoulit.erp.hr.salary.to.BaseSalaryTO">
+		UPDATE POSITION SET 
+		BASE_SALARY = #{baseSalary}
+		, HOBONG_RATIO = #{hobongRatio} 
+		WHERE POSITION_CODE = #{positionCode} and DEPT_CODE= #{deptCode}
+	</update>
+<!-- //****************************************************2020-08-28 63기 손유찬 ********************************* ********************** -->
+	<insert id="insertPosition" parameterType="kr.co.seoulit.erp.hr.salary.to.BaseSalaryTO">
+		INSERT INTO POSITION( DESCRIPTION, WORKPLACE_CODE, POSITION_CODE, POSITION_NAME, DEPT_CODE, BASE_SALARY, HOBONG_RATIO) VALUES(
+		'' 
+		,#{workPlaceCode}
+		, #{positionCode}
+		, #{positionName}
+		, #{deptCode}
+		, #{baseSalary}
+		, #{hobongRatio}
+		)
+	</insert>
+	
+	<delete id="deletePosition" parameterType="kr.co.seoulit.erp.hr.salary.to.BaseSalaryTO">
+		DELETE FROM POSITION
+		WHERE POSITION_CODE = #{positionCode} 
+		AND POSITION_NAME = #{positionName}
+		AND DEPT_CODE = #{deptCode}
+		AND HOBONG_RATIO = #{hobongRatio}
+	</delete>
+	
+	
+<!-- //****************************************************2020-08-28 63기 손유찬 ********************************* ********************** -->	
+	<select id="BaseSalaryList" resultMap="baseSalaryResult">
+		SELECT 
+		p.POSITION_CODE
+   		, d.DEPT_NAME
+   		, p.DEPT_CODE
+		, p.POSITION_NAME
+		, p.BASE_SALARY
+		, p.HOBONG_RATIO
+		FROM POSITION p , DEPARTMENT d
+    WHERE p.DEPT_CODE = d.DEPT_CODE
+    AND p.DEPT_CODE=#{selectDeptTitle}
+    ORDER BY DEPT_NAME,	POSITION_CODE
+	</select>
+
+</mapper>

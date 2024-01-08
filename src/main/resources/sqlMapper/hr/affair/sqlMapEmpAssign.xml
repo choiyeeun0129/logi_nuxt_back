@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.affair.dao.EmpAssignDAO">
+
+   <resultMap type="kr.co.seoulit.erp.hr.affair.to.AssignEmpTO" id="empAssignResult">
+      <result property="empAssignCode" column="EMP_ASSIGN_CODE" />
+      <result property="empCode" column="EMP_CODE" />
+      <result property="assignType" column="ASSIGN_TYPE" />
+      <result property="empName" column="EMP_NAME" />
+      <result property="assignDate" column="ASSIGN_DATE" />
+      <result property="empPosition" column="EMP_POSITION" />
+      <result property="currentDivision" column="CURRENT_DIVISION" />
+      <result property="assignDivision" column="ASSIGN_DIVISION" />
+      <result property="empAssign" column="EMP_ASSIGN" />
+      <result property="assignCode" column="ASSIGN_CODE" />
+   </resultMap>
+   
+<insert id="insertAssign" parameterType="map">
+	INSERT INTO EMP_ASSIGN(
+	EMP_ASSIGN_CODE, EMP_CODE, ASSIGN_DATE, CURRENT_DIVISION, ASSIGN_DIVISION
+	)VALUES(
+	'AP' || ASSIGN_SEQ.NEXTVAL,
+	#{EmpCode},
+	#{assignDate},
+	#{CurrentDept},
+	#{MoveDept}
+	)
+</insert>
+
+<select id="selectAssignList" parameterType="String" resultMap="empAssignResult">
+	SELECT e.EMP_ASSIGN_CODE, e.EMP_CODE, e.ASSIGN_TYPE,
+	b.EMP_NAME,
+	TO_CHAR(e.ASSIGN_DATE, 'YYYY-MM-DD') ASSIGN_DATE,
+	e.EMP_POSITION, e.CURRENT_DIVISION, e.ASSIGN_DIVISION,
+	e.EMP_ASSIGN
+	FROM emp_assign e,
+	employee_basic b WHERE e.EMP_CODE = b.EMP_CODE AND
+	e.ASSIGN_DATE BETWEEN
+	TO_DATE(#{startDate},'YYYY-MM-DD')
+	AND
+	TO_DATE(#{endDate},'YYYY-MM-DD')
+	ORDER BY ASSIGN_DATE
+</select>
+
+<update id="updateDeptCode" parameterType="map">
+	UPDATE EMPLOYEE_BASIC SET DEPT_CODE = #{MoveDept} WHERE EMP_CODE = #{EmpCode}
+</update>
+
+</mapper>

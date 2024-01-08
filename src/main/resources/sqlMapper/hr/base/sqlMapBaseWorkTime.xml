@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.base.dao.BaseWorkTimeDAO">
+
+   		<resultMap type="kr.co.seoulit.erp.hr.base.to.BaseWorkTimeTO" id="baseWorkTimeList">
+			<result property="applyYear" column="APPLY_YEAR" />
+			<result property="lunchEndTime" column="LUNCH_END_TIME" />
+			<result property="dinnerEndTime" column="DINNER_END_TIME" />
+			<result property="attendTime" column="ATTEND_TIME" />
+			<result property="overEndTime" column="OVER_END_TIME" />
+			<result property="quitTime" column="QUIT_TIME" />
+			<result property="lunchStartTime" column="LUNCH_START_TIME" />
+			<result property="nightEndTime" column="NIGHT_END_TIME" />
+			<result property="dinnerStartTime" column="DINNER_START_TIME" />
+			</resultMap>
+			
+			<select id="selectBaseWorkTimeList" resultMap="baseWorkTimeList">
+			select*from base_work_time order by apply_year
+		</select>
+	
+	<delete id="deleteBaseWorkTime" parameterType="java.util.HashMap">
+	delete from base_work_time where apply_year in
+	 <foreach collection="list" item='item' index='i' open="(" close=")" separator=","> #{item.applyYear} </foreach>
+	</delete>
+	
+		<update id="mergeBaseWorkTime" >
+
+merge into base_work_time B
+using 
+(
+		<foreach collection="list" item='item' index='i' open="" close="" separator="union">
+		                    SELECT 
+#{item.applyYear}		applyYear,
+#{item.lunchEndTime}	lunchEndTime,
+#{item.dinnerEndTime}	dinnerEndTime,
+#{item.attendTime}		attendTime,
+#{item.overEndTime}		overEndTime,
+#{item.quitTime}		quitTime,
+#{item.lunchStartTime}	lunchStartTime,
+#{item.nightEndTime}	nightEndTime,
+#{item.dinnerStartTime}	dinnerStartTime
+                     FROM DUAL
+		</foreach>
+) T
+on(
+apply_year=applyYear
+)
+WHEN MATCHED THEN
+UPDATE SET
+LUNCH_END_TIME		=	lunchEndTime,
+DINNER_END_TIME		=	dinnerEndTime,
+ATTEND_TIME			=	attendTime,
+OVER_END_TIME		=	overEndTime,
+QUIT_TIME			=	quitTime,
+LUNCH_START_TIME	=	lunchStartTime,
+NIGHT_END_TIME		=	nightEndTime,
+DINNER_START_TIME	=	dinnerStartTime
+WHEN NOT MATCHED THEN
+insert(
+APPLY_YEAR,
+LUNCH_END_TIME,
+DINNER_END_TIME,
+ATTEND_TIME,
+OVER_END_TIME,
+QUIT_TIME,
+LUNCH_START_TIME,
+NIGHT_END_TIME,
+DINNER_START_TIME
+)
+values(
+applyYear,
+lunchEndTime,
+dinnerEndTime,
+attendTime,
+overEndTime,
+quitTime,
+lunchStartTime,
+nightEndTime,
+dinnerStartTime
+)
+
+		</update>
+
+	</mapper>

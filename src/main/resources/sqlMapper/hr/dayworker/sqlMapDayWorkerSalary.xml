@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <mapper namespace="kr.co.seoulit.erp.hr.dayworker.dao.DayWorkerSalaryDAO">
+ 
+  <resultMap type="kr.co.seoulit.erp.hr.dayworker.to.DayWorkerSalaryTO" id="dayWorkerSalaryResult">
+      <result property="empCode" column="EMP_CODE" />
+      <result property="empName" column="EMP_NAME" />
+      <result property="lastWorkDate" column="LAST_WORK_DATE" />
+      <result property="daySalary" column="DAY_SALARY" />
+      <result property="monthSalary" column="MONTH_SALARY" />
+   </resultMap>
+   
+     <select id="selectDayWorkerSalaryList" parameterType="map" resultMap="dayWorkerSalaryResult">
+      SELECT *
+      FROM DAY_WORKER_SALARY
+      WHERE EMP_CODE = #{empCode} 
+      AND EMP_NAME = #{empName}
+   </select>
+   
+    <parameterMap type="map" id="DayWorkerSalary">
+      <parameter property="empCode" mode="IN"/>
+      <parameter property="empName" mode="IN"/>
+      <parameter property="workTime" mode="IN"/>
+      <parameter property="ERROR_CODE" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+      <parameter property="ERROR_MSG" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+      <parameter property="RESULT" mode="OUT" javaType="java.lang.String" jdbcType="CURSOR"/>
+   </parameterMap>
+   
+   
+   <select id="batchInsertDayAttd" parameterMap="DayWorkerSalary" statementType="CALLABLE">
+   <![CDATA[
+        {call P_DAY_WORKER_SALARY(
+                      , #{empCode,mode=IN,jdbcType=VARCHAR}
+                      , #{empName,mode=IN,jdbcType=VARCHAR}
+                      , #{workTime,mode=IN,jdbcType=VARCHAR}
+                      , #{errorCode, mode=OUT, jdbcType=VARCHAR}
+                      , #{errorMsg, mode=OUT, jdbcType=VARCHAR }
+                      , #{result, mode=OUT, jdbcType=VARCHAR }
+                      )}
+       ]]>
+         </select>
+       
+    <parameterMap type="map" id="DayWorkerMonthSalary">
+      <parameter property="empCode" mode="IN"/>
+      <parameter property="empName" mode="IN"/>
+      <parameter property="workDay" mode="IN"/>
+      <parameter property="ERROR_CODE" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+      <parameter property="ERROR_MSG" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+      <parameter property="RESULT" mode="OUT" javaType="java.lang.String" jdbcType="CURSOR"/>
+   </parameterMap>
+   
+   
+   <select id="batchInsertMonthWorkerSalary" parameterMap="DayWorkerMonthSalary" statementType="CALLABLE">
+   <![CDATA[
+        {call P_MONTH_WORKER_SALARY(
+                      , #{empCode,mode=IN,jdbcType=VARCHAR}
+                      , #{empName,mode=IN,jdbcType=VARCHAR}
+                      , #{workDay,mode=IN,jdbcType=VARCHAR}
+                      , #{errorCode, mode=OUT, jdbcType=VARCHAR}
+                      , #{errorMsg, mode=OUT, jdbcType=VARCHAR }
+                      , #{result, mode=OUT, jdbcType=VARCHAR }
+                      )}
+       ]]>
+       
+       
+   </select> 
+</mapper>

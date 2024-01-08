@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:30 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.base.dao.AccDetailCodeDAO">
+    <!--
+		Sorry, I can`t migrate	detailCodeBean
+		See console output for further details 
+	-->
+
+    <resultMap id="detailCodeResult" type="kr.co.seoulit.erp.account.base.to.DetailCodeBean">
+        <result property="divisionCodeNo" column="DIVISION_CODE_NO"/>
+        <result property="detailCode" column="DETAIL_CODE"/>
+        <result property="detailCodeName" column="DETAIL_CODE_NAME"/>
+        <result property="description" column="DESCRIPTION"/>
+    </resultMap>
+
+    <select id="selectDetailCodeList" parameterType="Map" resultMap="detailCodeResult">
+        SELECT DIVISION_CODE_NO,
+               DETAIL_CODE,
+               DETAIL_CODE_NAME,
+               DESCRIPTION
+        FROM CODE_DETAIL
+        WHERE DIVISION_CODE_NO = #{divisionCodeNo}
+   <if test="detailCodeName != null">and
+      DETAIL_CODE_NAME LIKE '%'||#{detailCodeName}||'%'
+   </if>  
+    </select>
+
+    <insert id="insertDetailCode" parameterType="String">
+    
+        INSERT INTO CODE_DETAIL(DIVISION_CODE_NO, DETAIL_CODE, DETAIL_CODE_NAME)
+        VALUES (#{divisionCodeNo}, #{detailCode}, #{detailCodeName})
+        
+    </insert>
+
+    <update id="updateDetailCode" parameterType="Map">
+    
+        UPDATE CODE_DETAIL
+        SET DETAIL_CODE_NAME = #{detailCodeName}
+        WHERE DIVISION_CODE_NO = #{divisionCodeNo}
+          AND DETAIL_CODE = #{detailCode}
+        
+    </update>
+
+    <delete id="deleteDetailCode" parameterType="String">
+    
+        DELETE
+        FROM CODE_DETAIL
+        WHERE DETAIL_CODE = #{codeNo}
+        
+    </delete>
+
+</mapper>

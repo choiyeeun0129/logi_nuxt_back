@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.affair.dao.CareerInfoDAO">	
+
+
+
+	<resultMap type="kr.co.seoulit.erp.hr.affair.to.CareerInfoTO" id="careerInfoResult">
+		<result property="empCode" column="EMP_CODE" />
+		<result property="careerCode" column="CAREER_CODE" />
+		<result property="companyName" column="COMPANY_NAME" />
+		<result property="occupation" column="OCCUPATION" />
+		<result property="assignmentTask" column="ASSIGNMENT_TASK" />
+		<result property="exHiredate" column="EX_HIREDATE" />
+		<result property="exRetirementDate" column="EX_RETIREMENT_DATE" />
+	</resultMap>
+	
+	<select id="selectCareerInfoList" resultMap="careerInfoResult"
+		parameterType="string">
+	SELECT * FROM CAREER_INFO
+	WHERE EMP_CODE=#{code}
+	</select>
+
+	<select id="selectCareerList" resultMap="careerInfoResult"
+		parameterType="string">
+		SELECT EMP_CODE
+		, CAREER_CODE
+		, COMPANY_NAME
+		, OCCUPATION
+		, ASSIGNMENT_TASK
+		, TO_CHAR(EX_HIREDATE,'YYYY/MM/DD') EX_HIREDATE
+		, TO_CHAR(EX_RETIREMENT_DATE,'YYYY/MM/DD') EX_RETIREMENT_DATE
+		FROM
+		CAREER_INFO
+		WHERE EMP_CODE = #{code}
+	</select>
+
+	<insert id="insertCareerInfo" parameterType="kr.co.seoulit.erp.hr.affair.to.CareerInfoTO">
+		INSERT INTO CAREER_INFO VALUES (
+		#{empCode}
+		, CAREER_CODE_SEQ.NEXTVAL
+		, #{companyName}, #{occupation},#{assignmentTask}
+		, to_date(#{exHiredate},'YYYY/MM/DD')
+		, to_date(#{exRetirementDate},'YYYY/MM/DD'
+		)
+		)
+	</insert>
+
+	<update id="updateCareerInfo" parameterType="kr.co.seoulit.erp.hr.affair.to.CareerInfoTO">
+		UPDATE CAREER_INFO SET 
+		COMPANY_NAME = #{companyName}
+		, OCCUPATION = #{occupation}
+		, ASSIGNMENT_TASK = #{assignmentTask}
+		, EX_HIREDATE = TO_DATE(#{exHiredate},'YYYY/MM/DD')
+		, EX_RETIREMENT_DATE = TO_DATE(#{exRetirementDate},'YYYY/MM/DD')
+		WHERE EMP_CODE = #{empCode}
+		AND CAREER_CODE = #{careerCode}
+	</update>
+
+	<delete id="deleteCareerInfo" parameterType="kr.co.seoulit.erp.hr.affair.to.CareerInfoTO">
+		DELETE FROM CAREER_INFO
+		WHERE EMP_CODE = #{empCode}
+		AND CAREER_CODE = #{careerCode}
+	</delete>
+</mapper>

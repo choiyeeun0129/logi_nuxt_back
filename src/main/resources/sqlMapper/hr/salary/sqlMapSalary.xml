@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.salary.dao.MonthSalaryDAO">
+	
+	<resultMap type="kr.co.seoulit.erp.hr.salary.to.MonthSalaryTO" id="monthSalaryResult">
+		<result property="empCode" column="EMP_CODE" />
+		<result property="applyYearMonth" column="APPLY_YEAR_MONTH" />
+		<result property="salary" column="SALARY" />
+		<result property="totalExtSal" column="TOTAL_EXT_SAL" />
+		<result property="totalPayment" column="TOTAL_PAYMENT" />
+		<result property="totalDeduction" column="TOTAL_DEDUCTION" />
+		<result property="realSalary" column="REAL_SALARY" />
+		<result property="cost" column="COST" />
+		<result property="unusedDaySalary" column="UNUSED_DAY_SALARY" />
+		<result property="finalizeStatus" column="FINALIZE_STATUS" />
+		<result property="deptCode" column="DEPT_CODE" />
+	</resultMap>
+
+	<parameterMap type="map" id="monthSalaryParameter" >
+      <parameter property="applyYearMonth" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="empCode" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="result" jdbcType="CURSOR" javaType="java.sql.ResultSet" mode="OUT"  resultMap="monthSalaryResult"/>
+      <parameter property="errorCode" jdbcType="VARCHAR" javaType="java.lang.String" mode="OUT" />
+      <parameter property="errorMsg" jdbcType="VARCHAR" javaType="java.lang.String" mode="OUT" />
+   </parameterMap>   
+   
+   
+   <parameterMap type="map" id="closeMonthSalaryParameter" >
+      <parameter property="applyYearMonth" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="deptCode" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="result" jdbcType="CURSOR" javaType="java.sql.ResultSet" mode="OUT" resultMap="monthSalaryResult"/>
+      <parameter property="errorCode" jdbcType="VARCHAR" javaType="java.lang.String" mode="OUT" />
+      <parameter property="errorMsg" jdbcType="VARCHAR" javaType="java.lang.String" mode="OUT" />
+   </parameterMap> 
+   	
+	<select id="batchMonthSalaryProcess" statementType="CALLABLE" parameterMap="monthSalaryParameter" >
+		<![CDATA[
+        {call P_HR_SALARY.P_CREATE_MONTH_SALARY(?,?,?,?,?) }
+    	]]>	
+	</select>
+	
+	<select id="findMonthSalaryProcess" statementType="CALLABLE" parameterMap="closeMonthSalaryParameter">
+	<![CDATA[
+        {call P_HR_SALARY.P_COMPUTE_MONTH_SALARY(?,?,?,?,?) }
+    		]]>	
+	</select>
+
+
+	<select id="selectMonthSalary" resultMap="monthSalaryResult">
+		SELECT EMP_CODE
+		, APPLY_YEAR_MONTH
+		, SALARY
+		, TOTAL_EXT_SAL
+		, TOTAL_PAYMENT
+		, TOTAL_DEDUCTION
+		, REAR_SALARY
+		, COST
+		, UNUSED_DAY_SALARY
+		, FUANALIZE_STATUS
+		FROM MONTH_SALARY 
+		WHERE APPLY_YEAR_MONTH = #{applyYearMonth}
+		AND EMP_CODE = #{empCode}
+	</select>
+
+	
+	<select id="selectYearSalary" resultMap="monthSalaryResult" parameterType="map">
+		<![CDATA[
+		SELECT EMP_CODE
+		APPLY_YEAR_MONTH
+		, SALARY
+		, TOTAL_EXT_SAL
+		, TOTAL_PAYMENT
+		, TOTAL_DEDUCTION
+		, REAL_SALARY
+		, COST
+		, UNUSED_DAY_SALARY
+		, FINALIZE_STATUS
+		FROM MONTH_SALARY 
+		WHERE APPLY_YEAR_MONTH LIKE #{applyYear}
+		AND EMP_CODE = #{empCode}
+		AND FINALIZE_STATUS = 'Y' 
+		]]>
+	</select>
+
+
+	
+	<update id="updateMonthSalary" parameterType="kr.co.seoulit.erp.hr.salary.to.MonthSalaryTO">
+		UPDATE MONTH_SALARY SET 
+		FINALIZE_STATUS = #{finalizeStatus} 
+		WHERE EMP_CODE = #{empCode}
+		AND APPLY_YEAR_MONTH = #{applyYearMonth} 
+	</update>
+	
+	
+
+</mapper>

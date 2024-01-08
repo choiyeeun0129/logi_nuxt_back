@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.logistic.transport.dao.TransportDAO">
+
+	<resultMap id="transportResult" type="TransportTO">
+		<result property="contractNo" column="CONTRACT_NO" />
+		<result property="reportingDate" column="REPORTING_DATE"  />
+		<result property="customerBasicAddress" column="CUSTOMER_BASIC_ADDRESS"  />
+		<result property="customerDetailAddress" column="CUSTOMER_DETAIL_ADDRESS"  />
+		<result property="transportStatus" column="TRANSPORT_STATUS"  />
+		<result property="commercialVehicle" column="COMMERCIAL_VEHICLE"  />
+		<result property="driver" column="DRIVER"  />
+		<result property="memo" column="MEMO"  />
+		<result property="dueDateOfContract" column="DUE_DATE_OF_CONTRACT"  />
+	</resultMap>
+	
+	<resultMap id="commercialVehicleInfoResult" type="CommercialVehicleInfoTO">
+		<result property="commercialVehicle" column="COMMERCIAL_VEHICLE"  />
+		<result property="driver" column="DRIVER"  />
+		<result property="transportStatus" column="TRANSPORT_STATUS"  />
+	</resultMap>
+		
+	<resultMap id="TransportAbleList" type="HashMap">
+		<result property="contractNo" column="CONTRACT_NO" />
+		<result property="contractDetailNo" column="CONTRACT_DETAIL_NO" />
+		<result property="reportingDate" column="REPORTING_DATE"  />
+		<result property="customerBasicAddress" column="CUSTOMER_BASIC_ADDRESS"  />
+		<result property="customerDetailAddress" column="CUSTOMER_DETAIL_ADDRESS"  />
+	</resultMap>
+	
+	<select id="searchTransportList" parameterType="map" resultMap="transportResult">
+    SELECT * FROM transport where reporting_Date BETWEEN #{startDate} AND #{endDate} order by reporting_Date
+	</select>
+	
+	<select id="searchCommercialVehicleList" parameterType="String" resultMap="commercialVehicleInfoResult">
+	SELECT * FROM commercial_vehicle_info where transport_Status = 'READY'
+	</select>
+	
+	<select id="searchTransportAbleList" parameterType="String" resultMap="TransportAbleList">
+		SELECT
+			co.contract_no,
+			cd.contract_detail_no,
+			(
+				SELECT
+    			to_char(sysdate, 'YY/MM/DD PMHH12:MI') sys_date12
+				FROM dual
+			) AS reporting_date,
+			cu.customer_basic_address,
+			cu.customer_detail_address
+		FROM
+			(
+				SELECT
+					contract_no,
+					customer_code
+				FROM
+					contract
+				WHERE
+					delivery_completion_status = 'Y'
+			)                co,
+			customer         cu,
+			contract_detail  cd
+		WHERE
+				cu.customer_code = co.customer_code
+		AND 	cd.contract_no = co.contract_no
+		
+</select>
+
+   <update id="updateTransportList" parameterType="kr.co.seoulit.erp.logistic.transport.to.TransportTO">
+		update TRANSPORT
+		SET
+		TRANSPORT_STATUS = #{transportStatus},
+		COMMERCIAL_VEHICLE = #{commercialVehicle}, 
+		DRIVER =  #{driver}, 
+		MEMO = #{memo}
+		where
+		CONTRACT_NO = #{contractNo}
+   </update>   
+
+
+
+	<select id="searchCommercialVehicleInList" parameterType="String" resultMap="commercialVehicleInfoResult">
+	SELECT * FROM commercial_vehicle_info
+	</select>
+	
+</mapper>

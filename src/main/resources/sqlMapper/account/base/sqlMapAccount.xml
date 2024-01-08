@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:29 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.base.dao.AccountDAO">
+ 
+   	<resultMap id="accountResult" type="kr.co.seoulit.erp.account.base.to.AccountBean">
+	    <result property="accountInnerCode" column="ACCOUNT_INNER_CODE"/>
+	    <result property="parentAccountInnercode" column="PARENT_ACCOUNT_INNER_CODE"/>
+	    <result property="accountCode" column="ACCOUNT_CODE"/>
+	    <result property="accountCharacter" column="ACCOUNT_CHARACTER"/>
+	    <result property="accountName" column="ACCOUNT_NAME"/>
+	    <result property="accountUseCheck" column="ACCOUNT_USE_CHECK"/>
+	    <result property="accountDescription" column="ACCOUNT_DESCRIPTION"/>
+	    <result property="editable" column="EDITABLE"/>
+	    <result property="lev" column="LEV"/>
+	    <result property="status" column="STATUS"/> <!--  2020-11-28 계정과목관리에 필요한 데이터 추가 유길현  -->
+  	</resultMap>
+  	
+  	<resultMap id="periodResult" type="kr.co.seoulit.erp.account.base.to.PeriodBean">
+	    <result property="accountPeriodNo" column="ACCOUNT_PERIOD_NO"/>
+	    <result property="fiscalYear" column="FISCAL_YEAR"/>
+	    <result property="workplaceCode" column="WORKPLACE_CODE"/>
+	    <result property="periodStartDate" column="PERIOD_START_DATE"/>
+	    <result property="periodEndDate" column="PERIOD_END_DATE"/>
+  	</resultMap>
+  
+
+  	<resultMap id="accountControlResult" type="kr.co.seoulit.erp.account.base.to.AccountControlBean">
+    <result property="accountControlCode" column="ACCOUNT_CONTROL_CODE"/>
+    <result property="accountControlName" column="ACCOUNT_CONTROL_NAME"/>
+    <result property="accountControlType" column="ACCOUNT_CONTROL_TYPE"/>
+  	</resultMap>
+  
+  	<resultMap type="accountCodeBean" id="selectaccountResult">
+		<result property="accountInnerCode" column="ACCOUNT_INNER_CODE" />
+		<result property="parentAccountInnerCode" column="PARENT_ACCOUNT_INNER_CODE" />
+		<result property="accountCode" column="PARENT_ACCOUNT_INNER_CODE" />
+		<result property="accountCharacter" column="ACCOUNT_CHARACTER" />
+		<result property="accountName" column="ACCOUNT_NAME" />
+		<result property="accountDispalyNameWithCode" column="ACCOUNT_DISPLAY_NAME_WITH_CODE" />
+		<result property="accountDisplayName" column="ACCOUNT_DISPLAY_NAME" />
+		<result property="accountDivision" column="ACCOUNT_DIVISION" />
+		<result property="accountUseCheck" column="ACCOUNT_USE_CHECK" />
+		<result property="accountDescription" column="ACCOUNT_DESCRIPTION" />
+		<result property="accountLevel" column="ACCOUNT_LEVEL" />
+		<result property="leaf" column="LEAF" />
+	</resultMap>
+	
+	<select id="getAccountList" resultMap="selectaccountResult">
+		<![CDATA[
+		SELECT 
+		LEVEL-1 AS ACCOUNT_LEVEL
+		,CONNECT_BY_ISLEAF AS LEAF		 
+		, ACCOUNT_INNER_CODE
+		, PARENT_ACCOUNT_INNER_CODE
+		, ACCOUNT_CODE
+		, ACCOUNT_CHARACTER
+		, ACCOUNT_NAME
+		, ACCOUNT_DISPLAY_NAME_WITH_CODE
+		, ACCOUNT_DISPLAY_NAME
+		, ACCOUNT_DIVISION
+		, ACCOUNT_USE_CHECK
+		, ACCOUNT_DESCRIPTION
+		FROM ACCOUNT    
+		START WITH PARENT_ACCOUNT_INNER_CODE IS NULL
+		CONNECT BY PRIOR ACCOUNT_INNER_CODE = PARENT_ACCOUNT_INNER_CODE
+		]]>
+	</select>
+  
+  <select id="selectPeriodNo" resultType="String">
+  	SELECT ACCOUNT_PERIOD_NO FROM PERIOD
+  		WHERE #{toDay} BETWEEN PERIOD_START_DATE AND PERIOD_END_DATE
+  </select>
+  
+  <!-- ========================================2020-09-19 조편백 코드 조회 시작 =============================================  -->
+  <select id="selectAccount"  parameterType="map" resultMap="accountResult">
+  
+ SELECT 
+ ACCOUNT_INNER_CODE,
+ PARENT_ACCOUNT_INNER_CODE,
+ ACCOUNT_CODE,
+ ACCOUNT_CHARACTER,
+ ACCOUNT_NAME,
+ ACCOUNT_DIVISION,
+ ACCOUNT_USE_CHECK,
+ ACCOUNT_DESCRIPTION,
+ EDITABLE
+ from ACCOUNT
+ WHERE PARENT_ACCOUNT_INNER_CODE IS not NULL
+ 
+ <if test="accountName != 'undefined'" >
+ AND ACCOUNT_NAME LIKE '%' || #{accountName} || '%'
+ </if>
+ 
+ <if test="accountCode != 'undefined'" >
+ AND ACCOUNT_CODE LIKE '%' || #{accountCode} || '%'
+ </if>	
+  </select>
+  <!-- ========================================2020-09-19 조편백 코드 조회 끝   =============================================  -->
+  
+  
+  <select id="selectParentAccountList" resultMap="accountResult">
+  <![CDATA[
+   SELECT 
+   			  ACCOUNT_INNER_CODE,
+               PARENT_ACCOUNT_INNER_CODE,
+               ACCOUNT_CODE,
+               ACCOUNT_CHARACTER,
+               ACCOUNT_NAME,
+               ACCOUNT_DIVISION,
+               ACCOUNT_USE_CHECK,
+               ACCOUNT_DESCRIPTION,
+               EDITABLE
+        FROM ACCOUNT
+        WHERE ACCOUNT_INNER_CODE LIKE '%-%'
+          AND ACCOUNT_INNER_CODE not IN
+              ('0101-0175', '0176-0250')
+          AND PARENT_ACCOUNT_INNER_CODE IS not NULL
+        ORDER BY ACCOUNT_INNER_CODE
+  ]]>   		
+  </select>
+  
+  <select id="selectDetailAccountList" parameterType="String" resultMap="accountResult">
+  <![CDATA[
+ SELECT * from ACCOUNT
+         WHERE ACCOUNT_INNER_CODE not LIKE '%-%'
+        AND PARENT_ACCOUNT_INNER_CODE = #{code}
+           ORDER BY ACCOUNT_INNER_CODE 
+  ]]>   		
+  </select>
+  
+  <update id="updateAccount" parameterType="kr.co.seoulit.erp.account.base.to.AccountBean">
+  <![CDATA[
+        UPDATE ACCOUNT
+        SET ACCOUNT_NAME = #{accountName}
+        WHERE ACCOUNT_INNER_CODE = #{accountInnerCode}
+        ]]>   		
+  </update>
+
+  
+  <select id="selectAccountListByName" parameterType="String" resultMap="accountResult">
+
+        SELECT ACCOUNT_INNER_CODE,
+               PARENT_ACCOUNT_INNER_CODE,
+               ACCOUNT_CODE,
+               ACCOUNT_CHARACTER,
+               ACCOUNT_NAME,
+               ACCOUNT_DIVISION,
+               ACCOUNT_USE_CHECK,
+               ACCOUNT_DESCRIPTION,
+               EDITABLE
+        FROM ACCOUNT
+        <where>
+        	<if test="accountName != 'null'" >
+       			ACCOUNT_NAME LIKE '%' || #{accountName} || '%'
+        	</if>
+          		AND ACCOUNT_CODE NOT LIKE '%-%'
+        </where>
+        order by ACCOUNT_INNER_CODE
+    </select>
+ 
+  <select id="selectAccountControlList" parameterType="String" resultMap="accountResult">
+  <![CDATA[
+        SELECT D.ACCOUNT_CONTROL_CODE,
+               ACCOUNT_CONTROL_NAME,
+               ACCOUNT_CONTROL_TYPE,
+               DESCRIPTION
+        FROM ACCOUNT_CONTROL_CODE C,
+             ACCOUNT_CONTROL_DETAIL D
+        WHERE C.ACCOUNT_CODE = #{accountCode}
+          AND C.ACCOUNT_CONTROL_CODE = D.ACCOUNT_CONTROL_CODE
+          ]]>   		
+    </select>
+    
+     <!--   =====================================  2020-08-25 계정별 원장 조편백   시작 ====================================   -->
+     
+  <resultMap type="ledgerByAccountBean" id="ledgerByAccountResult">
+        <result property="carryForward" column="CARRY_FORWARD"/>
+		<result property="reportingDate" column="REPORTING_DATE"/>
+		<result property="accountName" column="ACCOUNT_NAME"/>
+		<result property="leftDebtorPrice" column="LEFT_DEBTOR_PRICE"/>
+		<result property="rightCreditsPrice" column="RIGHT_CREDITS_PRICE"/>
+		<result property="totalPrice" column="TOTAL_PRICE"/>
+		
+	</resultMap>
+	
+	<parameterMap id="getLedgerByAccountInfoParam" type="map">
+        <parameter property="accountCode" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>
+        <parameter property="startDate" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>
+        <parameter property="endDate" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>
+        <parameter property="ERROR_CODE" jdbcType="DECIMAL" javaType="java.lang.Integer" mode="OUT"/>
+        <parameter property="ERROR_MSG" jdbcType="VARCHAR" javaType="java.lang.String" mode="OUT"/>
+        <parameter property="RESULT" jdbcType="CURSOR" javaType="java.sql.ResultSet" resultMap="ledgerByAccountResult" mode="OUT"/>
+    </parameterMap>
+
+	<select id="getLedgerbyAccountInfo"  parameterMap="getLedgerByAccountInfoParam" statementType="CALLABLE">
+	<![CDATA[
+   			{call P_LEDGERBY_ACCOUNT(?, ?, ?, ?, ?, ?)}
+   									   
+   			]]> 
+	</select>
+   <!--   =====================================  2020-08-25 계정별 원장 조편백   끝  ====================================    -->
+   
+   	<select id="selectDetailBudgetList" parameterType="String" resultMap="accountResult">
+  	<![CDATA[
+        SELECT * 
+  		FROM ACCOUNT 
+ 		WHERE ACCOUNT_INNER_CODE NOT LIKE '%-%' 
+       	AND PARENT_ACCOUNT_INNER_CODE = #{code}
+       	AND BUDGET='T' 
+		ORDER BY ACCOUNT_INNER_CODE 
+    ]]>   		
+   	</select>
+    
+    <select id="selectParentBudgetList" resultMap="accountResult">
+  	<![CDATA[
+    SELECT * 
+  	FROM ACCOUNT 
+ 	WHERE ACCOUNT_INNER_CODE LIKE '%-%' 
+       AND ACCOUNT_INNER_CODE NOT IN ('0101-0175','0176-0250') 
+       AND PARENT_ACCOUNT_INNER_CODE IS NOT NULL 
+       AND account_inner_code IN 
+       (SELECT DISTINCT parent_account_inner_code 
+         FROM ACCOUNT 
+        WHERE ACCOUNT_INNER_CODE NOT LIKE '%-%' 
+              AND budget='T'
+       ) 
+	ORDER BY ACCOUNT_INNER_CODE 
+    ]]>   		
+    </select>
+    
+    <select id="selectAccountPeriodList" resultMap="periodResult">
+  	<![CDATA[
+        SELECT SUBSTR(PERIOD_START_DATE,1,4) FISCAL_YEAR 
+     	, ACCOUNT_PERIOD_NO 
+     	, WORKPLACE_CODE 
+     	, PERIOD_START_DATE 
+     	, PERIOD_END_DATE 
+  		FROM PERIOD
+    ]]>   	 		
+    </select>
+    
+    <!--   =====================================  2020-11-28 계정관리목록 유길현   시작 ====================================   -->
+   <insert id="insertAccountList" parameterType="kr.co.seoulit.erp.account.base.to.AccountBean">
+   	<![CDATA[
+   		INSERT INTO ACCOUNT (
+   			ACCOUNT_INNER_CODE,
+			PARENT_ACCOUNT_INNER_CODE,
+			ACCOUNT_CODE,
+			ACCOUNT_CHARACTER,
+			ACCOUNT_NAME,
+			ACCOUNT_USE_CHECK,
+			ACCOUNT_DIVISION,
+			ACCOUNT_DESCRIPTION,
+			GROUP_CODE,
+			EDITABLE,
+			STATUS	
+   		)
+   		VALUES(
+   			#{accountInnerCode},
+		    #{parentAccountInnercode},
+		    #{accountCode},
+		    #{accountCharacter},
+		    #{accountName},
+		    #{accountUseCheck},
+		    #{accountDivision},
+		    #{accountDescription},
+		    #{groupCode},
+		    #{editable},
+		    #{status}
+   		)
+   	]]>
+   </insert>
+   
+   <delete id="deleteAccountList" parameterType="kr.co.seoulit.erp.account.base.to.AccountBean">
+   	DELETE FROM ACCOUNT
+   		WHERE ACCOUNT_INNER_CODE=#{accountInnerCode}
+   </delete>
+   
+   <update id="updateAccountList" parameterType="kr.co.seoulit.erp.account.base.to.AccountBean">
+	<![CDATA[
+        UPDATE ACCOUNT
+        SET ACCOUNT_INNER_CODE = #{accountInnerCode},
+			PARENT_ACCOUNT_INNER_CODE = #{parentAccountInnercode},
+			ACCOUNT_CODE = #{accountCode},
+			ACCOUNT_CHARACTER = #{accountCharacter},
+			ACCOUNT_NAME = #{accountName},
+			ACCOUNT_USE_CHECK = #{accountUseCheck},
+			ACCOUNT_DIVISION = #{accountDivision},
+			ACCOUNT_DESCRIPTION = #{accountDescription},
+			GROUP_CODE = #{groupCode},
+			EDITABLE = #{editable},
+			STATUS = #{status}
+        WHERE ACCOUNT_INNER_CODE = #{accountInnerCode}
+        ]]>   
+   </update>
+   <!--   =====================================  2020-11-28 계정관리목록 유길현   끝 ======================================   -->
+      <!-- 박미노 추가 -->
+      <select id="selectCurrentAssetList" resultMap="accountResult">
+  	<![CDATA[
+       SELECT ACCOUNT_NAME
+        ,ACCOUNT_CODE 
+        FROM ACCOUNT 
+        WHERE group_code='2.비유동자산'
+        AND  account_name != '사용자설정계정과목'
+        AND  account_name != '감가상각누계액' 
+    ]]>   	 		
+    </select>
+   
+</mapper>

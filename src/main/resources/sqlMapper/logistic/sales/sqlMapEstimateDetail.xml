@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.logistic.sales.dao.EstimateDetailDAO">
+
+
+    <resultMap id="estimateDetailResult" type="EstimateDetailTO">
+        <result property="description" column="DESCRIPTION"/>
+        <result property="dueDateOfEstimate" column="DUE_DATE_OF_ESTIMATE"/>
+        <result property="estimateAmount" column="ESTIMATE_AMOUNT"/>
+        <result property="estimateDetailNo" column="ESTIMATE_DETAIL_NO"/>
+        <result property="estimateNo" column="ESTIMATE_NO"/>
+        <result property="itemCode" column="ITEM_CODE"/>
+        <result property="itemName" column="ITEM_NAME"/>
+        <result property="sumPriceOfEstimate" column="SUM_PRICE_OF_ESTIMATE"/>
+        <result property="unitOfEstimate" column="UNIT_OF_ESTIMATE"/>
+        <result property="unitPriceOfEstimate" column="UNIT_PRICE_OF_ESTIMATE"/>
+        <result property="sumPriceOfEstimate" column="SUM_PRICE_OF_ESTIMATE"/>
+    </resultMap>
+
+    <resultMap id="selectLogisticExelResult" type="logisticExelTO">
+        <result property="estimateDate" column="ESTIMATE_DATE"/>
+        <result property="estimateNo" column="ESTIMATE_NO"/>
+        <result property="customerCode" column="CUSTOMER_CODE"/>
+        <result property="customerName" column="CUSTOMER_NAME"/>
+        <result property="businessLicenseNumber" column="BUSINESS_LICENSE_NUMBER"/>
+        <result property="estimateAmount" column="ESTIMATE_AMOUNT"/>
+        <result property="unitPriceOfEstimate" column="UNIT_PRICE_OF_ESTIMATE"/>
+        <result property="sumPriceOfEstimate" column="SUM_PRICE_OF_ESTIMATE"/>
+        <result property="itemName" column="ITEM_NAME"/>
+        <result property="dueDateOfEstimate" column="DUE_DATE_OF_ESTIMATE"/>
+        <result property="customerTelNumber" column="CUSTOMER_TEL_NUMBER"/>
+    </resultMap>
+
+
+    <select id="selectLogisticExel" parameterType="String" resultMap="selectLogisticExelResult">
+     	SELECT
+		a.ESTIMATE_DATE,
+		a.ESTIMATE_NO,
+		c.CUSTOMER_CODE,
+		c.CUSTOMER_NAME,
+		c.BUSINESS_LICENSE_NUMBER,
+		b.ESTIMATE_AMOUNT,
+		b.UNIT_PRICE_OF_ESTIMATE,
+		b.SUM_PRICE_OF_ESTIMATE,
+		b.ITEM_NAME,
+		b.DUE_DATE_OF_ESTIMATE,
+		c.CUSTOMER_TEL_NUMBER
+		FROM ESTIMATE a, ESTIMATE_DETAIL b, CUSTOMER c
+		WHERE a.ESTIMATE_NO=b.ESTIMATE_NO
+		AND a.CUSTOMER_CODE = c.CUSTOMER_CODE
+		AND a.ESTIMATE_NO=#{estimateNo}
+   </select>
+
+
+    <select id="selectEstimateDetailList" parameterType="java.lang.String" resultMap="estimateDetailResult">
+      SELECT * FROM ESTIMATE_DETAIL WHERE ESTIMATE_NO = #{estimateNo}
+   </select>
+
+    <resultMap id="estimateDetailNoResult" type="estimateDetailTO" >
+        <result property="estimateDetailNo" column="ESTIMATE_DETAIL_NO" jdbcType="VARCHAR" javaType="string" />
+    </resultMap>
+
+    <select id="selectEstimateDetailCount"  parameterType="String" resultMap="estimateDetailNoResult">
+      SELECT ESTIMATE_DETAIL_NO FROM ESTIMATE_DETAIL WHERE ESTIMATE_NO = #{estimateNo}
+   </select>
+
+
+    <insert id="insertEstimateDetail" parameterType="EstimateDetailTO" >
+      Insert into ESTIMATE_DETAIL
+         (ESTIMATE_DETAIL_NO, ESTIMATE_NO, ITEM_CODE, ITEM_NAME,
+         UNIT_OF_ESTIMATE, DUE_DATE_OF_ESTIMATE, ESTIMATE_AMOUNT,
+         UNIT_PRICE_OF_ESTIMATE, SUM_PRICE_OF_ESTIMATE, DESCRIPTION)
+      values ( #{estimateDetailNo:VARCHAR} , #{estimateNo:VARCHAR} , #{itemCode:VARCHAR} ,
+         #{itemName:NVARCHAR} , #{unitOfEstimate:VARCHAR} , #{dueDateOfEstimate:VARCHAR} ,
+         #{estimateAmount:INTEGER} , #{unitPriceOfEstimate:INTEGER} , #{sumPriceOfEstimate:INTEGER} ,
+         #{description:NVARCHAR} )
+   </insert>
+
+    <update id="updateEstimateDetail" parameterType="EstimateDetailTO" >
+      UPDATE ESTIMATE_DETAIL SET
+         ITEM_CODE = #{itemCode:VARCHAR} ,
+         ITEM_NAME = #{itemName:NVARCHAR} ,
+         UNIT_OF_ESTIMATE = #{unitOfEstimate:VARCHAR} ,
+         DUE_DATE_OF_ESTIMATE = #{dueDateOfEstimate:VARCHAR} ,
+         ESTIMATE_AMOUNT = #{estimateAmount:INTEGER} ,
+         UNIT_PRICE_OF_ESTIMATE = #{unitPriceOfEstimate:INTEGER} ,
+         SUM_PRICE_OF_ESTIMATE = #{sumPriceOfEstimate:INTEGER} ,
+         DESCRIPTION = #{description:NVARCHAR}
+      WHERE ESTIMATE_DETAIL_NO = #{estimateDetailNo}
+   </update>
+
+    <delete id="deleteEstimateDetail" parameterType="EstimateDetailTO" >
+      DELETE FROM ESTIMATE_DETAIL
+      WHERE ESTIMATE_DETAIL_NO = #{estimateDetailNo}
+   </delete>
+    <!-- ***** 2020.08.28 양지훈 수정 종료 ***** -->
+
+    <!-- 69 GDW -->
+    <update id="updateDueDateOfEstimate" parameterType="EstimateDetailTO" >
+          UPDATE ESTIMATE_DETAIL SET DUE_DATE_OF_ESTIMATE = #{dueDateOfEstimate}
+          WHERE ESTIMATE_DETAIL_NO = #{estimateDetailNo};
+    </update>
+</mapper>

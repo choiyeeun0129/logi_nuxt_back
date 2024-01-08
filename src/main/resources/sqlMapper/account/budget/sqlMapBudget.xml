@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:31 KST 2020 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+		namespace="kr.co.seoulit.erp.account.budget.dao.BudgetDAO">
+
+	<resultMap type="kr.co.seoulit.erp.account.budget.to.BudgetBean" id="budgetResult">
+		<result property="deptCode" column="DEPT_CODE" />
+		<result property="workplaceCode" column="WORKPLACE_CODE" />
+		<result property="accountInnerCode" column="ACCOUNT_INNER_CODE" />
+		<result property="accountPeriodNo" column="ACCOUNT_PERIOD_NO" />
+		<result property="budgetingCode" column="BUDGETING_CODE" />
+		<result property="m1Budget" column="M1_BUDGET" />
+		<result property="m2Budget" column="M2_BUDGET" />
+		<result property="m3Budget" column="M3_BUDGET" />
+		<result property="m4Budget" column="M4_BUDGET" />
+		<result property="m5Budget" column="M5_BUDGET" />
+		<result property="m6Budget" column="M6_BUDGET" />
+		<result property="m7Budget" column="M7_BUDGET" />
+		<result property="m8Budget" column="M8_BUDGET" />
+		<result property="m9Budget" column="M9_BUDGET" />
+		<result property="m10Budget" column="M10_BUDGET" />
+		<result property="m11Budget" column="M11_BUDGET" />
+		<result property="m12Budget" column="M12_BUDGET" />
+	</resultMap>
+
+	<parameterMap id="budgetParams" type="kr.co.seoulit.erp.account.budget.to.BudgetBean">
+		<parameter property="deptCode" jdbcType="VARCHAR" javaType="String" mode="IN" />
+		<parameter property="workplaceCode" jdbcType="VARCHAR" javaType="String" mode="IN" />
+		<parameter property="accountInnerCode" jdbcType="VARCHAR" javaType="String" mode="IN" />
+		<parameter property="accountPeriodNo" jdbcType="VARCHAR" javaType="String" mode="IN" />
+		<parameter property="budgetingCode" jdbcType="VARCHAR" javaType="String" mode="IN" />
+		<parameter property="m1Budget" jdbcType="VARCHAR" javaType="int" mode="IN" />
+		<parameter property="m2Budget" jdbcType="VARCHAR" javaType="int" mode="IN" />
+		<parameter property="m3Budget" jdbcType="VARCHAR" javaType="int" mode="IN" />
+		<parameter property="m4Budget" jdbcType="VARCHAR" javaType="int" mode="IN" />
+		<parameter property="m5Budget" jdbcType="VARCHAR" javaType="int" mode="IN" />
+		<parameter property="m6Budget" jdbcType="VARCHAR" javaType="int" mode="IN" />
+		<parameter property="m7Budget" jdbcType="VARCHAR" javaType="int" mode="IN" />
+		<parameter property="m8Budget" jdbcType="VARCHAR" javaType="int" mode="IN" />
+		<parameter property="m9Budget" jdbcType="VARCHAR" javaType="int" mode="IN" />
+		<parameter property="m10Budget" jdbcType="VARCHAR" javaType="int" mode="IN" />
+		<parameter property="m11Budget" jdbcType="VARCHAR" javaType="int" mode="IN" />
+		<parameter property="m12Budget" jdbcType="VARCHAR" javaType="int" mode="IN" />
+		<!-- <parameter property="errorCode" jdbcType="DECIMAL" javaType="int" mode="OUT" />
+        <parameter property="errorMsg" jdbcType="VARCHAR" javaType="String" mode="OUT" /> -->
+		<!-- <parameter property="RESULT" jdbcType="CURSOR" javaType="java.sql.ResultSet" mode="OUT"
+           resultMap="incomeStatementResult" /> -->
+	</parameterMap>
+
+	<select id="selectBudget" resultMap="budgetResult" parameterType="kr.co.seoulit.erp.account.budget.to.BudgetBean">
+		SELECT * FROM BUDGET
+		WHERE DEPT_CODE = #{deptCode}
+		  AND
+			WORKPLACE_CODE = #{workplaceCode}
+		  AND ACCOUNT_INNER_CODE =
+			  #{accountInnerCode}
+		  AND ACCOUNT_PERIOD_NO = #{accountPeriodNo}
+		  AND
+			BUDGETING_CODE= #{budgetingCode}
+	</select>
+
+	<select id="selectBudgetAppl" resultMap="budgetResult"
+			parameterType="kr.co.seoulit.erp.account.budget.to.BudgetBean">
+		SELECT * FROM BUDGET
+		WHERE DEPT_CODE = #{deptCode}
+		  AND WORKPLACE_CODE = #{workplaceCode}
+		  AND ACCOUNT_INNER_CODE = #{accountInnerCode}
+		  AND ACCOUNT_PERIOD_NO = #{accountPeriodNo}
+		  AND BUDGETING_CODE = #{budgetingCode}
+	</select>
+
+	<select id="orgBudget" parameterMap="budgetParams" statementType="CALLABLE">
+    <![CDATA[
+		{call P_ORG_BUDGET(? , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}
+		]]>
+   </select>
+
+	<resultMap type="kr.co.seoulit.erp.account.budget.to.BudgetStatusBean" id="budgetStatusResult">
+		<result property="accountInnerCode" column="ACCOUNT_INNER_CODE" />
+		<result property="accountName" column="ACCOUNT_NAME" />
+		<result property="annualBudgetRecord" column="ABR" />
+		<result property="annualBudget" column="ANNUALBUDGET" />
+		<result property="remainingBudget" column="REMAINING_BUDGET" />
+		<result property="budgetExecRatio" column="BUDGET_EXEC_RATE" />
+		<result property="monthBudgetRecord" column="AMBR" />
+		<result property="monthBudget" column="BUDGET" />
+		<result property="remainingMonthBudget" column="REMAINING_MONTH_BUDGET" />
+		<result property="monthBudgetExecRatio" column="MONTH_BUDGET_EXEC_RATE" />
+	</resultMap>
+
+	<parameterMap id="budgetStatusParams" type="hashMap">
+		<parameter property="accountPeriodNo"  mode="IN" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<parameter property="workplaceCode"  mode="IN" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<parameter property="deptCode"  mode="IN" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<parameter property="RESULT" jdbcType="CURSOR" javaType="java.sql.ResultSet" mode="OUT" resultMap="budgetStatusResult"/>
+	</parameterMap>
+
+	<select id="callBudgetStatus" parameterMap="budgetStatusParams" statementType="CALLABLE">
+    <![CDATA[
+		{call P_BUDGET_STATUS(?,?,?,?)}
+		]]>
+   </select>
+
+	<resultMap type="kr.co.seoulit.erp.account.budget.to.BudgetComparisonStatusBean" id="budgetComparisonStatusResult">
+		<result property="sortation" column="SORTATION" />
+		<result property="applicationBudget" column="APPLICATION_BUDGET" />
+		<result property="compilationBudget" column="COMPILATION_BUDGET" />
+		<result property="executionBudget" column="EXECUTION_BUDGET" />
+		<result property="executionPerformance" column="EXECUTION_PERFORMANCE" />
+		<result property="exampleCompare" column="EXAMPLE_COMPARE" />
+	</resultMap>
+
+	<select id="selectBudgetComparisonStatus" resultMap="budgetComparisonStatusResult"
+			parameterType="kr.co.seoulit.erp.account.budget.to.BudgetBean">
+   <![CDATA[
+		SELECT
+			A.SORTATION,
+			A.BUDGET AS APPLICATION_BUDGET,
+			NVL(B.BUDGET,0) AS COMPILATION_BUDGET ,
+			NVL(C.BUDGET,0) AS EXECUTION_BUDGET,
+			NVL(D.BUDGET,0) AS EXECUTION_PERFORMANCE,
+			NVL(TO_NUMBER(D.BUDGET)-(TO_NUMBER(C.BUDGET)),0) AS EXAMPLE_COMPARE
+		FROM
+			(SELECT *
+			 FROM (SELECT
+					   M1_BUDGET AS "01", M2_BUDGET AS "02",  M3_BUDGET AS "03",
+					   (M1_BUDGET+M2_BUDGET+M3_BUDGET) AS "1분기",
+					   M4_BUDGET AS "04",  M5_BUDGET AS "05",  M6_BUDGET AS "06",
+					   (M4_BUDGET+M5_BUDGET+M6_BUDGET) AS "2분기",
+					   (M1_BUDGET+M2_BUDGET+M3_BUDGET+M4_BUDGET+M5_BUDGET+M6_BUDGET) AS "상반기",
+					   M7_BUDGET AS "07",M8_BUDGET AS "08", M9_BUDGET AS "09",
+					   (M7_BUDGET+M8_BUDGET+M9_BUDGET) AS "3분기",
+					   M10_BUDGET AS "10" ,M11_BUDGET AS "11",M12_BUDGET AS "12",
+					   (M10_BUDGET+M11_BUDGET+M12_BUDGET) AS "4분기",
+					   (M7_BUDGET+M8_BUDGET+M9_BUDGET+M10_BUDGET+M11_BUDGET+M12_BUDGET) AS "하반기",
+					   (M1_BUDGET+M2_BUDGET+M3_BUDGET+M4_BUDGET+
+						M5_BUDGET+ M6_BUDGET+M7_BUDGET+M8_BUDGET+
+						M9_BUDGET+M10_BUDGET+M11_BUDGET+M12_BUDGET) AS "합계"
+				   FROM BUDGET
+				   WHERE ACCOUNT_INNER_CODE = #{accountInnerCode}
+					 AND BUDGETING_CODE='1'
+					 AND ACCOUNT_PERIOD_NO = #{accountPeriodNo}
+				  )
+					  UNPIVOT (
+							   BUDGET
+								   FOR
+  SORTATION
+  IN (
+   "01", "02", "03", "1분기",
+   "04", "05", "06", "2분기","상반기",
+   "07", "08", "09", "3분기",
+   "10", "11", "12","4분기","하반기","합계"
+   ) )) A,
+			(SELECT *
+			 FROM (SELECT
+					   M1_BUDGET AS "01", M2_BUDGET AS "02",  M3_BUDGET AS "03",
+					   (M1_BUDGET+M2_BUDGET+M3_BUDGET) AS "1분기",
+					   M4_BUDGET AS "04",  M5_BUDGET AS "05",  M6_BUDGET AS "06",
+					   (M4_BUDGET+M5_BUDGET+M6_BUDGET) AS "2분기",
+					   (M1_BUDGET+M2_BUDGET+M3_BUDGET+M4_BUDGET+M5_BUDGET+M6_BUDGET) AS "상반기",
+					   M7_BUDGET AS "07",M8_BUDGET AS "08", M9_BUDGET AS "09",
+					   (M7_BUDGET+M8_BUDGET+M9_BUDGET) AS "3분기",
+					   M10_BUDGET AS "10" ,M11_BUDGET AS "11",M12_BUDGET AS "12",
+					   (M10_BUDGET+M11_BUDGET+M12_BUDGET) AS "4분기",
+					   (M7_BUDGET+M8_BUDGET+M9_BUDGET+M10_BUDGET+M11_BUDGET+M12_BUDGET) AS "하반기",
+					   (M1_BUDGET+M2_BUDGET+M3_BUDGET+M4_BUDGET+
+						M5_BUDGET+ M6_BUDGET+M7_BUDGET+M8_BUDGET+
+						M9_BUDGET+M10_BUDGET+M11_BUDGET+M12_BUDGET) AS "합계"
+				   FROM BUDGET
+				   WHERE ACCOUNT_INNER_CODE=#{accountInnerCode}
+					 AND BUDGETING_CODE='2'
+					 AND ACCOUNT_PERIOD_NO = #{accountPeriodNo}
+				  )
+					  UNPIVOT (
+							   BUDGET
+								   FOR
+  SORTATION
+  IN (
+    "01", "02", "03", "1분기",
+   "04", "05", "06", "2분기","상반기",
+   "07", "08", "09", "3분기",
+   "10", "11", "12","4분기","하반기","합계"
+   ) )) B,
+			(SELECT *
+			 FROM (SELECT
+					   M1_BUDGET AS "01", M2_BUDGET AS "02",  M3_BUDGET AS "03",
+					   (M1_BUDGET+M2_BUDGET+M3_BUDGET) AS "1분기",
+					   M4_BUDGET AS "04",  M5_BUDGET AS "05",  M6_BUDGET AS "06",
+					   (M4_BUDGET+M5_BUDGET+M6_BUDGET) AS "2분기",
+					   (M1_BUDGET+M2_BUDGET+M3_BUDGET+M4_BUDGET+M5_BUDGET+M6_BUDGET) AS "상반기",
+					   M7_BUDGET AS "07",M8_BUDGET AS "08", M9_BUDGET AS "09",
+					   (M7_BUDGET+M8_BUDGET+M9_BUDGET) AS "3분기",
+					   M10_BUDGET AS "10" ,M11_BUDGET AS "11",M12_BUDGET AS "12",
+					   (M10_BUDGET+M11_BUDGET+M12_BUDGET) AS "4분기",
+					   (M7_BUDGET+M8_BUDGET+M9_BUDGET+M10_BUDGET+M11_BUDGET+M12_BUDGET) AS "하반기",
+					   (M1_BUDGET+M2_BUDGET+M3_BUDGET+M4_BUDGET+
+						M5_BUDGET+ M6_BUDGET+M7_BUDGET+M8_BUDGET+
+						M9_BUDGET+M10_BUDGET+M11_BUDGET+M12_BUDGET) AS "합계"
+				   FROM BUDGET
+				   WHERE ACCOUNT_INNER_CODE=#{accountInnerCode}
+					 AND BUDGETING_CODE='3'
+					 AND ACCOUNT_PERIOD_NO = #{accountPeriodNo}
+				  )
+					  UNPIVOT (
+							   BUDGET
+								   FOR
+  SORTATION
+  IN (
+   "01", "02", "03", "1분기",
+   "04", "05", "06", "2분기","상반기",
+   "07", "08", "09", "3분기",
+   "10", "11", "12","4분기","하반기","합계"
+   ) )) C,
+			(
+				(SELECT
+					 B.VV AS SORTATION,
+					 NVL(A.BUDGET,0) AS BUDGET
+				 FROM(
+						 SELECT DECODE(SLIP_NO,
+									   NULL, '합계',
+									   SUBSTR(SLIP_NO, 5,2)) AS SORTATION
+							  , SUM(LEFT_DEBTOR_PRICE) AS BUDGET
+						 FROM JOURNAL
+						 WHERE SLIP_NO IN
+							   (SELECT SLIP_NO
+								FROM SLIP
+								WHERE SLIP_NO IN
+									  (SELECT SLIP_NO
+									   FROM JOURNAL
+									   WHERE ACCOUNT_INNER_CODE=#{accountInnerCode}
+									  )
+								  AND SLIP_STATUS='승인'
+								  AND ACCOUNT_PERIOD_NO = #{accountPeriodNo}
+							   )
+						 GROUP BY CUBE(SLIP_NO)
+					 ) A,
+
+					 (select
+						  DECODE(LPAD(LEVEL, 2, '0'),
+								 13,'합계',LPAD(LEVEL, 2, '0')) AS VV ,
+						  DECODE(LPAD(LEVEL, 2, '0'),
+								 13,'합계',LPAD(LEVEL, 2, '0')) AS SORTATION
+					  from dual
+						  connect by level <= 13) B
+				 WHERE A.SORTATION(+)=B.SORTATION)
+				UNION ALL
+				(SELECT
+					 VV AS SORTATION , SUM(BUDGET) AS BUDGET
+				 FROM
+					 (SELECT
+--B.SORTATION,
+NVL(A.BUDGET,0) AS BUDGET,
+B.VV
+					  FROM(
+							  SELECT DECODE(SLIP_NO,
+											NULL, '합계',
+											SUBSTR(SLIP_NO, 5,2)) AS SORTATION
+								   , SUM(LEFT_DEBTOR_PRICE) AS BUDGET
+							  FROM JOURNAL
+							  WHERE SLIP_NO IN
+									(SELECT SLIP_NO
+									 FROM SLIP
+									 WHERE SLIP_NO IN
+										   (SELECT SLIP_NO
+											FROM JOURNAL
+											WHERE ACCOUNT_INNER_CODE=#{accountInnerCode}
+										   )
+									   AND SLIP_STATUS='승인'
+									   AND ACCOUNT_PERIOD_NO = #{accountPeriodNo}
+									)
+							  GROUP BY CUBE(SLIP_NO)
+						  ) A,
+
+						  (select
+							   DECODE(LPAD(LEVEL, 2, '0'),
+									  13,'1분기',
+									  14,'2분기',
+									  15,'3분기',
+									  16,'4분기',
+									  17,'상반기',
+									  18,'하반기',
+									  19,'합계',
+									  LPAD(LEVEL, 2, '0')) SORTATION,
+							   DECODE(LPAD(LEVEL, 2, '0'),
+									  01,'1분기',
+									  02,'1분기',
+									  03,'1분기',
+									  04,'2분기',
+									  05,'2분기',
+									  06,'2분기',
+									  07,'3분기',
+									  08,'3분기',
+									  09,'3분기',
+									  10,'4분기',
+									  11,'4분기',
+									  12,'4분기',
+									  13,'1분기',
+									  14,'2분기',
+									  15,'3분기',
+									  16,'4분기',
+									  17,'상반기',
+									  18,'하반기',
+									  19,'합계',
+									  LPAD(LEVEL, 2, '0')) VV
+						   from dual
+							   connect by level <= 12) B
+					  WHERE A.SORTATION(+)=B.SORTATION)
+				 GROUP BY VV
+				)
+				UNION ALL
+				(SELECT
+					 VV AS SORTATION , SUM(BUDGET) AS BUDGET
+				 FROM
+					 (SELECT
+--B.SORTATION,
+NVL(A.BUDGET,0) AS BUDGET,
+B.VV
+					  FROM(
+							  SELECT DECODE(SLIP_NO,
+											NULL, '합계',
+											SUBSTR(SLIP_NO, 5,2)) AS SORTATION
+								   , SUM(LEFT_DEBTOR_PRICE) AS BUDGET
+							  FROM JOURNAL
+							  WHERE SLIP_NO IN
+									(SELECT SLIP_NO
+									 FROM SLIP
+									 WHERE SLIP_NO IN
+										   (SELECT SLIP_NO
+											FROM JOURNAL
+											WHERE ACCOUNT_INNER_CODE=#{accountInnerCode}
+										   )
+									   AND SLIP_STATUS='승인'
+									   AND ACCOUNT_PERIOD_NO = #{accountPeriodNo}
+									)
+							  GROUP BY CUBE(SLIP_NO)
+						  ) A,
+						  (select
+							   DECODE(LPAD(LEVEL, 2, '0'),
+									  13,'1분기',
+									  14,'2분기',
+									  15,'3분기',
+									  16,'4분기',
+									  17,'상반기',
+									  18,'하반기',
+									  19,'합계',
+									  LPAD(LEVEL, 2, '0')) SORTATION,
+							   DECODE(LPAD(LEVEL, 2, '0'),
+									  01,'상반기',
+									  02,'상반기',
+									  03,'상반기',
+									  04,'상반기',
+									  05,'상반기',
+									  06,'상반기',
+									  07,'하반기',
+									  08,'하반기',
+									  09,'하반기',
+									  10,'하반기',
+									  11,'하반기',
+									  12,'하반기',
+									  13,'1분기',
+									  14,'2분기',
+									  15,'3분기',
+									  16,'4분기',
+									  17,'상반기',
+									  18,'하반기',
+									  19,'합계',
+									  LPAD(LEVEL, 2, '0')) VV
+						   from dual
+							   connect by level <= 12) B
+					  WHERE A.SORTATION(+)=B.SORTATION)
+				 GROUP BY VV
+				)
+			) D
+		WHERE A.SORTATION=B.SORTATION(+)
+		  AND A.SORTATION=C.SORTATION(+)
+		  AND A.SORTATION=D.SORTATION(+)
+		ORDER BY DECODE(SORTATION,
+						'01',1, '02',2, '03',3, '1분기',4,
+						'04',5, '05',6, '06',7, '2분기',8,'상반기',9,
+						'07',10, '08',11, '09',12, '3분기',13,
+						'10',14, '11',15, '12',16,'4분기',17,'하반기',18)
+		]]>
+   </select>
+
+</mapper>

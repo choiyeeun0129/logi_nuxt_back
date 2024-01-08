@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.logistic.production.dao.MrpGatheringDAO">
+	
+	<resultMap id="mrpGatheringList" type="mrpGatheringTO">
+		<result property="mrpGatheringNo" column="MRP_GATHERING_NO"  />
+		<result property="orderOrProductionStatus" column="ORDER_OR_PRODUCTION_STATUS"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="unitOfMrpGathering" column="UNIT_OF_MRP_GATHERING"  />
+		<result property="claimDate" column="CLAIM_DATE"  />
+		<result property="dueDate" column="DUE_DATE"  />
+		<result property="necessaryAmount" column="NECESSARY_AMOUNT"  />
+<!-- 		<result property="mrpTOList" select="mrp.selectMrpList" javaType="java.util.ArrayList"/> -->
+	</resultMap>
+	
+	
+	<resultMap id="mrpGatheringResult" type="mrpGatheringTO">
+		<result property="orderOrProductionStatus" column="ORDER_OR_PRODUCTION_STATUS"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="unitOfMrpGathering" column="UNIT_OF_MRP_GATHERING"  />
+		<result property="claimDate" column="CLAIM_DATE"  />
+		<result property="dueDate" column="DUE_DATE"  />
+		<result property="necessaryAmount" column="NECESSARY_AMOUNT"  />
+	</resultMap>
+	
+	<select id="selectMrpGatheringList" parameterType="map" resultMap="mrpGatheringList">
+	SELECT * FROM MRP_GATHERING WHERE
+	( CASE #{dateSearchCondtion} WHEN 'claimDate' THEN
+	TO_DATE(CLAIM_DATE, 'YYYY-MM-DD') WHEN 'dueDate' THEN
+	TO_DATE(DUE_DATE, 'YYYY-MM-DD') END )
+	BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD') AND TO_DATE(#{endDate},'YYYY-MM-DD')
+	</select>
+	
+	<select id="getMrpGathering" parameterType="String" resultMap="mrpGatheringResult">
+	<![CDATA[WITH MRP_NO_STR AS ( SELECT #{mrpNoList} FROM DUAL ) ,
+
+	MRP_NO_LIST AS (
+	SELECT TRIM( REGEXP_SUBSTR( (SELECT * FROM MRP_NO_STR ) ,'[^,]+', 1, LEVEL ) ) AS MRP_NO FROM DUAL
+	CONNECT BY REGEXP_SUBSTR( (SELECT * FROM MRP_NO_STR ) , '[^,]+', 1, LEVEL ) IS NOT NULL
+	)
+
+	SELECT
+    ( CASE TO_CHAR(ITEM_CLASSIFICATION) WHEN '원재료' THEN '구매'
+            WHEN '반제품' THEN '생산' WHEN '완제품' THEN '생산'
+            ELSE TO_CHAR(ITEM_CLASSIFICATION) END ) AS ORDER_OR_PRODUCTION_STATUS,
+    ITEM_CODE, TRIM(ITEM_NAME) AS ITEM_NAME, UNIT_OF_MRP AS UNIT_OF_MRP_GATHERING,  
+    MIN(ORDER_DATE) AS CLAIM_DATE, MIN(REQUIRED_DATE) AS DUE_DATE,
+    SUM(REQUIRED_AMOUNT) AS NECESSARY_AMOUNT
+	FROM (
+    SELECT * FROM MRP
+    WHERE MRP_GATHERING_STATUS IS NULL
+    AND MRP_NO IN ( SELECT MRP_NO FROM MRP_NO_LIST )
+    )
+	GROUP BY ITEM_CLASSIFICATION, ITEM_CODE, TRIM(ITEM_NAME), UNIT_OF_MRP
+	ORDER BY CLAIM_DATE, ORDER_OR_PRODUCTION_STATUS ]]>
+	</select>
+	
+	
+	
+	<resultMap type="mrpGatheringTO" id="mrpGatheringNum">
+		<result property="mrpGatheringNo" column="MRP_GATHERING_NO"  />
+	</resultMap>
+	
+	<select id="selectMrpGatheringCount" parameterType="String" resultMap="mrpGatheringNum">
+	SELECT * FROM MRP_GATHERING WHERE INSTR(MRP_GATHERING_NO, REPLACE( #{mrpGatheringRegisterDate} , '-' , '' ) ) > 0
+	</select>
+	
+	<insert id="insertMrpGathering" parameterType="mrpGatheringTO">
+			INSERT INTO MRP_GATHERING 
+						( MRP_GATHERING_NO, ORDER_OR_PRODUCTION_STATUS, ITEM_CODE, ITEM_NAME,
+						  UNIT_OF_MRP_GATHERING, CLAIM_DATE, DUE_DATE, NECESSARY_AMOUNT, MRP_GATHERING_SEQ
+						 ) 				
+				VALUES ( #{mrpGatheringNo}, #{orderOrProductionStatus}, 
+						 #{itemCode}, #{itemName}, #{unitOfMrpGathering},
+						 #{claimDate}, #{dueDate}, #{necessaryAmount},#{mrpGatheringSeq}
+						)
+	</insert>
+	
+	<update id="updateMrpGathering" parameterType="mrpGatheringTO">
+	UPDATE MRP_GATHERING 
+		SET
+			ITEM_CODE = #{itemCode} , 
+			ITEM_NAME = #{itemName} , 
+			UNIT_OF_MRP_GATHERING = #{unitOfMrpGathering} ,
+			NECESSARY_AMOUNT = #{necessaryAmount} , 
+			DUE_DATE = #{dueDate} , 
+			CLAIM_DATE = #{claimDate} ,
+			ORDER_OR_PRODUCTION_STATUS = #{orderOrProductionStatus}
+			
+			WHERE MRP_GATHERING_NO = #{mrpGatheringNo}
+	</update>
+	
+
+	<delete id="deleteMrpGathering" parameterType="mrpGatheringTO">
+	DELETE FROM MRP_GATHERING WHERE MRP_GATHERING_NO = #{mrpGatheringNo}
+	</delete>
+	
+		<select id="selectMrpGatheringSeqCount" resultType="int">
+			<![CDATA[
+select MRP_GATHERING_SEQ.nextval from dual
+			]]>
+		</select>
+		
+		<parameterMap type="map" id="updateMrpGatheringContractParameter">
+			<parameter property="mrpGatheringNoList" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN" />
+			<parameter property="ERROR_CODE" javaType="java.lang.Integer" jdbcType="DECIMAL" mode="OUT" />
+			<parameter property="ERROR_MSG" javaType="java.lang.String" jdbcType="VARCHAR" mode="OUT" />
+		</parameterMap>
+		
+		<select id="updateMrpGatheringContract" parameterMap="updateMrpGatheringContractParameter" statementType="CALLABLE">
+			<![CDATA[
+			{call P_MRP_GATHERING_CONTRACT(?,?,?)}
+			]]>
+		</select>
+	
+</mapper>

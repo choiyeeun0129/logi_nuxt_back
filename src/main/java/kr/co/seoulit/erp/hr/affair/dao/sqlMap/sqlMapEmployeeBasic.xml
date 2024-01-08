@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.hr.affair.dao.EmployeeBasicDAO">
+
+	<resultMap id="employeeBasicResult" type="kr.co.seoulit.erp.hr.affair.to.EmployeeBasicTO">
+		<result property="companyCode" column="COMPANY_CODE"  />
+		<result property="empCode" column="EMP_CODE"  />
+		<result property="empName" column="EMP_NAME"  />
+		<result property="empEngName" column="EMP_ENG_NAME"  />
+		<result property="socialSecurityNumber" column="SOCIAL_SECURITY_NUMBER"  />
+		<result property="hireDate" column="HIRE_DATE"  />
+		<result property="retirementDate" column="RETIREMENT_DATE"  />
+		<result property="userOrNot" column="USER_OR_NOT"  />
+		<result property="birthDate" column="BIRTH_DATE"  />
+		<result property="gender" column="GENDER"  />
+		<result property="zipCode" column="ZIP_CODE"  />
+		<result property="basicAddress" column="BASIC_ADDRESS"  />
+		<result property="image" column="IMAGE"  />
+		<result property="positionCode" column="POSITION_CODE"  />
+		<result property="positionName" column="POSITION_NAME"  />
+		<result property="updateDate" column="UPDATE_DATE"  />
+
+	</resultMap>
+
+	<select id="selectEmpList" resultMap="employeeBasicResult">
+		select * from employee_basic
+		order by emp_name
+		<if test="deptCode != 'ALL'">
+		where dept_code = #{deptCode}
+		</if>
+	</select>
+	
+	
+	<select id="selectEmployeeBasicList" parameterType="map" resultMap="employeeBasicResult">
+	SELECT * FROM EMPLOYEE_BASIC WHERE COMPANY_CODE = #{companyCode}
+	</select>
+	
+	<select id="selectEmployeeBasicTO" parameterType="map" resultMap="employeeBasicResult">
+	SELECT * FROM EMPLOYEE_BASIC WHERE COMPANY_CODE = #{companyCode}  AND EMP_CODE = #{empCode}
+	</select>
+	
+	<insert id="insertEmployeeBasic" parameterType="kr.co.seoulit.erp.hr.affair.to.EmployeeBasicTO">
+	Insert into EMPLOYEE_BASIC
+		( COMPANY_CODE , EMP_CODE , EMP_NAME , EMP_ENG_NAME ,
+		SOCIAL_SECURITY_NUMBER , HIRE_DATE , RETIREMENT_DATE ,
+		USER_OR_NOT , BIRTH_DATE , GENDER )
+	values ( #{companyCode} ,
+			 #{empCode} ,
+			 #{empName} , 
+			 #{empEngName} , 
+			 #{socialSecurityNumber} , 
+			 #{hireDate} , 
+			 #{retirementDate} , 
+			 #{userOrNot} , 
+			 #{birthDate} , 
+			 #{gender} 
+			)
+	</insert>
+	
+	<update id="changeUserAccountStatus" parameterType="EmployeeBasicTO">
+	UPDATE EMPLOYEE_BASIC SET  USER_OR_NOT = #{userOrNot} WHERE COMPANY_CODE = #{companyCode} AND EMP_CODE = #{empCode}
+	</update>
+	
+	
+	
+	
+	
+	
+<!-- *******************************2020-12-03 권은비*****************************  -->
+	<resultMap id="employeeBasicInfoResult" type="kr.co.seoulit.erp.hr.affair.to.EmployeeBasicTO">
+		<result property="empCode" column="EMP_CODE"  />
+		<result property="empName" column="EMP_NAME"  />
+		<result property="deptCode" column="DEPT_CODE"  />
+		<result property="deptName" column="DEPT_NAME"  />
+		<result property="gender" column="GENDER"  />
+		<result property="birthDate" column="BIRTH_DATE"  />
+		<result property="zipCode" column="ZIP_CODE"  />
+		<result property="basicAddress" column="BASIC_ADDRESS"  />
+		<result property="image" column="IMAGE"  />
+		<result property="positionCode" column="POSITION_CODE"  />
+		<result property="positionName" column="POSITION_NAME"  />
+		<result property="updateDate" column="UPDATE_DATE"  />
+		<result property="email" column="EMAIL"  />
+		<result property="levelOfEducation" column="LEVEL_OF_EDUCATION"  />
+		
+		<collection property="workInfoList" column="EMP_CODE" javaType="ArrayList" ofType="WorkInfoTO" 
+			select="kr.co.seoulit.erp.hr.affair.dao.WorkInfoDAO.selectWorkInfoList" />
+		<collection property="careerInfoList" column="EMP_CODE" javaType="ArrayList" ofType="CareerInfoTO" 
+			select="kr.co.seoulit.erp.hr.affair.dao.CareerInfoDAO.selectCareerInfoList" />
+		<collection property="educationInfoList" column="EMP_CODE" javaType="ArrayList" ofType="EducationInfoTO" 
+			select="kr.co.seoulit.erp.hr.affair.dao.EducationInfoDAO.selectEducationInfoList" />
+		<collection property="familyInfoList" column="EMP_CODE" javaType="ArrayList" ofType="FamilyInfoTO" 
+			select="kr.co.seoulit.erp.hr.affair.dao.FamilyInfoDAO.selectFamilyInfoList" />
+		
+		
+		
+	</resultMap>
+
+		<select id="getEmpBasicInfo" resultMap="employeeBasicInfoResult" parameterType="String">
+	SELECT g.EMP_CODE, g.ZIP_CODE, g.BASIC_ADDRESS, g.IMAGE, g.DEPT_CODE, g.POSITION_CODE, g.UPDATE_DATE, g.DEPT_NAME, g.POSITION_NAME, g.EMAIL,g.LEVEL_OF_EDUCATION,h.EMP_NAME, h.GENDER, h.BIRTH_DATE
+	FROM (SELECT * FROM (SELECT e.EMP_CODE, e.ZIP_CODE, e.BASIC_ADDRESS, e.IMAGE, e.DEPT_CODE, e.POSITION_CODE, e.UPDATE_DATE, e.DEPT_NAME, f.POSITION_NAME,e.EMAIL,e.LEVEL_OF_EDUCATION
+	FROM (SELECT * FROM (SELECT c.EMP_CODE, c.ZIP_CODE, c.BASIC_ADDRESS, c.IMAGE, c.DEPT_CODE, c.POSITION_CODE, c.UPDATE_DATE, d.DEPT_NAME,c.EMAIL,c.LEVEL_OF_EDUCATION
+	FROM (SELECT b.EMP_CODE, b.ZIP_CODE, b.BASIC_ADDRESS, b.IMAGE, b.DEPT_CODE, b.POSITION_CODE, b.UPDATE_DATE,b.EMAIL,b.LEVEL_OF_EDUCATION
+	FROM (SELECT EMP_CODE ,MAX(UPDATE_DATE) UPDATE_DATE
+	FROM EMPLOYEE_DETAIL
+	GROUP BY EMP_CODE) a, EMPLOYEE_DETAIL b
+	WHERE a.EMP_CODE=b.EMP_CODE
+	AND a.UPDATE_DATE=b.UPDATE_DATE) c, DEPARTMENT d
+	WHERE c.DEPT_CODE=d.DEPT_CODE(+))
+	GROUP BY EMP_CODE, ZIP_CODE, BASIC_ADDRESS, IMAGE, DEPT_CODE, POSITION_CODE, UPDATE_DATE, DEPT_NAME,EMAIL,LEVEL_OF_EDUCATION)e, POSITION f
+	WHERE e.POSITION_CODE=f.POSITION_CODE(+))
+	GROUP BY EMP_CODE, ZIP_CODE, BASIC_ADDRESS, IMAGE, DEPT_CODE, POSITION_CODE, UPDATE_DATE, DEPT_NAME, POSITION_NAME,EMAIL,LEVEL_OF_EDUCATION) g, EMPLOYEE_BASIC h
+	WHERE g.EMP_CODE=h.EMP_CODE
+	AND  g.EMP_CODE=#{empCode}
+	</select>
+	
+	
+	
+</mapper>

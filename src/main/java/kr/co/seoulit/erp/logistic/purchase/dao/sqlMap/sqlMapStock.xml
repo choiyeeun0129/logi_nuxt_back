@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.logistic.purchase.dao.StockDAO">
+
+	<resultMap id="stockResult" type="stockTO">
+		<result property="warehouseCode" column="WAREHOUSE_CODE"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="unitOfStock" column="UNIT_OF_STOCK"  />
+		<result property="safetyAllowanceAmount" column="SAFETY_ALLOWANCE_AMOUNT"  />
+		<result property="stockAmount" column="STOCK_AMOUNT"  />
+		<result property="orderAmount" column="ORDER_AMOUNT"  />
+		<result property="inputAmount" column="INPUT_AMOUNT"  />
+		<result property="deliveryAmount" column="DELIVERY_AMOUNT"  />
+		<result property="totalStockAmount" column="TOTAL_STOCK_AMOUNT"/> <!--230403 추가-->
+	</resultMap>
+
+	<resultMap id="stockLogResult" type="stockLogTO">
+		<result property="logDate" column="LOG_DATE"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="amount" column="AMOUNT"  />
+		<result property="reason" column="REASON"  />
+		<result property="cause" column="CAUSE"  />
+		<result property="effect" column="EFFECT"  />
+	</resultMap>
+
+	<!--230403 추가-->
+	<select id="selectStockList" resultMap="stockResult">
+		SELECT * FROM STOCK order by item_code
+	</select>
+
+
+	<select id="selectWarehouseStockList" parameterType="string" resultMap="stockResult">
+		SELECT *
+		FROM STOCK
+		WHERE WAREHOUSE_CODE = #{warehouseCode}
+		order by item_code
+	</select>
+
+	<select id="selectStockLogList" parameterType="map" resultMap="stockLogResult">
+		select * from stock_log
+		where to_date(log_date,'YYYY-MM-DD HH24:MI:SS')
+				  between to_date(#{startDate},'YYYY-MM-DD')
+				  AND to_date(#{endDate},'YYYY-MM-DD')
+		order by log_date desc
+	</select>
+
+	<parameterMap type="map" id="parameter">
+		<parameter property="orderNoList" mode="IN"/>
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+	</parameterMap>
+
+	<select id="warehousing" parameterMap="parameter" statementType="CALLABLE" >
+		{call P_WAREHOUSING(?,?,?)}
+	</select>
+
+	<select id="inspection" parameterMap="parameter" statementType="CALLABLE">
+         <![CDATA[
+		{call P_INSPECTION(?,?,?)}
+		]]>
+      </select>
+
+</mapper>

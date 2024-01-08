@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.logistic.production.dao.MrpDAO">
+	
+	<resultMap id="mrpList" type="mrpTO">
+		<result property="mrpNo" column="MRP_NO"  />
+		<result property="mpsNo" column="MPS_NO"  />
+		<result property="mrpGatheringNo" column="MRP_GATHERING_NO"  />
+		<result property="itemClassification" column="ITEM_CLASSIFICATION"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="orderDate" column="ORDER_DATE"  />
+		<result property="requiredAmount" column="REQUIRED_AMOUNT" />
+		<result property="requiredDate" column="REQUIRED_DATE"  />
+		<result property="unitOfMrp" column="UNIT_OF_MRP"  />
+		<result property="mrpGatheringStatus" column="MRP_GATHERING_STATUS"  />
+	</resultMap>
+	
+	<select id="selectMrpListAll" parameterType="String" resultMap="mrpList">
+	
+	SELECT * FROM MRP
+	<where>
+			<if test='mrpGatheringStatusCondition == "null"'>
+				MRP_GATHERING_STATUS IS NULL
+			</if>
+	
+			<if test='mrpGatheringStatusCondition == ""'>
+				MRP_GATHERING_STATUS IS NULL
+			</if>
+	
+			<if test='mrpGatheringStatusCondition == "notNull"'>
+				MRP_GATHERING_STATUS IS NOT NULL
+			</if>
+	</where>
+	order by MRP_NO
+	</select>
+	
+	<select id="selectMrpList" parameterType="map" resultMap="mrpList">
+	SELECT * FROM MRP WHERE ( CASE #{dateSearchCondtion} WHEN 'orderDate' THEN
+	TO_DATE(ORDER_DATE, 'YYYY-MM-DD') WHEN 'requiredDate' THEN
+	TO_DATE(REQUIRED_DATE, 'YYYY-MM-DD') END )
+	BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD') AND TO_DATE(#{endDate},'YYYY-MM-DD')
+	</select>
+	
+	<select id="selectMrpListAsMrpGatheringNo" parameterType="String" resultMap="mrpList">
+	SELECT * FROM MRP WHERE MRP_GATHERING_NO = #{mrpGatheringNo}
+	</select>
+	
+	
+	<resultMap id="openMrplist" type="openMrpTO">
+		<result property="mpsNo" column="MPS_NO"  />
+		<result property="bomNo" column="BOM_NO"  />
+		<result property="itemClassification" column="ITEM_CLASSIFICATION"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="unitOfMrp" column="UNIT_OF_MRP"  />
+		<result property="orderDate" column="ORDER_DATE"  />
+		<result property="requiredDate" column="REQUIRED_DATE"  />
+		<result property="planAmount" column="PLAN_AMOUNT"  />
+		<result property="totalLossRate" column="TOTAL_LOSS_RATE"  />
+		<result property="caculatedAmount" column="CACULATED_AMOUNT"  />
+		<result property="requiredAmount" column="REQUIRED_AMOUNT"/>
+	</resultMap>
+	
+	<!--2020-09-02 63기 김태윤 수정 -->
+	<parameterMap type="map" id="openMrpParam">
+		<parameter property="mpsNoList" mode="IN" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="ERROR_CODE" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="ERROR_MSG" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="RESULT" javaType="java.sql.ResultSet" jdbcType="CURSOR" mode="OUT" resultMap="openMrplist"/>
+	</parameterMap>
+	
+	<select id="openMrp" parameterMap="openMrpParam" statementType="CALLABLE" >
+				<![CDATA[
+	{call P_MRP_OPEN(?,?,?,?) }
+	]]>
+	</select>
+	<!--2020-09-02 63기 김태윤 수정 끝--> 
+	
+<resultMap id="mrpNoResult" type="mrpTO">
+	<result property="mrpNo" column="MRP_NO" />
+</resultMap>
+	
+	<select id="selectMrpCount" parameterType="String" resultMap="mrpNoResult">
+	SELECT MRP_NO 
+	FROM MRP 
+	WHERE INSTR(MRP_NO, REPLACE( #{mrpRegisterDate} , '-' , '' ) ) &gt; 0
+	</select>
+	
+	<insert id="insertMrp" parameterType="mrpTO">
+			INSERT INTO MRP
+		               	( MRP_NO, MPS_NO, MRP_GATHERING_NO, ITEM_CLASSIFICATION, 
+		               	 ITEM_CODE, ITEM_NAME, UNIT_OF_MRP, 
+		               	 REQUIRED_AMOUNT, ORDER_DATE, REQUIRED_DATE,
+		               	 MRP_GATHERING_STATUS, PLAN_AMOUNT)
+               	VALUES ( #{mrpNo}, #{mpsNo}, 
+               			 #{mrpGatheringNo}, #{itemClassification},
+               			 #{itemCode}, #{itemName},
+               			 #{unitOfMrp}, #{requiredAmount},
+               			 to_char(to_date(#{orderDate}),'yyyy-mm-dd') , 
+               			 to_char(to_date(#{requiredDate}),'yyyy-mm-dd'), 
+               			 #{mrpGatheringStatus}, #{planAmount}
+               		   )                
+	</insert>
+	
+	<update id="updateMrp" parameterType="mrpTO">
+	UPDATE MRP 
+	SET 
+	MPS_NO = #{mpsNo} , 
+	MRP_GATHERING_NO = #{mrpGatheringNo} ,
+	ITEM_CLASSIFICATION = #{itemClassification} ,
+	ITEM_CODE = #{itemCode} ,
+	ITEM_NAME = #{itemName} , 
+	UNIT_OR_MRP = #{unitOfMrp} ,
+	REQUIRED_AMOUNT = #{requiredAmount} , 
+	ORDER_DATE = #{orderDate} ,
+	REQUIRED_DATE = #{requiredDate} , 
+	MRP_GATHERING_STATUS = #{mrpGatheringStatus}
+	
+	WHERE MRP_NO = #{mrpNo}
+	</update>
+	
+	<update id="changeMrpGatheringStatus" parameterType="map">
+	UPDATE MRP SET MRP_GATHERING_NO = #{mrpGatheringNo} , MRP_GATHERING_STATUS = #{mrpGatheringStatus} WHERE MRP_NO = #{mrpNo}
+	</update>
+	
+	<delete id="deleteMrp" parameterType="mrpTO">
+	DELETE FROM MRP WHERE MRP_NO = #{mrpNo}
+	</delete>
+	
+	
+	
+</mapper>

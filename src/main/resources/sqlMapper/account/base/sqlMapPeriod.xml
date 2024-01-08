@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:32 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.base.dao.PeriodDAO">
+
+    <select id="getPeriodNo" parameterType="String" resultType="String">
+    
+      SELECT ACCOUNT_PERIOD_NO FROM PERIOD WHERE 
+      #{today}
+      BETWEEN PERIOD_START_DATE AND PERIOD_END_DATE
+        
+	</select>
+	
+	  <insert id="insertPeriodNo" parameterType="Map">
+    <![CDATA[
+       insert into 
+       period 
+       values((select count(*)+1 from period),'BRC-01',#{sdate},#{edate})
+        ]]>
+	</insert>
+
+</mapper>

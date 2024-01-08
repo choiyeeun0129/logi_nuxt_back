@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.logistic.sales.dao.ContractDetailDAO">
+
+	<resultMap id="contractDetailResult" type="contractDetailTO">
+		<result property="contractDetailNo" column="CONTRACT_DETAIL_NO" />
+		<result property="contractNo" column="CONTRACT_NO" />
+		<result property="itemCode" column="ITEM_CODE" />
+		<result property="itemName" column="ITEM_NAME" />
+		<result property="unitOfContract" column="UNIT_OF_CONTRACT" />
+		<result property="dueDateOfContract" column="DUE_DATE_OF_CONTRACT" />
+		<result property="estimateAmount" column="ESTIMATE_AMOUNT" />
+		<result property="stockAmountUse" column="STOCK_AMOUNT_USE" />
+		<result property="productionRequirement" column="PRODUCTION_REQUIREMENT" />
+		<result property="unitPriceOfContract" column="UNIT_PRICE_OF_CONTRACT" />
+		<result property="sumPriceOfContract" column="SUM_PRICE_OF_CONTRACT" />
+		<result property="processingStatus" column="PROCESSING_STATUS" />
+		<result property="operationCompletedStatus" column="OPERATION_COMPLETED_STATUS" />
+		<result property="deliveryCompletionStatus" column="DELIVERY_COMPLETION_STATUS" />
+		<result property="description" column="DESCRIPTION" />
+	</resultMap>
+
+	<resultMap id="contractDetailNoResult" type="contractDetailTO">
+		<result property="contractDetailNo" column="CONTRACT_DETAIL_NO" jdbcType="VARCHAR" javaType="string" />
+	</resultMap>
+
+	<select id="selectContractDetailList" parameterType="string" resultMap="contractDetailResult">
+		SELECT *
+		FROM CONTRACT_DETAIL
+		WHERE CONTRACT_NO = #{contractNo}
+	</select>
+
+	<select id="selectDeliverableContractDetailList" parameterType="String" resultMap="contractDetailResult">
+		SELECT * FROM CONTRACT_DETAIL WHERE CONTRACT_NO = #{contractNo}
+	</select>
+
+	<select id="selectContractDetailCount" parameterType="string" resultMap="contractDetailNoResult">
+		SELECT CONTRACT_DETAIL_NO
+		FROM CONTRACT_DETAIL
+		WHERE CONTRACT_NO = #{contractNo}
+	</select>
+
+	<!--	출고를 위한 수주상세조회-->
+	<select id="getContractOutputDetailList" parameterType="string" resultMap="contractDetailResult">
+		<![CDATA[
+		SELECT * FROM CONTRACT_DETAIL WHERE CONTRACT_NO=#{contractNo}
+		]]>
+	</select>
+
+	<insert id="insertContractDetail" parameterType="contractDetailTO">
+		Insert into CONTRACT_DETAIL
+			( CONTRACT_DETAIL_NO, CONTRACT_NO, ITEM_CODE, ITEM_NAME, UNIT_OF_CONTRACT,
+			DUE_DATE_OF_CONTRACT, ESTIMATE_AMOUNT, UNIT_PRICE_OF_CONTRACT,
+			SUM_PRICE_OF_CONTRACT, PROCESSING_STATUS, DELIVERY_COMPLETION_STATUS,DESCRIPTION)
+		values (
+			#{contractDetailNo:VARCHAR} ,
+			#{contractNo:VARCHAR} ,
+			#{itemCode:VARCHAR} ,
+			#{itemName:NVARCHAR} ,
+			#{unitOfContract:VARCHAR} ,
+			#{dueDateOfContract:VARCHAR} ,
+			#{estimateAmount:INTEGER} ,
+			#{unitPriceOfContract:INTEGER} ,
+			#{sumPriceOfContract:INTEGER} ,
+			#{processingStatus:CHAR} ,
+			#{deliveryCompletionStatus:VARCHAR} ,
+			#{description:NVARCHAR}
+		)
+	</insert>
+
+	<update id="updateContractDetail" parameterType="contractDetailTO">
+		UPDATE CONTRACT_DETAIL SET
+			CONTRACT_NO = #{contractNo:VARCHAR},
+			ITEM_CODE = #{itemCode:VARCHAR},
+			ITEM_NAME = #{itemName:NVARCHAR},
+			UNIT_OF_CONTRACT = #{unitOfContract:VARCHAR},
+			DUE_DATE_OF_CONTRACT = #{dueDateOfContract:VARCHAR},
+			ESTIMATE_AMOUNT = #{estimateAmount:INTEGER},
+			UNIT_PRICE_OF_CONTRACT = #{unitPriceOfContract:INTEGER},
+			SUM_PRICE_OF_CONTRACT = #{sumPriceOfContract:INTEGER},
+			PROCESSING_STATUS = #{processingStatus:CHAR} ,
+			DELIVERY_COMPLETION_STATUS = #{deliveryCompletionStatus:VARCHAR},
+			DESCRIPTION = #{description:NVARCHAR}
+		WHERE CONTRACT_DETAIL_NO = #{contractDetailNo}
+	</update>
+
+	<update id="changeMpsStatusOfContractDetail" parameterType="map">
+		UPDATE CONTRACT_DETAIL SET
+			PROCESSING_STATUS = #{mpsStatus:CHAR}
+		WHERE CONTRACT_DETAIL_NO = #{contractDetailNo}
+	</update>
+
+	<delete id="deleteContractDetail" parameterType="contractDetailTO">
+		DELETE FROM CONTRACT_DETAIL
+		WHERE CONTRACT_DETAIL_NO = #{contractDetailNo}
+	</delete>
+
+	<parameterMap type="map" id="procedureInsertContractDetailParameter">
+		<parameter property="estimateNo" mode="IN" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="contractNo" mode="IN" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+	</parameterMap>
+
+	<select id="procedureInsertContractDetail" parameterMap="procedureInsertContractDetailParameter" statementType="CALLABLE">
+		{call P_INSERT_NEW_CONTRACT_DETAIL(?,?,?,?)}
+	</select>
+
+</mapper>

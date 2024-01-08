@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.logistic.outsourcing.dao.OutsourcOrderDAO">
+
+    <resultMap id="mrpGatheringList" type="mrpGatheringTO">
+        <result property="mrpGatheringNo" column="MRP_GATHERING_NO"/>
+        <result property="orderOrProductionStatus" column="ORDER_OR_PRODUCTION_STATUS"/>
+        <result property="itemCode" column="ITEM_CODE"/>
+        <result property="itemName" column="ITEM_NAME"/>
+        <result property="unitOfMrpGathering" column="UNIT_OF_MRP_GATHERING"/>
+        <result property="claimDate" column="CLAIM_DATE"/>
+        <result property="dueDate" column="DUE_DATE"/>
+        <result property="necessaryAmount" column="NECESSARY_AMOUNT"/>
+        <result property="requestStatus" column="REQUEST_STATUS"/>
+        <result property="outsourcStatus" column="OUTSOURC_STATUS"/>
+    </resultMap>
+
+    <select id="selectOutsourcInfoList" parameterType="map" resultType="kr.co.seoulit.erp.logistic.outsourcing.to.OutsourcTO">
+        SELECT *
+        FROM  OUTSOURC_INFO o
+        WHERE o.FORWARD_STATUS is null
+                <if test='dateSearchCondtion=="CLAIM_DATE"'>
+                    AND o.CLAIM_DATE BETWEEN #{startDate} AND #{endDate}
+                </if>
+                <if test='dateSearchCondtion=="DUE_DATE"'>
+                    AND o.DUE_DATE BETWEEN #{startDate} AND #{endDate}
+                </if>
+    </select>
+
+
+    <select id="selectMrpGatheringList" parameterType="map" resultMap="mrpGatheringList">
+        SELECT *
+        FROM MRP_GATHERING m
+        WHERE m.REQUEST_STATUS is null
+          and m.OUTSOURC_STATUS is null
+
+        <if test='dateSearchCondtion=="CLAIM_DATE"'>
+            AND m.CLAIM_DATE BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test='dateSearchCondtion=="DUE_DATE"'>
+            AND m.DUE_DATE BETWEEN #{startDate} AND #{endDate}
+        </if>
+          and m.item_code in (select item_code from item i where i.ITEM_CLASSIFICATION = 'IT-SI')
+    </select>
+
+    <select id="getStandardUnitPrice" parameterType="String" resultType="int">
+        select STANDARD_UNIT_PRICE
+        from OUTSOURC
+        where item_code = #{itemCode}
+    </select>
+
+
+    <insert id="insertOutsourc" parameterType="java.util.Map">
+        <foreach collection="list" item="item" index="index" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL">
+            INTO OUTSOURC_INFO (
+            CLAIM_DATE,
+            DUE_DATE,
+            ITEM_CODE,
+            ITEM_NAME,
+            MRP_GATHERING_NO,
+            MRP_GATHERING_SEQ,
+            NECESSARY_AMOUNT,
+            ORDER_OR_PRODUCTION_STATUS,
+            OUTSOURC_AMOUNT,
+            SUM_PRICE_OF_OUTSOURC,
+            UNIT_OF_MRP_GATHERING,
+            UNIT_PRICE_OF_OUTSOURC,
+            OUTSOURC_NO
+            ) VALUES(
+            #{item.claimDate},
+            #{item.dueDate},
+            #{item.itemCode},
+            #{item.itemName},
+            #{item.mrpGatheringNo},
+            #{item.mrpGatheringSeq},
+            #{item.necessaryAmount},
+            #{item.orderOrProductionStatus},
+            #{item.outsourcAmount},
+            #{item.sumPriceOfOutsourc},
+            #{item.unitOfMrpGathering},
+            #{item.unitPriceOfOutsourc},
+            'OPC-'||OUTSOURC_SEQ.nextval
+            )
+        </foreach>
+    </insert>
+
+
+    <update id="updateMrpGathering" parameterType="java.util.List">
+
+        <foreach collection="list" item="item" separator=";" open="DECLARE BEGIN" close="; END;">
+            UPDATE MRP_GATHERING
+            SET
+            NECESSARY_AMOUNT=NECESSARY_AMOUNT-#{item.outsourcAmount},
+            OUTSOURC_STATUS='Y'
+            <where>
+                MRP_GATHERING_NO=#{item.mrpGatheringNo}
+            </where>
+        </foreach>
+
+    </update>
+
+
+    <resultMap id="OutsourcInfoList" type="OutsourcTO">
+        <result property="claimDate" column="CLAIM_DATE"/>
+        <result property="dueDate" column="DUE_DATE"/>
+        <result property="itemCode" column="ITEM_CODE"/>
+        <result property="itemName" column="ITEM_NAME"/>
+        <result property="mrpGatheringNo" column="MRP_GATHERING_NO"/>
+        <result property="mrpGatheringSeq" column="MRP_GATHERING_SEQ"/>
+        <result property="necessaryAmount" column="NECESSARY_AMOUNT"/>
+        <result property="orderOrProductionStatus" column="ORDER_OR_PRODUCTION_STATUS"/>
+        <result property="outsourcAmount" column="OUTSOURC_AMOUNT"/>
+        <result property="sumPriceOfOutsourc" column="SUM_PRICE_OF_OUTSOURC"/>
+        <result property="unitOfMrpGathering" column="UNIT_OF_MRP_GATHERING"/>
+        <result property="unitPriceOfOutsourc" column="UNIT_PRICE_OF_OUTSOURC"/>
+        <result property="outsourcNo" column="OUTSOURC_NO"/>
+        <result property="forwardStatus" column="FORWARD_STATUS"/>
+    </resultMap>
+
+    <select id="selectOutsourcList" parameterType="map" resultType="kr.co.seoulit.erp.logistic.outsourcing.to.OutsourcTO">
+        SELECT *
+        FROM  OUTSOURC_INFO o
+        WHERE o.FORWARD_STATUS is null
+<!--        <if test='dateSearchCondtion=="CLAIM_DATE"'>-->
+<!--            AND o.CLAIM_DATE BETWEEN #{startDate} AND #{endDate}-->
+<!--        </if>-->
+<!--        <if test='dateSearchCondtion=="DUE_DATE"'>-->
+<!--            AND o.DUE_DATE BETWEEN #{startDate} AND #{endDate}-->
+<!--        </if>-->
+/*        SELECT *
+        FROM OUTSOURC_INFO o
+        WHERE (
+            CASE #{dateSearchCondtion}
+                WHEN 'claimDate' THEN
+                    TO_DATE(o.CLAIM_DATE, 'YYYY-MM-DD')
+                WHEN 'dueDate' THEN
+                    TO_DATE(o.DUE_DATE, 'YYYY-MM-DD')
+                END
+            )
+            BETWEEN
+            TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            AND
+            TO_DATE(#{endDate}, 'YYYY-MM-DD')
+          AND o.FORWARD_STATUS is null*/
+    </select>
+
+
+    <parameterMap type="map" id="param">
+        <parameter property="mrpGatheringNoList" mode="IN" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <parameter property="ERROR_CODE" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+        <parameter property="ERROR_MSG" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+    </parameterMap>
+
+    <select id="updateNecessaryAmount" parameterMap="param" statementType="CALLABLE">
+				<![CDATA[
+        {call P_INSERT_OUTSOURC_INFO(?, ?, ?) }
+        ]]>
+	</select>
+    <parameterMap type="map" id="params">
+        <parameter property="outsourcNo" mode="IN" javaType="java.lang.String" jdbcType="VARCHAR"/>
+
+    </parameterMap>
+    <select id="updateForwardStatus" parameterMap="params" >
+				<![CDATA[
+        {call P_OUTSOURCE_FOWARD(?) }
+        ]]>
+	</select>
+
+</mapper>

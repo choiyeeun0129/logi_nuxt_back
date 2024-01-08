@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.logistic.production.dao.MpsDAO">
+
+	<resultMap id="mpsList" type="mpsTO">
+		<result property="mpsPlanDate" column="MPS_PLAN_DATE"  />
+		<result property="mpsNo" column="MPS_NO"  />
+		<result property="contractDetailNo" column="CONTRACT_DETAIL_NO"  />
+		<result property="dueDateOfMps" column="DUE_DATE_OF_MPS"  />
+		<result property="salesPlanNo" column="SALES_PLAN_NO"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="mpsPlanAmount" column="MPS_PLAN_AMOUNT"  />
+		<result property="mrpApplyStatus" column="MRP_APPLY_STATUS"  />
+		<result property="description" column="DESCRIPTION"  />
+		<result property="unitOfMps" column="UNIT_OF_MPS"  />
+		<result property="mpsPlanClassification" column="MPS_PLAN_CLASSIFICATION"  />
+		<result property="scheduledEndDate" column="SCHEDULED_END_DATE"  />
+	</resultMap>
+	
+	<select id="selectMpsList" parameterType="map" resultMap="mpsList">
+	SELECT * FROM MPS
+	WHERE TO_DATE(MPS_PLAN_DATE, 'YYYY-MM-DD')
+	BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD') AND TO_DATE(#{endDate},'YYYY-MM-DD')
+	
+	<if test="includeMrpApply = excludeMrpApply">
+	AND MRP_APPLY_STATUS IS NULL
+	</if>
+
+	
+	</select>
+	
+		
+	<resultMap id="mpsNoResult" type="mpsTO" >
+		<result property="mpsNo" column="MPS_NO"/>
+	</resultMap>
+	
+	<select id="selectMpsCount" parameterType="String" resultMap="mpsNoResult">
+	SELECT * FROM MPS WHERE MPS_PLAN_DATE = #{mpsPlanDate}
+	</select>
+	
+	<insert id="insertMps" parameterType="mpsTO">
+	Insert into MPS
+	(MPS_NO, CONTRACT_DETAIL_NO, MPS_PLAN_CLASSIFICATION,
+	SALES_PLAN_NO, ITEM_CODE, ITEM_NAME, MPS_PLAN_DATE, SCHEDULED_END_DATE,
+	UNIT_OF_MPS, DUE_DATE_OF_MPS, MPS_PLAN_AMOUNT, MRP_APPLY_STATUS, DESCRIPTION)
+	values (#{mpsNo},
+			#{contractDetailNo},
+			#{mpsPlanClassification},
+			#{salesPlanNo},
+			#{itemCode},
+			#{itemName},
+			#{mpsPlanDate},
+			#{scheduledEndDate},
+			#{unitOfMps},
+			#{dueDateOfMps},
+			#{mpsPlanAmount},
+			#{mrpApplyStatus},
+			#{description}
+		   )
+	</insert>
+	
+	<update id="updateMps" parameterType="mpsTO">
+	UPDATE MPS SET
+	MPS_PLAN_CLASSIFICATION = #{mpsPlanClassification} ,
+	CONTRACT_DETAIL_NO = #{contractDetailNo} ,
+	SALES_PLAN_NO = #{salesPlanNo} , 
+	ITEM_CODE = #{itemCode} , 
+	ITEM_NAME = #{itemName} ,
+	UNIT_OF_MPS = #{unitOfMps} , 
+	MPS_PLAN_DATE = #{mpsPlanDate} ,
+	MPS_PLAN_AMOUNT = #{mpsPlanAmount} , 
+	DUE_DATE_OF_MPS = #{dueDateOfMps} ,
+	SCHEDULED_END_DATE = #{scheduledEndDate} , 
+	MRP_APPLY_STATUS = #{mrpApplyStatus} ,
+	DESCRIPTION = #{description}
+	
+	WHERE MPS_NO = #{mpsNo}
+	</update>
+	
+	<update id="changeMrpApplyStatus" parameterType="map">
+	UPDATE MPS SET MRP_APPLY_STATUS = #{mrpStatus} WHERE MPS_NO = #{mpsNo}
+	</update>
+	
+	<delete id="deleteMps" parameterType="mpsTO">
+	DELETE FROM MPS WHERE MPS_NO = #{mpsNo}
+	</delete>
+	
+	
+	
+</mapper>

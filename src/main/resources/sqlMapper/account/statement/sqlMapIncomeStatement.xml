@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:31 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.statement.dao.IncomeStatementDAO">
+    <!--
+		Sorry, I can`t migrate	incomeStatementBean
+		See console output for further details 
+	-->
+
+    <resultMap id="incomeStatementResult" type="kr.co.seoulit.erp.account.statement.to.IncomeStatementBean">
+        <result property="accountInnerCode" column="ACCOUNT_INNER_CODE"/>
+        <result property="accountName" column="ACCOUNT_NAME"/>
+        <result property="parentAccountCode" column="PARENT_ACCOUNT_CODE"/>
+        <result property="income" column="INCOME"/>
+        <result property="incomeSummary" column="INCOME_SUMMARY"/>
+        <result property="earlyIncome" column="EARLY_INCOME"/>
+        <result property="earlyIncomeSummary" column="EARLY_INCOME_SUMMARY"/>
+    </resultMap>
+
+     <parameterMap id="incomeStatementParams" type="java.util.HashMap">
+        <parameter property="toDate" jdbcType="VARCHAR" javaType="String" mode="IN"/>
+        <parameter property="ERROR_CODE" jdbcType="DECIMAL" javaType="int" mode="OUT"/>
+        <parameter property="ERROR_MSG" jdbcType="VARCHAR" javaType="String" mode="OUT"/>
+        <parameter property="RESULT" jdbcType="CURSOR" javaType="java.sql.ResultSet" mode="OUT" resultMap="incomeStatementResult"/>
+    </parameterMap>
+    
+    <select id="callIncomeStatement" parameterMap="incomeStatementParams" statementType="CALLABLE">
+    <![CDATA[
+        {call P_INCOME_STATEMENT(?,?,?,?)}
+    ]]>
+    </select>
+
+</mapper>

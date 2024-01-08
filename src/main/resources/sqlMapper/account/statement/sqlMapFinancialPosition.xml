@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:31 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.statement.dao.FinancialPositionDAO">
+
+    <resultMap id="financialPositionResult" type="kr.co.seoulit.erp.account.statement.to.FinancialPositionBean">
+        <result property="lev" column="LEV"/>
+        <result property="category" column="CATEGORY"/>
+        <result property="accountName" column="ACCOUNT_NAME"/>
+        <result property="accountCode" column="ACCOUNT_CODE"/>
+        <result property="balanceDetail" column="BALANCE_DETAIL"/>
+        <result property="balanceSummary" column="BALANCE_SUMMARY"/>
+        <result property="preBalanceDetail" column="PRE_BALANCE_DETAIL"/>
+        <result property="preBalanceSummary" column="PRE_BALANCE_SUMMARY"/>
+    </resultMap>
+
+    <parameterMap id="financialPositionParams" type="java.util.Map">
+        <parameter property="toDate" jdbcType="VARCHAR" javaType="String" mode="IN"/>
+        <parameter property="ERROR_CODE" jdbcType="DECIMAL" javaType="int" mode="OUT"/>
+        <parameter property="ERROR_MSG" jdbcType="VARCHAR" javaType="String" mode="OUT"/>
+        <parameter property="RESULT" jdbcType="CURSOR" javaType="java.sql.ResultSet" mode="OUT" resultMap="financialPositionResult"/>
+    </parameterMap>
+
+     <select id="callFinancialPosition" parameterMap="financialPositionParams" statementType="CALLABLE" >
+   	<![CDATA[
+   	{call P_FINANCIAL_POSITION (?,?,?,?)}		   
+   	]]>   									 
+    </select>
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.logistic.sales.dao.ReturnDAO">
+
+    <resultMap id="returnResult" type="kr.co.seoulit.erp.logistic.sales.to.ReturnTO">
+        <result property="returnNo" column="RETURN_NO"  />
+        <result property="deliveryNumber" column="DELIVERY_NUMBER"  />
+        <result property="itemName" column="ITEM_NAME"  />
+        <result property="itemCode" column="ITEM_CODE"  />
+        <result property="rcvdDate" column="RCVD_DATE"  />
+        <result property="returnReason" column="RETURN_REASON"  />
+        <result property="returnQty" column="RETURN_QTY"  />
+        <result property="returnProcessor" column="RETURN_PROCESSOR"  />
+        <result property="returnStat" column="RETURN_STAT"  />
+        <result property="returnNote" column="RETURN_NOTE"  />
+    </resultMap>
+
+    <!--    반품요청 수령일자별 조회-->
+    <select id="getReturnList" parameterType="map" resultMap="returnResult">
+    SELECT * FROM RETURN
+    WHERE RCVD_DATE BETWEEN #{startDate, jdbcType=TIMESTAMP} AND #{endDate, jdbcType=TIMESTAMP}
+    </select>
+
+    <!--    반품요청 전체조회-->
+    <select id="returnListForStock" parameterType="map" resultMap="returnResult">
+        SELECT * FROM RETURN
+    </select>
+
+        <!-- 반품요청 수정 -->
+    <update id="updateReturn" parameterType="map">
+        UPDATE RETURN
+        SET
+            DELIVERY_NUMBER = #{deliveryNumber},
+            ITEM_NAME = #{itemName},
+            ITEM_CODE = #{itemCode},
+            RCVD_DATE = #{rcvdDate},
+            RETURN_REASON = #{returnReason},
+            RETURN_QTY = #{returnQty},
+            RETURN_PROCESSOR = #{returnProcessor},
+            RETURN_STAT = #{returnStat},
+            RETURN_NOTE = #{returnNote}
+        WHERE RETURN_NO = #{returnNo}
+    </update>
+
+        <!-- 반품요청 삭제 -->
+    <delete id="deleteReturn" parameterType="String">
+        DELETE FROM RETURN
+        WHERE RETURN_NO = #{returnNo}
+    </delete>
+
+
+    <!-- ReturnNo 최신값 조회 -->
+    <select id="getReturnMaxNo" resultType="String">
+        SELECT MAX(RETURN_NO) FROM RETURN
+    </select>
+
+
+    <!-- 반품요청 등록 -->
+    <insert id="addReturn" parameterType="map">
+        INSERT INTO RETURN (RETURN_NO, DELIVERY_NUMBER, ITEM_NAME, ITEM_CODE, RCVD_DATE, RETURN_REASON, RETURN_QTY, RETURN_PROCESSOR, RETURN_STAT, RETURN_NOTE)
+        VALUES (#{returnNo},#{deliveryNumber}, #{itemName}, #{itemCode}, #{rcvdDate},#{returnReason},#{returnQty},#{returnProcessor},#{returnStat},#{returnNote})
+    </insert>
+
+</mapper>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.logistic.purchase.dao.OrderDAO">
+	 
+	<resultMap id="orderTempResult" type="orderTempTO">
+		<result property="mrpGatheringNo" column="MRP_GATHERING_NO"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="unitOfMrp" column="UNIT_OF_MRP"  />
+		<result property="requiredAmount" column="REQUIRED_AMOUNT"  />
+		<result property="stockAmount" column="STOCK_AMOUNT"  />
+		<result property="orderDate" column="ORDER_DATE"  />
+		<result property="requiredDate" column="REQUIRED_DATE"  />
+	</resultMap>
+	
+	<parameterMap id="getOrderListParam" type="map">
+		<parameter property="startDate" mode="IN" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<parameter property="endDate" mode="IN" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="result" mode="OUT" javaType="java.sql.ResultSet" jdbcType="CURSOR" resultMap="orderTempResult"/>
+	</parameterMap>
+	
+	<select id="getOrderList" parameterMap="getOrderListParam" statementType="CALLABLE" >
+	{call P_ORDERLIST_OPEN(?,?,?,?,?)}
+	</select>
+	
+	
+	
+	
+	<resultMap id="orderDialogTempResult" type="orderDialogTempTO">
+		<result property="mrpGatheringNo" column="MRP_GATHERING_NO"/>
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="unitOfMrp" column="UNIT_OF_MRP"  />
+		<result property="requiredAmount" column="REQUIRED_AMOUNT"  />
+		<result property="stockAmount" column="STOCK_AMOUNT"  />
+		<result property="calculatedRequiredAmount" column="CALCULATED_REQUIRED_AMOUNT"  />
+		<result property="standardUnitPrice" column="STANDARD_UNIT_PRICE"  />
+		<result property="sumPrice" column="SUM_PRICE"  />
+	</resultMap>
+	
+	<parameterMap id="getOrderDialogInfoParam" type="map">
+		<parameter property="mrpNoList" mode="IN" />
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="result" mode="OUT" javaType="java.sql.ResultSet" jdbcType="CURSOR"  resultMap="orderDialogTempResult"/>
+	</parameterMap>
+	
+	<select id="getOrderDialogInfo" parameterMap="getOrderDialogInfoParam" statementType="CALLABLE" >
+	{call P_ORDER_DIALOG_OPEN(?,?,?,?)}
+	</select>
+	
+	
+	
+	
+	<parameterMap id="orderParam" type="map">		
+		<parameter property="mrpGatheringNoList" mode="IN" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+	</parameterMap>
+	
+	<select id="order" parameterMap="orderParam" statementType="CALLABLE" >
+	{call P_ORDER(?,?,?)}
+	</select>
+	
+	
+	
+	<parameterMap id="optionOrderParam" type="map">
+		<parameter property="itemCode" mode="IN" />
+		<parameter property="itemAmount" mode="IN" />
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+	</parameterMap>
+	
+	<select id="optionOrder" parameterMap="optionOrderParam" statementType="CALLABLE" >
+	{call P_OPTION_ORDER(?,?,?,?)}
+	</select>
+	
+	
+	<resultMap id="orderInfoResult" type="orderInfoTO">
+		<result property="orderNo" column="ORDER_NO"  />
+		<result property="orderDate" column="ORDER_DATE"  />
+		<result property="orderInfoStatus" column="ORDER_INFO_STATUS"  />
+		<result property="orderSort" column="ORDER_SORT"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="orderAmount" column="ORDER_AMOUNT"  />
+	</resultMap>
+	
+	<update id="updateOrderInfo" parameterType="map">
+	UPDATE ORDER_INFO 
+	SET ORDER_SLIP_STATUS = #{orderSlipStatus} 
+	WHERE ORDER_NO = #{orderNo}
+	</update>
+	
+	
+	<select id="getOrderInfoListOnDelivery" resultMap="orderInfoResult">
+	select * from order_info where ORDER_INFO_STATUS = '운송중'
+	</select>
+	
+	
+	<select id="getOrderDialog" resultMap="orderDialogTempResult">
+	select * from order_dialog_temp
+	</select>
+	
+	
+	<select id="getOrderInfoList" parameterType="map" resultMap="orderInfoResult" >
+	select * from order_info
+	where
+	to_date(order_date,'YY-MM-DD')
+	between to_date(#{startDate},'YY-MM-DD') AND
+	to_date(#{endDate},'YY-MM-DD')
+	</select>
+	
+</mapper>

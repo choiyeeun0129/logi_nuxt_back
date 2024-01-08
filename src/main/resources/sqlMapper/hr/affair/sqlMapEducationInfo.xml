@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.affair.dao.EducationInfoDAO">
+	
+
+
+	<resultMap type="kr.co.seoulit.erp.hr.affair.to.EducationInfoTO" id="educationInfoResult">
+		<result property="empCode" column="EMP_CODE"></result>
+		<result property="educationCode" column="EDUCATION_CODE"></result>
+		<result property="schoolName" column="SCHOOL_NAME"></result>
+		<result property="major" column="MAJOR"></result>
+		<result property="entranceDate" column="ENTRANCE_DATE"></result>
+		<result property="graduateDate" column="GRADUATE_DATE"></result>
+		<result property="grade" column="GRADE"></result>
+	</resultMap>
+	
+	
+		<select id="selectEducationInfoList" resultMap="educationInfoResult"
+		parameterType="string">
+		SELECT * FROM EDUCATION_INFO
+		WHERE EMP_CODE=#{code}
+		</select>
+	
+
+	<select id="selectEducationList" resultMap="educationInfoResult"
+		parameterType="string">
+		SELECT EMP_CODE
+		, EDUCATION_CODE
+		, SCHOOL_NAME
+		, MAJOR
+		, GRADE
+		, TO_CHAR(ENTRANCE_DATE,'YYYY/MM/DD') ENTRANCE_DATE
+		, TO_CHAR(GRADUATE_DATE,'YYYY/MM/DD') GRADUATE_DATE
+		FROM EDUCATION_INFO
+		WHERE EMP_CODE = #{code}
+	</select>
+
+	<insert id="insertEducationInfo"
+		parameterType="kr.co.seoulit.erp.hr.affair.to.EducationInfoTO">
+		INSERT INTO EDUCATION_INFO VALUES (
+		#{empCode},
+		EDUCATION_CODE_SEQ.NEXTVAL,
+		#{schoolName},
+		#{major},
+		TO_DATE(#entranceDate#,'YYYY/MM/DD'),
+		TO_DATE(#graduateDate#,'YYYY/MM/DD'),
+		#{grade}
+		)
+	</insert>
+
+	<update id="updateEducationInfo"
+		parameterType="kr.co.seoulit.erp.hr.affair.to.EducationInfoTO">
+		UPDATE EDUCATION_INFO SET
+		SCHOOL_NAME= #{schoolName} 
+		, MAJOR = #{major}
+		, ENTRANCE_DATE = to_date(#{entranceDate},'YYYY/MM/DD')
+		, GRADUATE_DATE = to_date(#{graduateDate},'YYYY/MM/DD')
+		, GRADE = #{grade}
+		WHERE EMP_CODE = #{empCode} 
+		AND EDUCATION_CODE = #{educationCode}
+	</update>
+
+	<delete id="deleteEducationInfo"
+		parameterType="kr.co.seoulit.erp.hr.affair.to.EducationInfoTO">
+		DELETE FROM EDUCATION_INFO
+		WHERE EMP_CODE = #{empCode}
+		AND EDUCATION_CODE = #{educationCode}
+	</delete>
+	
+
+</mapper>

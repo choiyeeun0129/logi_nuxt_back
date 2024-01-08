@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.hr.company.dao.LogiWorkplaceDAO">
+	
+	<resultMap id="workplaceResult" type="workplaceTO">
+		<result property="workplaceCeoName" column="WORKPLACE_CEO_NAME"  />
+		<result property="isMainOffice" column="IS_MAIN_OFFICE"  />
+		<result property="workplaceDetailAddress" column="WORKPLACE_DETAIL_ADDRESS"  />
+		<result property="workplaceBusinessConditions" column="WORKPLACE_BUSINESS_CONDITIONS"  />
+		<result property="workplaceBusinessItems" column="WORKPLACE_BUSINESS_ITEMS"  />
+		<result property="workplaceFaxNumber" column="WORKPLACE_FAX_NUMBER"  />
+		<result property="workplaceEstablishDate" column="WORKPLACE_ESTABLISH_DATE"  />
+		<result property="businessLicenseNumber" column="BUSINESS_LICENSE_NUMBER"  />
+		<result property="workplaceTelNumber" column="WORKPLACE_TEL_NUMBER"  />
+		<result property="workplaceName" column="WORKPLACE_NAME"  />
+		<result property="workplaceBasicAddress" column="WORKPLACE_BASIC_ADDRESS"  />
+		<result property="workplaceCloseDate" column="WORKPLACE_CLOSE_DATE"  />
+		<result property="workplaceCode" column="WORKPLACE_CODE"  />
+		<result property="companyCode" column="COMPANY_CODE"  />
+		<result property="workplaceOpenDate" column="WORKPLACE_OPEN_DATE"  />
+		<result property="corporationLicenseNumber" column="CORPORATION_LICENSE_NUMBER"  />
+		<result property="workplaceZipCode" column="WORKPLACE_ZIP_CODE"  />
+	</resultMap>
+	
+	<select id="selectWorkplaceList" parameterType="String" resultMap="workplaceResult">
+	SELECT * FROM WORKPLACE WHERE COMPANY_CODE = #{companyCode}
+	</select>
+	
+	<insert id="insertWorkplace" parameterType="workplaceTO">
+	Insert into WORKPLACE
+		( WORKPLACE_CODE , COMPANY_CODE , WORKPLACE_NAME , BUSINESS_LICENSE_NUMBER ,
+		CORPORATION_LICENSE_NUMBER , WORKPLACE_CEO_NAME , WORKPLACE_BUSINESS_CONDITIONS ,
+		WORKPLACE_BUSINESS_ITEMS , WORKPLACE_ZIP_CODE , WORKPLACE_BASIC_ADDRESS ,
+		WORKPLACE_DETAIL_ADDRESS , WORKPLACE_TEL_NUMBER , WORKPLACE_FAX_NUMBER ,
+		WORKPLACE_ESTABLISH_DATE , WORKPLACE_OPEN_DATE , WORKPLACE_CLOSE_DATE , IS_MAIN_OFFICE)
+	values ( #{workplaceCode} ,
+			 #{companyCode} ,
+			 #{workplaceName} , 
+			 #{businessLicenseNumber} , 
+			 #{corporationLicenseNumber} , 
+			 #{workplaceCeoName} , 
+			 #{workplaceBusinessConditions} , 
+			 #{workplaceBusinessItems} , 
+			 #{workplaceZipCode} , 
+			 #{workplaceBasicAddress} , 
+			 #{workplaceDetailAddress} , 
+			 #{workplaceTelNumber} , 
+			 #{workplaceFaxNumber} , 
+			 #{workplaceEstablishDate} , 
+			 #{workplaceOpenDate} , 
+			 #{workplaceCloseDate} , 
+			 #{isMainOffice}
+			)
+	</insert>
+	
+	<update id="updateWorkplace" parameterType="workplaceTO">
+	UPDATE WORKPLACE SET
+		COMPANY_CODE = #{companyCode} , 
+		WORKPLACE_NAME = #{workplaceName} , 
+		BUSINESS_LICENSE_NUMBER = #{businessLicenseNumber} ,
+		CORPORATION_LICENSE_NUMBER = #{corporationLicenseNumber} , 
+		WORKPLACE_CEO_NAME = #{workplaceCeoName} , 
+		WORKPLACE_BUSINESS_CONDITIONS = #{workplaceBusinessConditions} ,
+		WORKPLACE_BUSINESS_ITEMS = #{workplaceBusinessItems} , 
+		WORKPLACE_ZIP_CODE = #{workplaceZipCode} , 
+		WORKPLACE_BASIC_ADDRESS = #{workplaceBasicAddress} ,
+		WORKPLACE_DETAIL_ADDRESS = #{workplaceDetailAddress} ,
+	    WORKPLACE_TEL_NUMBER = #{workplaceTelNumber} , 
+		WORKPLACE_FAX_NUMBER = #{workplaceFaxNumber} ,
+		WORKPLACE_ESTABLISH_DATE = #{workplaceEstablishDate} , 
+		WORKPLACE_OPEN_DATE = #{workplaceOpenDate} , 
+		WORKPLACE_CLOSE_DATE = #{workplaceCloseDate} , 
+		IS_MAIN_OFFICE = #{isMainOffice}
+	WHERE WORKPLACE_CODE = #{workplaceCode}
+	</update>
+	
+	<delete id="deleteWorkplace" parameterType="workplaceTO">
+	DELETE FROM WORKPLACE WHERE WORKPLACE_CODE = #{workplaceCode}
+	</delete>
+	
+</mapper>

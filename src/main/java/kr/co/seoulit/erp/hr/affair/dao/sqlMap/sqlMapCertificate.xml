@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.affair.dao.CertificateDAO">
+	
+	<resultMap type="kr.co.seoulit.erp.hr.affair.to.CertificateTO" id="certificateResult">
+		<result property="deptName" column="DEPT_NAME" />
+		<result property="empCode" column="EMP_CODE" />
+		<result property="empName" column="EMP_NAME" />
+		<result property="usageCode" column="USAGE_CODE" />
+		<result property="requestDate" column="REQUEST_DATE" />
+		<result property="useDate" column="USE_DATE" />
+		<result property="approvalStatus" column="APPROVAL_STATUS" />
+		<result property="rejectCause" column="REJECT_CAUSE" />
+		<result property="etc" column="ETC" />		
+	</resultMap>
+	
+	<resultMap type="kr.co.seoulit.erp.hr.affair.to.CertificateTO" id="certificateResult2">
+		<result property="empCode" column="EMP_CODE" />
+		<result property="usageCode" column="USAGE_CODE" />
+		<result property="usageName" column="USAGE_NAME" />
+		<result property="requestDate" column="REQUEST_DATE" />
+		<result property="useDate" column="USE_DATE" />
+		<result property="approvalStatus" column="APPROVAL_STATUS" />
+		<result property="rejectCause" column="REJECT_CAUSE" />
+		<result property="etc" column="ETC" />		
+	</resultMap>
+	
+	
+	
+
+	<insert id="insertCertificateRequest" parameterType="kr.co.seoulit.erp.hr.affair.to.CertificateTO">
+		INSERT INTO CERTIFICATE VALUES (
+		#{empCode}
+		,#{usageCode}
+		,#{requestDate}
+		,#{useDate}
+		,#{approvalStatus}
+		,null
+		,#{etc})
+	</insert>
+
+	<select id="selectCertificateList" resultMap="certificateResult2"
+		parameterType="map">
+		SELECT EMP_CODE, USAGE_CODE, DETAIL_CODE_NAME USAGE_NAME
+			,TO_CHAR(C.REQUEST_DATE, 'YYYY-MM-DD') REQUEST_DATE
+			,TO_CHAR(C.USE_DATE,'YYYY-MM-DD') USE_DATE
+			,C.APPROVAL_STATUS, C.REJECT_CAUSE, C.ETC
+			FROM CERTIFICATE C, DETAIL_CODE D
+			WHERE C.USAGE_CODE=D.DETAIL_CODE_NUMBER
+			AND C.EMP_CODE=#{empCode}
+			AND C.REQUEST_DATE BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD') AND TO_DATE(#{endDate},'YYYY-MM-DD')
+	</select>
+		
+	<select id="selectCertificateListByAllDept" resultMap="certificateResult"
+		parameterType="string">
+		SELECT D.DEPT_NAME, C.EMP_CODE, E.EMP_NAME, C.USAGE_CODE, DD.DETAIL_CODE_NAME,
+		TO_CHAR(REQUEST_DATE, 'YYYY-MM-DD') REQUEST_DATE, 
+		TO_CHAR(USE_DATE, 'YYYY-MM-DD') USE_DATE, 
+		APPROVAL_STATUS, REJECT_CAUSE, ETC
+		FROM CERTIFICATE C, EMPLOYEE_BASIC E,DEPARTMENT D, DETAIL_CODE DD
+		WHERE C.EMP_CODE=E.EMP_CODE(+)
+		AND E.DEPT_CODE=D.DEPT_CODE(+)
+		AND C.USAGE_CODE=DD.DETAIL_CODE_NUMBER(+)
+		AND REQUEST_DATE=TO_DATE(#{requestDate},'yyyy-mm-dd')
+	</select>
+	
+	<select id="selectCertificateListByDept" resultMap="certificateResult"
+		parameterType="map">
+		SELECT D.DEPT_NAME, C.EMP_CODE, E.EMP_NAME, C.USAGE_CODE, DD.DETAIL_CODE_NAME,
+		TO_CHAR(REQUEST_DATE, 'YYYY-MM-DD') REQUEST_DATE, 
+		TO_CHAR(USE_DATE, 'YYYY-MM-DD') USE_DATE, 
+		APPROVAL_STATUS, REJECT_CAUSE, ETC
+		FROM CERTIFICATE C, EMPLOYEE_BASIC E,DEPARTMENT D, DETAIL_CODE DD
+		WHERE C.EMP_CODE=E.EMP_CODE(+)
+		AND E.DEPT_CODE=D.DEPT_CODE(+)
+		AND C.USAGE_CODE=DD.DETAIL_CODE_NUMBER(+)
+		AND D.DEPT_NAME=#{deptName}
+		AND REQUEST_DATE BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD') AND TO_DATE(#{endDate},'YYYY-MM-DD')
+	</select>
+		
+	<delete id="deleteCertificate" parameterType="kr.co.seoulit.erp.hr.affair.to.CertificateTO">
+		DELETE FROM CERTIFICATE 
+		WHERE EMP_CODE=#{empCode} 
+		AND REQUEST_DATE=TO_DATE(#{requestDate},'YYYY-MM-DD')
+	</delete>
+	
+	<update id="updateCertificate" parameterType="map">
+		<![CDATA[
+		UPDATE CERTIFICATE 
+		SET	APPROVAL_STATUS=#{approvalStatus},  REJECT_CAUSE=#{rejectCause}
+		WHERE EMP_CODE = #{empCode} 
+		AND REQUEST_DATE = TO_DATE(#{requestDate},'YYYY-MM-DD')
+			]]>
+	</update>	
+
+</mapper>
+	
+	

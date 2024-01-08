@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.logistic.sales.dao.OutputDAO">
+
+
+    <resultMap id="OutputResult" type="OutputTO" >
+        <result property="outputNumber" column="OUTPUT_NUMBER" />
+        <result property="requestDate" column="REQUEST_DATE" />
+        <result property="customerName" column="CUSTOMER_NAME" />
+        <result property="warehouseCode" column="WAREHOUSE_CODE" />
+        <result property="requestPerson" column="REQUEST_PERSON" />
+        <result property="dueDate" column="DUE_DATE" />
+        <result property="requestDeadline" column="REQUEST_DEADLINE" />
+        <result property="description" column="DESCRIPTION" />
+    </resultMap>
+
+    <resultMap id="OutputDetailResult" type="OutputTO" >
+        <result property="outputDetailNumber" column="OUTPUT_DETAIL_NUMBER" />
+        <result property="itemCode" column="ITEM_CODE" />
+        <result property="itemName" column="ITEM_NAME" />
+        <result property="standard" column="STANDARD" />
+        <result property="dueDate" column="DUE_DATE" />
+        <result property="expectedArrivalDate" column="EXPENTED_ARRIVAL_DATE" />
+        <result property="unitOfStock" column="UNIT_OF_STOCK" />
+        <result property="requestQuantity" column="REQUEST_QUANTITY" />
+        <result property="inspection" column="INSPECTION" />
+    </resultMap>
+
+    <select id="getOutputList" resultMap="OutputResult">
+        SELECT * FROM SHIPMENT_REGIST ORDER BY OUTPUT_NUMBER
+    </select>
+
+    <select id="getOutputDetailList" parameterType="String" resultMap="OutputDetailResult">
+        SELECT * FROM SHIPMENT_REGIST_DETAIL WHERE OUTPUT_DETAIL_NUMBER = #{outputDetailNumber}
+    </select>
+
+    <insert id="addNewOutput" parameterType="map" >
+        Insert into SHIPMENT_REGIST
+        ( OUTPUT_NUMBER , CONTRACT_NO ,REQUEST_DATE, CUSTOMER_NAME , WAREHOUSE_CODE , REQUEST_PERSON,ITEM_NAME,STANDARD, DUE_DATE,EXPECTED_ARRIVAL_DATE,UNIT_OF_STOCK,REQUEST_QUANTITY,INSPECTION)
+        values ( #{outputNumber} , #{contractNo}, #{requestDate} , #{customerName} , #{warehouseCode} , #{requestPerson},#{itemName},#{standard},#{dueDate},#{expectedArrivalDate},#{unitOfStock},#{requestQuantity},#{inspection} )
+    </insert>
+
+<!--    배송등록 후 출고목록삭제-->
+    <delete id="delete" parameterType="String">
+        DELETE FROM SHIPMENT_REGIST WHERE OUTPUT_NUMBER = #{outputNumber}
+    </delete>
+
+    <!-- 최신번호 조회 -->
+    <select id="getOutputMaxNo" resultType="String">
+        SELECT MAX(OUTPUT_NUMBER)
+        FROM SHIPMENT_REGIST
+    </select>
+
+    <delete id="deleteOutput" parameterType="String">
+        DELETE FROM SHIPMENT_REGIST WHERE OUTPUT_NUMBER = #{outputNumber}
+    </delete>
+
+</mapper>

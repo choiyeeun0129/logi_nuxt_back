@@ -1,0 +1,108 @@
+plugins {
+   id 'org.springframework.boot' version '2.5.6'
+   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+   id 'java'
+//   id "com.ewerk.gradle.plugins.querydsl" version "1.0.10" //
+
+}
+
+group = 'kr.co.seoulit'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+   mavenCentral()
+}
+
+dependencies {
+
+   //Spring
+   implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+   implementation 'org.springframework.boot:spring-boot-starter-web'
+   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+   developmentOnly 'org.springframework.boot:spring-boot-devtools'
+   //testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+   //SpringBoot Mybatis
+   implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.2'
+
+   //log4j
+   implementation group: 'org.bgee.log4jdbc-log4j2', name: 'log4jdbc-log4j2-jdbc4.1', version: '1.16'
+
+   // https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc6
+   implementation group: 'com.oracle.database.jdbc', name: 'ojdbc6', version: '11.2.0.4'
+
+   // https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter Swagger
+   implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+
+
+   //Lombok
+   compileOnly 'org.projectlombok:lombok:1.18.12'
+   annotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+   implementation group: 'com.auth0', name: 'java-jwt', version: '3.8.1'
+   implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.10.5'
+   implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
+   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+   implementation group: 'commons-io', name: 'commons-io', version: '2.5'
+
+   implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.10.5'
+   implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.10.5'
+   implementation group: 'net.sf.json-lib', name: 'json-lib-ext-spring', version: '1.0.2'
+
+   //GSON - https://mvnrepository.com/artifact/com.google.code.gson/gson
+   implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
+
+   testImplementation('org.springframework.boot:spring-boot-starter-test') {
+      exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+   }
+
+   //JPA
+   implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+   implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.4.9.Final'
+   implementation 'javax.servlet:javax.servlet-api:4.0.1'
+
+   implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.0.Final'
+
+//   implementation 'com.querydsl:querydsl-jpa' // QueryDsl
+
+   //MapStruct
+   implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+
+   annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+
+}
+
+test {
+   useJUnitPlatform()
+}
+
+//def querydslDir = "$buildDir/generated/querydsl" // (3)
+//
+//querydsl { // (4)
+//   jpa = true
+//   querydslSourcesDir = querydslDir
+//}
+//
+//sourceSets { // (5)
+//   main.java.srcDir querydslDir
+//}
+//
+//configurations { // (6)
+//   querydsl.extendsFrom compileClasspath
+//}
+//
+//compileQuerydsl { // (7)
+//   options.annotationProcessorPath = configurations.querydsl
+//}
+//
+///**
+// * comileQuerydsl.doFirst 추가
+// */
+//compileQuerydsl.doFirst {
+//  if(file(querydslDir).exists())
+//     delete(file(querydslDir))
+//}
+

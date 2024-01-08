@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.hr.base.dao.HrDetailCodeDAO">
+
+
+         <resultMap type="kr.co.seoulit.erp.hr.base.to.HrDetailCodeTO" id="detailCodeResult">
+			<result property="detailCodeNumber" column="DETAIL_CODE_NUMBER" />
+			<result property="codeNumber" column="CODE_NUMBER" />
+			<result property="detailCodeName" column="DETAIL_CODE_NAME" />
+			<result property="detailCodeNameusing" column="DETAIL_CODE_NAMEUSING" />
+			</resultMap>
+			
+			<select id="selectDetailCodeList" resultMap="detailCodeResult">
+			SELECT CODE_NUMBER
+			, DETAIL_CODE_NUMBER
+			, DETAIL_CODE_NAME
+			, DETAIL_CODE_NAMEUSING
+			FROM DETAIL_CODE
+			WHERE CODE_NUMBER = #{codeNumber}
+		</select>
+		
+			<update id="updateDetailCode" parameterType="kr.co.seoulit.erp.hr.base.to.HrDetailCodeTO">
+			UPDATE DETAIL_CODE SET
+			 CODE_NUMBER = #{codeNumber}
+			, DETAIL_CODE_NAME = #{detailCodeName}
+			, DETAIL_CODE_NAMEUSING = #{detailCodeNameusing}
+			WHERE DETAIL_CODE_NUMBER = #{detailCodeNumber}
+		</update>
+		
+			<insert id="registDetailCode" parameterType="kr.co.seoulit.erp.hr.base.to.HrDetailCodeTO">
+			INSERT INTO DETAIL_CODE VALUES(
+			  #{detailCodeNumber}
+			, #{codeNumber}  
+			, #{detailCodeName}
+			, #{detailCodeNameusing}
+			)
+		</insert>
+		
+			<delete id="deleteDetailCode" parameterType="kr.co.seoulit.erp.hr.base.to.HrDetailCodeTO">
+			DELETE FROM DETAIL_CODE
+			WHERE DETAIL_CODE_NUMBER =  #{detailCodeNumber}
+			AND DETAIL_CODE_NAME = #{detailCodeName}
+			
+		</delete>
+		
+		<select id="selectDetailCodeListRest" resultMap="detailCodeResult" parameterType="string">
+			SELECT CODE_NUMBER
+			, DETAIL_CODE_NUMBER
+			, DETAIL_CODE_NAME
+			, DETAIL_CODE_NAMEUSING
+			FROM DETAIL_CODE
+			WHERE DETAIL_CODE_NUMBER = #{code1}
+		    OR DETAIL_CODE_NUMBER = #{code2}
+		    OR DETAIL_CODE_NUMBER = #{code3}
+			
+			</select>
+		
+		
+</mapper>
+	
+	
+	

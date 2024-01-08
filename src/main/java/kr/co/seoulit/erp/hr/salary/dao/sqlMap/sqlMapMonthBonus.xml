@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.salary.dao.BonusDAO">
+	
+	<resultMap type="kr.co.seoulit.erp.hr.salary.to.BonusTO" id="bonusResult">
+		<result property="empCode" column="EMP_CODE" />
+		<result property="applyYearMonth" column="APPLY_YEAR_MONTH" />
+		<result property="bonus" column="BONUS" />
+	</resultMap>
+	
+	<select id="selectBonus" parameterType="kr.co.seoulit.erp.hr.salary.to.BonusTO" resultMap="bonusResult">
+		SELECT * 
+		FROM BONUS
+		WHERE EMP_CODE = #{empCode}
+		AND APPLY_YEAR_MONTH = #{applyYearMonth}
+	</select>
+	
+	<insert id="insertBonus" parameterType="kr.co.seoulit.erp.hr.salary.to.BonusTO">
+		INSERT INTO BONUS VALUES(
+		#{empCode}, 
+		#{applyYearMonth}, 
+		#{bonus}
+		)
+	</insert>
+	
+	
+	<delete id="deleteAllBonus" parameterType="kr.co.seoulit.erp.hr.salary.to.BonusTO">
+		DELETE FROM BONUS
+	</delete>
+	
+</mapper>

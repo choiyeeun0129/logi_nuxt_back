@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="kr.co.seoulit.erp.hr.base.dao.HolidayDAO">
+	
+ 
+
+	<resultMap type="kr.co.seoulit.erp.hr.base.to.HolidayTO" id="holidayResult">
+		<result property="applyDay" column="APPLY_DAY" />
+		<result property="holidayName" column="HOLIDAY_NAME" />
+		<result property="holidayCode" column="HOLIDAY_CODE" />
+		<result property="note" column="NOTE" />		
+	</resultMap>
+
+ <update id="updateCodeList" parameterType="kr.co.seoulit.erp.hr.base.to.HolidayTO">
+		UPDATE HOLIDAY SET
+		APPLY_DAY = #{applyDay},
+		HOLIDAY_NAME = #{holidayName},
+		NOTE = #{note}
+		WHERE HOLIDAY_CODE = #{holidayCode}
+	</update>
+
+	<insert id="insertCodeList"  parameterType="kr.co.seoulit.erp.hr.base.to.HolidayTO">
+			<![CDATA[
+			
+		INSERT INTO HOLIDAY VALUES (
+		TO_DATE(#{applyDay},'YYYY-MM-DD') 
+		, #{holidayName}
+		, #{note}
+		, #{holidayCode}
+        )
+		
+		 ]]>
+	</insert>
+	
+	<delete id="deleteCodeList">
+		DELETE FROM	HOLIDAY
+		WHERE HOLIDAY_CODE = #{holidayCode}
+	</delete>
+
+	<select id="selectHolidayList" resultMap="holidayResult">
+		SELECT TO_CHAR(APPLY_DAY, 'YYYY-MM-DD') apply_day
+		, HOLIDAY_NAME , HOLIDAY_CODE
+		, NOTE
+		FROM HOLIDAY
+	</select>
+
+	<select id="selectWeekDayCount" resultType="string" parameterType="string">
+		SELECT WEEKDAY_COUNTING_FUNC(#{startDaye},#{endDate})
+		WEEKDAY_COUNT
+		FROM DUAL
+	</select>
+	<select id="selectHolidayCount" resultType="int">
+		SELECT COUNT(*)
+		FROM HOLIDAY
+	</select>
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="kr.co.seoulit.erp.hr.attendance.dao.EduAttendeeDAO">
+
+	<resultMap type="kr.co.seoulit.erp.hr.attendance.to.EduAttendeeTO" id="eduAttendeeResult">
+		<result property="classCode" column="CLASS_CODE" />
+		<result property="empNo" column="EMP_NO" />
+		<result property="empName" column="EMP_NAME" />
+		<result property="startDate" column="START_DATE" />
+		<result property="endDate" column="END_DATE" />
+		<result property="totalHours" column="TOTAL_HOURS" />	
+		<result property="attendanceScore" column="ATTENDANCE_SCORE" />
+		<result property="testScore" column="TEST_SCORE" />
+		<result property="totalScore" column="TOTAL_SCORE" />	
+		<result property="cost" column="COST" />	
+		<result property="actualCharge" column="ACTUAL_CHARGE" />
+		<result property="status" column="STATUS" />
+	</resultMap>
+		
+	<select id="selectAttendeeAll" resultMap="eduAttendeeResult">
+		<![CDATA[SELECT * FROM CORPORATE_EDUCATION_ATTENDEE]]>
+	</select>	
+		
+	<select id="selectAttendeeList" resultMap="eduAttendeeResult" parameterType="kr.co.seoulit.erp.hr.attendance.to.EduAttendeeTO">
+		SELECT * FROM CORPORATE_EDUCATION_ATTENDEE
+		WHERE CLASS_CODE=#{classCode}
+	</select>
+	
+	<select id="selectAttendee" resultMap="eduAttendeeResult" parameterType="kr.co.seoulit.erp.hr.attendance.to.EduAttendeeTO">
+		SELECT * FROM CORPORATE_EDUCATION_ATTENDEE
+		WHERE EMP_NO= #{empNo}
+	</select>
+
+ 	<update id="updateAttendee" parameterType="kr.co.seoulit.erp.hr.attendance.to.EduAttendeeTO">
+ 	<![CDATA[
+		UPDATE CORPORATE_EDUCATION_ATTENDEE SET
+			  START_DATE = #{startDate}
+			, END_DATE = #{endDate}
+			, TOTAL_HOURS = #{totalHours}
+			, ATTENDANCE_SCORE = #{attendanceScore}
+			, TEST_SCORE = #{testScore}
+			, TOTAL_SCORE = #{totalScore}
+			, COST = #{cost}
+			, ACTUAL_CHARGE = #{actualCharge}
+			, STATUS = #{status}
+		WHERE EMP_NO = #{empNo}
+	]]>	
+	</update>
+
+	<insert id="insertAttendee"  parameterType="kr.co.seoulit.erp.hr.attendance.to.EduAttendeeTO">
+	<![CDATA[
+		INSERT INTO CORPORATE_EDUCATION_ATTENDEE (
+			  CLASS_CODE
+			, EMP_NO
+			, EMP_NAME
+			, START_DATE
+			, END_DATE
+			, TOTAL_HOURS
+			, ATTENDANCE_SCORE
+			, TEST_SCORE
+			, TOTAL_SCORE
+			, COST
+			, ACTUAL_CHARGE
+			, STATUS
+		) 
+		VALUES (
+			  #{classCode}
+			, #{empNo}
+			, #{empName} 
+			, #{startDate}
+			, #{endDate}
+			, #{totalHours}
+			, #{attendanceScore}
+			, #{testScore}
+			, #{totalScore}
+			, #{cost}
+			, #{actualCharge}
+			, #{status}
+        )		
+	]]>
+	</insert>
+	
+	<delete id="deleteAttendee" parameterType="kr.co.seoulit.erp.hr.attendance.to.EduAttendeeTO">
+		DELETE FROM	CORPORATE_EDUCATION_ATTENDEE
+		WHERE EMP_NO=#{empNo} and CLASS_CODE=#{classCode}
+	</delete>
+
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <mapper namespace="kr.co.seoulit.erp.hr.attendance.dao.ElasticDAO">
+
+	<resultMap type="kr.co.seoulit.erp.hr.attendance.to.ElasticTO" id="elasticResult">
+      <result property="empCode" column="EMP_CODE" />
+      <result property="applyDay" column="APPLY_DAY" />
+      <result property="startTime" column="START_TIME" />
+      <result property="endTime" column="END_TIME" />
+   </resultMap>	
+    
+    
+    <select id="selectElasticList" parameterType="map" resultMap="elasticResult">
+      SELECT 
+        EMP_CODE
+      , TO_CHAR(APPLY_DAY, 'YYYY/MM/DD') APPLY_DAY 
+      , START_TIME
+      , END_TIME
+      FROM ELASTIC 
+      WHERE EMP_CODE = #{empCode} 
+      AND   APPLY_DAY = #{applyDay}
+   	</select>
+   	
+   	<insert id="insertElastic" parameterType="kr.co.seoulit.erp.hr.attendance.to.ElasticTO">
+      INSERT INTO ELASTIC VALUES (
+        #{empCode}
+      , #{applyDay}
+      , #{startTime}
+      , #{endTime}
+      )
+   </insert>
+   
+   <delete id="deleteElastic" parameterType="kr.co.seoulit.erp.hr.attendance.to.ElasticTO">
+      DELETE FROM ELASTIC 
+        WHERE EMP_CODE = #{empCode}
+        AND APPLY_DAY = #{applyDay}
+        AND END_TIME = #{endTime}
+   </delete>
+</mapper>

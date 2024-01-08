@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <mapper namespace="kr.co.seoulit.erp.hr.attendance.dao.DayAttdDAO">
+
+ <resultMap type="kr.co.seoulit.erp.hr.attendance.to.DayAttdTO" id="dayAttdResult">
+      <result property="empCode" column="EMP_CODE" />
+      <result property="empName" column="EMP_NAME" />
+      <result property="dayAttdCode" column="DAY_ATTD_CODE" />
+      <result property="applyDay" column="APPLY_DAY" />
+      <result property="attdTypeCode" column="ATTD_TYPE_CODE" />
+      <result property="attdTypeName" column="ATTD_TYPE_NAME" />
+      <result property="time" column="TIME" />
+   </resultMap>
+   
+      <select id="selectDayAttdList" parameterType="map" resultMap="dayAttdResult">
+      SELECT D.EMP_CODE
+      , E.EMP_NAME
+      , D.DAY_ATTD_CODE
+      , TO_CHAR(D.APPLY_DAY, 'YYYY/MM/DD') APPLY_DAY 
+      , D.ATTD_TYPE_CODE
+      , D.ATTD_TYPE_NAME
+      , D.TIME 
+      FROM DAY_ATTD D
+      , EMPLOYEE_BASIC E 
+      WHERE D.EMP_CODE = #{empCode} 
+      AND D.APPLY_DAY = #{applyDay}
+      AND D.EMP_CODE = E.EMP_CODE 
+   </select>
+   
+   <insert id="insertDayAttd" parameterType="kr.co.seoulit.erp.hr.attendance.to.DayAttdTO">
+      INSERT INTO DAY_ATTD VALUES (
+      #{empCode}
+      , DAY_ATTD_CODE_SEQ.NEXTVAL 
+      , #{applyDay}
+      , #{attdTypeCode}
+      , #{attdTypeName}
+      , #{time}
+      )
+   </insert>
+   
+   <delete id="deleteDayAttd" parameterType="kr.co.seoulit.erp.hr.attendance.to.DayAttdTO">
+   		DELETE FROM DAY_ATTD 
+		WHERE EMP_CODE = #{empCode}
+		AND DAY_ATTD_CODE = #{dayAttdCode}
+   </delete>
+   
+
+   
+   <!-- 여기여기 -->
+   
+   <parameterMap type="map" id="DayATTdTO">
+      <parameter property="empCode" mode="IN"/>
+      <parameter property="attdTypeCode" mode="IN"/>
+      <parameter property="attdTypeName" mode="IN"/>
+      <parameter property="applyDay" mode="IN"/>
+      <parameter property="time" mode="IN"/>
+      <parameter property="ERROR_CODE" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+      <parameter property="ERROR_MSG" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+   </parameterMap>
+   
+   
+   <select id="batchInsertDayAttd" parameterMap="DayATTdTO" statementType="CALLABLE">
+   <![CDATA[
+        {call P_INSERT_DAY_ATTD(
+                       #{empCode,mode=IN,jdbcType=VARCHAR}
+                      , DAY_ATTD_CODE_SEQ.NEXTVAL
+                      , #{attdTypeCode,mode=IN,jdbcType=VARCHAR}
+                      , #{attdTypeName,mode=IN,jdbcType=VARCHAR}
+                      , #{applyDay,mode=IN,jdbcType=DATE}
+                      , #{time,mode=IN,jdbcType=NUMERIC}
+                      , #{errorCode, mode=OUT, jdbcType=VARCHAR}
+                      , #{errorMsg, mode=OUT, jdbcType=VARCHAR }
+                      )}
+       ]]>
+   </select> 
+   
+   <!--  
+   <select id="batchInsertDayAttd" parameterType="kr.co.seoulit.erp.hr.attd.to.DayAttdTO" statementType="CALLABLE">
+
+   <![CDATA[
+        {call P_INSERT_DAY_ATTD(
+                       #{empCode,mode=IN,jdbcType=VARCHAR}
+                      , DAY_ATTD_CODE_SEQ.NEXTVAL
+                      , #{attdTypeCode,mode=IN,jdbcType=VARCHAR}
+                      , #{attdTypeName,mode=IN,jdbcType=VARCHAR}
+                      , #{applyDay,mode=IN,jdbcType=DATE}
+                      , #{time,mode=IN,jdbcType=NUMERIC}
+                      , #{errorCode, mode=OUT, jdbcType=VARCHAR}
+                      , #{errorMsg, mode=OUT, jdbcType=VARCHAR }
+                      )}
+       ]]>
+   </select>
+    -->
+    
+</mapper>

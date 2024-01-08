@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.salary.dao.MonthExtSalDAO">
+
+
+	<resultMap type="kr.co.seoulit.erp.hr.salary.to.MonthExtSalTO" id="baseSalaryResult">
+		<result property="monthExtSalCode" column="MONTH_EXT_SAL_CODE" />
+		<result property="applyYearMonth" column="APPLY_YEAR_MONTH" />
+		<result property="empCode" column="EMP_CODE" />
+		<result property="extSalCode" column="EXT_SAL_CODE" />
+		<result property="extSalName" column="EXT_SAL_NAME" />
+		<result property="price" column="PRICE" />
+	</resultMap>   
+	
+	<select id="selectMonthExtSalList" resultMap="baseSalaryResult" parameterType="map">
+		SELECT MONTH_EXT_SAL_CODE
+		, APPLY_YEAR_MONTH
+		, EMP_CODE
+		, EXT_SAL_CODE
+		, EXT_SAL_NAME
+		, PRICE
+		FROM MONTH_EXT_SAL 
+		WHERE APPLY_YEAR_MONTH = #{applyYearMonth}
+		AND EMP_CODE = #{empCode}  
+	</select>
+</mapper>
+	

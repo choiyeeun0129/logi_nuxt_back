@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:32 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.currentAsset.dao.CurrentAssetDetailDAO">
+
+  <resultMap id="assetDetailResult" type="kr.co.seoulit.erp.account.currentAsset.to.CurrentAssetDetailBean">
+	    <result property="assetCode" column="ASSET_CODE"/>
+	    <result property="acquistionCost" column="acquistion_Cost"/>
+	    <result property="depreciation" column="depreciation"/>
+	    <result property="bookValue" column="book_Value"/>
+	    <result property="amortizationWay" column="amortization_Way"/>
+	    <result property="amortizationFinalYear" column="amortization_Final_Year"/>
+	     <result property="usefulLife" column="usefulLife"/>
+	    <result property="amortizationRate" column="amortization_Rate"/>
+	    <result property="month" column="month"/>
+	    <result property="normalAmortization" column="normal_Amortization"/>
+	    <result property="RAccumulatedAmortization" column="RAccumulated_Amortization"/>
+	    <result property="accumulatedAmortization" column="accumulated_Amortization"/>
+	     <result property="bookValueEnd" column="book_ValueEnd"/>
+  </resultMap>
+ 
+ 	
+ <select id="selectAssetDetail" parameterType="string" resultMap="assetDetailResult">
+		    select*FROM CURRENT_ASSET_DETAIL  WHERE asset_Code =#{assetCode} 
+		
+  </select>
+    <insert id="insertCurrentAssetDetail" parameterType="Map" > 
+    <![CDATA[    
+      INSERT INTO Current_Asset_Detail
+      (
+      asset_code
+      ,acquistion_Cost
+      ,depreciation
+      ,book_Value
+      ,amortization_Way
+      ,amortization_Final_Year
+      ,usefulLife
+      ,amortization_Rate
+      ,month
+      ,normal_Amortization
+      ,RAccumulated_Amortization
+      ,accumulated_Amortization
+      ,book_ValueEnd)
+      VALUES (#{assetCode},
+      		  #{acquistionCost},
+			  #{depreciation},
+			  #{bookValue},
+			  #{amortizationWay},
+			  #{amortizationFinalYear},
+			  #{usefulLife},
+			  (rtrim(to_char(#{amortizationRate}, 'FM9990D99'), '.')),
+			  #{month},
+			  #{normalAmortization},
+			  #{RAccumulatedAmortization},
+			  #{accumulatedAmortization},
+			  #{bookValueEnd}
+			        )
+      ]]> 
+    </insert>
+ <delete id="deleteCrrentAssetDetail" parameterType="String">
+   <![CDATA[
+   DELETE 
+   FROM CURRENT_ASSET_DETAIL 
+   WHERE asset_code = #{asset_code}
+   ]]>
+   </delete>
+     <update id="updateCurrentAssetDetail" parameterType="Map" > 
+    <![CDATA[    
+      update Current_Asset_Detail set 
+      acquistion_Cost=#{acquistionCost}
+      ,depreciation=#{depreciation}
+      ,book_Value=#{bookValue}
+      ,amortization_Way=#{amortizationWay}
+      ,amortization_Final_Year=#{amortizationFinalYear}
+      ,usefulLife=#{usefulLife}
+      ,amortization_Rate=(rtrim(to_char(#{amortizationRate}, 'FM9990D99'), '.'))
+      ,month=#{month}
+      ,normal_Amortization=#{normalAmortization}
+      ,RAccumulated_Amortization=#{RAccumulatedAmortization}
+      ,accumulated_Amortization=#{accumulatedAmortization}
+      ,book_ValueEnd=#{bookValueEnd}	       
+      where asset_code=#{assetCode} 
+      ]]> 
+    </update>
+ 
+ 
+ </mapper> 

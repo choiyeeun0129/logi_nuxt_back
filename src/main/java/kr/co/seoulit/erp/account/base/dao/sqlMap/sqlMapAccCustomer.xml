@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:29 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.base.dao.AccCustomerDAO">
+ 
+  <!--   =============================  2020-08-31 거래처관리 조편백  mapper 생성 ==============================   -->
+ 
+   <resultMap id="customerResult" type="kr.co.seoulit.erp.account.base.to.CustomerBean">
+   
+     <result property="customerCode" column="CUSTOMER_CODE"/>
+     <result property="workplaceCode" column="WORKPLACE_CODE"/>
+     <result property="customerName" column="CUSTOMER_NAME"/>
+     <result property="customerType" column="CUSTOMER_TYPE"/>
+     <result property="customerCeo" column="CUSTOMER_CEO"/>
+     <result property="businessLicenseNumber" column="BUSINESS_LICENSE_NUMBER"/> 
+   	 <result property="socialSecurityNumber" column="SOCIAL_SECURITY_NUMBER"/>
+ 	 <result property="customerBusinessConditions" column="CUSTOMER_BUSINESS_CONDITIONS"/>
+ 	 <result property="customerBusinessItems" column="CUSTOMER_BUSINESS_ITEMS"/>
+ 	 <result property="customerZipCode" column="CUSTOMER_ZIP_CODE"/>
+  	 <result property="customerBasicAddress" column="CUSTOMER_BASIC_ADDRESS"/>
+ 	 <result property="customerDetailAddress" column="CUSTOMER_DETAIL_ADDRESS"/>
+ 	 <result property="customerTelNumber" column="CUSTOMER_TEL_NUMBER"/>
+ 	 <result property="customerFaxNumber" column="CUSTOMER_FAX_NUMBER"/>
+ 	 <result property="customerNote" column="CUSTOMER_NOTE"/> 
+ 	 <result property="accountNumber" column="ACCOUNT_NUMBER"/>
+ 	 <result property="cardNumber" column="CARD_NUMBER"/>
+ 	 <result property="cardType" column="CARD_TYPE"/>
+ 	 <result property="cardMemberName" column="CARD_MEMBER_NAME"/>
+ 	 <result property="cardOpenPlace" column="CARD_OPEN_PLACE"/>
+ 	 <result property="financialInstituteCode" column="FINANCIAL_INSTITUTE_CODE"/>
+ 	 <result property="financialInstituteName" column="FINANCIAL_INSTITUTE_NAME"/>
+  </resultMap>  
+
+  
+  <select id="selectCustomerList" resultMap="customerResult">
+  		SELECT * FROM Customer
+  </select>
+  
+  
+  <delete id="deleteNormalAccount"> 
+  	DELETE FROM CUSTOMER 
+ 	 WHERE CUSTOMER_CODE = #{customerCode}
+  </delete>
+  
+  
+  <insert id="insertNormalAccount">
+  <![CDATA[
+  	INSERT INTO CUSTOMER (
+		CUSTOMER_CODE,
+		CUSTOMER_NAME,
+		CUSTOMER_TEL_NUMBER,
+		BUSINESS_LICENSE_NUMBER,
+		CUSTOMER_BUSINESS_CONDITIONS,
+		CUSTOMER_BUSINESS_ITEMS,
+    	ACCOUNT_NUMBER,
+    	CUSTOMER_TYPE,
+    	
+    	CUSTOMER_NOTE,
+    	CARD_NUMBER,
+    	CARD_TYPE,
+    	CARD_MEMBER_NAME,
+    	CARD_OPEN_PLACE,
+    	FINANCIAL_INSTITUTE_CODE,
+    	FINANCIAL_INSTITUTE_NAME
+		)
+	VALUES(
+		#{customerCode},
+		#{customerName},
+		#{customerTelNumber},
+		#{businessLicenseNumber},
+		#{customerBusinessConditions},
+		#{customerBusinessItems},
+    	#{accountNumber},
+   	 	#{customerType},
+   	 	#{customerNote},
+   	 	#{cardNumber},
+   	 	#{cardType},
+   	 	#{cardMemberName},
+   	 	#{cardOpenPlace},
+   	 	#{financialInstituteCode},
+   	 	#{financialInstituteName}   	 	
+		)
+	]]>
+  </insert>
+  
+  <update id="updateNormalAccount">
+	<![CDATA[
+    UPDATE CUSTOMER SET  
+ 	CUSTOMER_NAME=#{customerName},
+	CUSTOMER_TEL_NUMBER=#{customerTelNumber},
+	BUSINESS_LICENSE_NUMBER=#{businessLicenseNumber},
+	CUSTOMER_BUSINESS_CONDITIONS=#{customerBusinessConditions},
+	CUSTOMER_BUSINESS_ITEMS=#{customerBusinessItems},
+	ACCOUNT_NUMBER=#{accountNumber},
+	CUSTOMER_TYPE=#{customerType},
+	CUSTOMER_NOTE=#{customerNote},
+	CARD_NUMBER=#{cardNumber},
+	CARD_TYPE=#{cardType},
+	CARD_MEMBER_NAME=#{cardMemberName},
+	CARD_OPEN_PLACE=#{cardOpenPlace},
+	FINANCIAL_INSTITUTE_CODE=#{financialInstituteCode},
+	FINANCIAL_INSTITUTE_NAME=#{financialInstituteName}
+    WHERE CUSTOMER_CODE=#{customerCode}
+	]]>
+  </update>
+  
+  
+</mapper>

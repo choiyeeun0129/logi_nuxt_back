@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:30 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.base.dao.AccCodeDAO">
+    <!--
+		Sorry, I can`t migrate	codeBean
+		See console output for further details 
+	-->
+
+    <resultMap id="codeResult" type="kr.co.seoulit.erp.account.base.to.CodeBean">
+        <result property="codeType" column="CODE_TYPE"/>
+        <result property="divisionCodeName" column="DIVISION_CODE_NAME"/>
+        <result property="divisionCodeNo" column="DIVISION_CODE_NO"/>
+    </resultMap>
+    
+ <select id="selectCodeList" resultMap="codeResult">
+    <![CDATA[
+        SELECT DIVISION_CODE_NO,
+               CODE_TYPE,
+               DIVISION_CODE_NAME
+        FROM CODE
+        WHERE DIVISION_CODE_NO <> 'HR-02'
+        ORDER BY DIVISION_CODE_NO
+        ]]>
+	</select>
+
+
+    <insert id="insertCode" parameterType="kr.co.seoulit.erp.account.base.to.CodeBean">
+    <![CDATA[
+        INSERT INTO CODE(DIVISION_CODE_NO, CODE_TYPE, DIVISION_CODE_NAME)
+        VALUES (#{divisionCodeNo}, #{codeType}, #{divisionCodeName})
+        ]]>
+	</insert>
+
+    <update id="updateCode" parameterType="kr.co.seoulit.erp.account.base.to.CodeBean">
+    <![CDATA[
+        UPDATE CODE
+        SET DIVISION_CODE_NO   = #{divisionCodeNo},
+            CODE_TYPE          = #{codeType},
+            DIVISION_CODE_NAME = #{divisionCodeName}
+        WHERE DIVISION_CODE_NO = #{divisionCodeNo}
+        ]]>
+	</update>
+
+    <delete id="deleteCode" parameterType="String">
+    <![CDATA[
+        DELETE CODE
+        WHERE DIVISION_CODE_NO = #{Code}
+        ]]>
+	</delete>
+
+</mapper>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.logistic.sales.dao.DeliveryDAO">
+	
+	<resultMap id="deliveryResult" type="deliveryInfoTO">
+		<result property="deliveryNo" column="DELIVERY_NO" />
+		<result property="estimateNo" column="ESTIMATE_NO" />
+		<result property="contractNo" column="CONTRACT_NO" />
+		<result property="contractDetailNo" column="CONTRACT_DETAIL_NO" />
+		<result property="customerCode" column="CUSTOMER_CODE" />
+		<result property="personCodeInCharge" column="PERSON_CODE_IN_CHARGE" />
+		<result property="itemCode" column="ITEM_CODE" />
+		<result property="itemName" column="ITEM_NAME" />
+		<result property="unitOfDelivery" column="UNIT_OF_DELIVERY" />
+		<result property="deliveryAmount" column="DELIVERY_AMOUNT" />
+		<result property="unitPrice" column="UNIT_PRICE" />
+		<result property="sumPrice" column="SUM_PRICE" />
+		<result property="deliverydate" column="DELIVERY_DATE" />
+		<result property="deliveryPlaceName" column="DELIVERY_PLACE_NAME" />
+		<result property="finalizeStatus" column="FINALIZE_STATUS" />
+	</resultMap>
+
+	<select id="selectDeliveryInfoList" resultMap="deliveryResult">
+		select * 
+		from DELIVERY_INFO 
+		order by delivery_date desc
+	</select>
+	
+	<insert id="insertDeliveryResult" parameterType="deliveryInfoTO">  
+		insert into delivery_info values
+		(#{deliveryNo},#{estimateNo},#{contractNo},
+		#{contractDetailNo},#{customerCode},#{personCodeInCharge},
+		#{itemCode},#{itemName},#{unitOfDelivery},#{deliveryAmount},
+		#{unitPrice},#{sumPrice},#{deliverydate},#{deliveryPlaceName},{#finalizeStatus})
+	</insert>
+	
+	<update id="updateDeliveryResult" parameterType="deliveryInfoTO">
+		UPDATE Delivery_Result SET 
+			DELIVERY_NO = #{deliveryNo} , 
+			ESTIMATE_NO = #{estimateNo},
+			CONTRACT_NO = #{contractNo} , 
+			CONTRACT_DETAIL_NO = #{contractDetailNo} , 
+			CUSTOMER_CODE = #{customerCode} , 
+			PERSON_CODE_IN_CHARGE = #{personCodeInCharge} , 
+			ITEM_CODE = #{itemCode} , 
+			ITEM_NAME = #{itemName} , 
+			UNIT_OF_DELIVERY = #{unitOfDelivery} , 
+			DELIVERY_AMOUNT = #{deliveryAmount} , 
+			UNIT_PRICE = #{unitPrice} , 
+			SUM_PRICE = #{sumPrice} , 
+			DELIVERY_DATE = #{deliverydate} ,
+			DELIVERY_PLACE_NAME = #{deliveryPlaceName} ,
+			FINALIZE_STATUS=#{finalizeStatus}
+		WHERE DELIVERY_NO = #{deliveryNo}
+	</update>
+	
+	<delete id="deleteDeliveryResult" parameterType="deliveryInfoTO">
+		DELETE FROM DELIVERY_RESULT WHERE DELIVERY_NO = #{deliveryNo}
+	</delete>
+	
+	<parameterMap type="map" id="deliverParameter">
+		<parameter property="contractDetailNo" mode="IN" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+	</parameterMap>
+	
+	<select id="deliver" parameterMap="deliverParameter" statementType="CALLABLE">
+		{call P_DELIVER(?,?,?)}		
+	</select>
+	
+	<update id="deliverUpdate" parameterType="deliveryInfoTO">
+		UPDATE DELIVERY_INFO SET 
+		FINALIZE_STATUS = #{finalizeStatus} 
+		WHERE DELIVERY_NO = #{deliveryNo}
+	</update>
+
+</mapper>

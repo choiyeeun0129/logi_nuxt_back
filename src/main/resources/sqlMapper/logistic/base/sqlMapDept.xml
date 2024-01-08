@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.logistic.base.dao.DeptInfoDAO">
+
+    <resultMap id="DeptResult" type="DeptInfoTO">
+        <result property="workplaceCode" column="WORKPLACE_CODE" />
+        <result property="deptCode" column="DEPT_CODE" />
+        <result property="deptName" column="DEPT_NAME" />
+        <result property="workplaceName" column="WORKPLACE_NAME" />
+        <result property="companyCode" column="COMPANY_CODE" />
+        <result property="deptStartDate" column="DEPT_START_DATE" />
+        <result property="deptEndDate" column="DEPT_END_DATE" />
+    </resultMap>
+
+    <select id="getDeptInfo" parameterType="DeptInfoTO" resultMap="DeptResult">
+        SELECT * FROM DEPARTMENT
+    </select>
+
+
+</mapper>

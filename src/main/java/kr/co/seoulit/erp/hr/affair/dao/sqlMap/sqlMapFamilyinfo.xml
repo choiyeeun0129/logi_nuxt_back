@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.affair.dao.FamilyInfoDAO">
+
+	<resultMap type="kr.co.seoulit.erp.hr.affair.to.FamilyInfoTO" id="familyInfoResult">
+		<result property="empCode" column="EMP_CODE"></result>
+		<result property="familyCode" column="FAMILY_CODE"></result>
+		<result property="familyName" column="FAMILY_NAME"></result>
+		<result property="relation" column="RELATION"></result>
+		<result property="birthdate" column="BIRTHDATE"></result>
+		<result property="liveTogether" column="LIVE_TOGETHER"></result>
+	</resultMap>
+	
+	
+		<select id="selectFamilyInfoList" resultMap="familyInfoResult"
+		parameterType="string">
+		SELECT * FROM FAMILY_INFO
+		WHERE EMP_CODE =#{code}
+		</select>
+	
+
+	<select id="selectFamilyList" resultMap="familyInfoResult"
+		parameterType="string">
+		SELECT EMP_CODE
+		, FAMILY_CODE
+		, FAMILY_NAME
+		, RELATION
+		, TO_CHAR(BIRTHDATE,'YYYY/MM/DD') BIRTHDATE
+		, LIVE_TOGETHER
+		FROM FAMILY_INFO
+		WHERE EMP_CODE = #{code}
+	</select>
+
+	<insert id="insertFamilyInfo" parameterType="kr.co.seoulit.erp.hr.affair.to.FamilyInfoTO">
+		INSERT INTO	FAMILY_INFO VALUES (
+		#{empCode}
+		, FAMILY_CODE_SEQ.NEXTVAL
+		, #{familyName}
+		, #{relation}
+		, TO_DATE(#{birthdate}, 'YYYY/MM/DD')
+		, #{liveTogether}
+		)
+	</insert>
+
+	<update id="updateFamilyInfo" parameterType="kr.co.seoulit.erp.hr.affair.to.FamilyInfoTO">
+		UPDATE FAMILY_INFO SET 
+		FAMILY_NAME = #{familyName}
+		, RELATION = #{relation}
+		, BIRTHDATE = TO_DATE(#{birthdate}, 'YYYY/MM/DD')
+		, LIVE_TOGETHER = #{liveTogether}
+		WHERE EMP_CODE = #{empCode}
+		AND FAMILY_CODE = #{familyCode}
+	</update>
+
+	<delete id="deleteFamilyInfo" parameterType="kr.co.seoulit.erp.hr.affair.to.FamilyInfoTO">
+		DELETE FROM FAMILY_INFO
+		WHERE EMP_CODE = #{empCode}
+		AND FAMILY_CODE = #{familyCode}
+	</delete>
+
+</mapper>

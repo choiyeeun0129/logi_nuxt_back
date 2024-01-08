@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.hr.company.dao.FinancialAccountAssociatesDAO">
+
+	
+	<resultMap id="FinancialAccountAssociatesResult" type="financialAccountAssociatesTO">
+		<result property="accountOpenPlace" column="ACCOUNT_OPEN_PLACE"  />
+		<result property="divisionCodeNo" column="DIVISION_CODE_NO"  />
+		<result property="financialInstituteName" column="FINANCIAL_INSTITUTE_NAME"  />
+		<result property="cardType" column="CARD_TYPE"  />
+		<result property="businessLicenseNumber" column="BUSINESS_LICENSE_NUMBER"  />
+		<result property="cardNumber" column="CARD_NUMBER"  />
+		<result property="cardOpenPlace" column="CARD_OPEN_PLACE"  />
+		<result property="accountAssociatesType" column="ACCOUNT_ASSOCIATES_TYPE"  />
+		<result property="financialInstituteCode" column="FINANCIAL_INSTITUTE_CODE"  />
+		<result property="workplaceCode" column="WORKPLACE_CODE"  />
+		<result property="cardMemberName" column="CARD_MEMBER_NAME"  />
+		<result property="accountAssociatesCode" column="ACCOUNT_ASSOCIATES_CODE"  />
+		<result property="accountNumber" column="ACCOUNT_NUMBER"  />
+		<result property="accountAssociatesName" column="ACCOUNT_ASSOCIATES_NAME"  />
+	</resultMap>
+
+	<select id="selectFinancialAccountAssociatesListByCompany" resultMap="FinancialAccountAssociatesResult">
+	SELECT * FROM FINANCIAL_ACCOUNT_ASSOCIATES ORDER BY ACCOUNT_ASSOCIATES_CODE
+	</select>
+	
+	<select id="selectFinancialAccountAssociatesListByWorkplace" parameterType="String" resultMap="FinancialAccountAssociatesResult">
+	SELECT * FROM FINANCIAL_ACCOUNT_ASSOCIATES WHERE WORKPLACE_CODE = #{workplaceCode}
+	</select>
+	
+	<insert id="insertFinancialAccountAssociates" parameterType="financialAccountAssociatesTO">
+	Insert into FINANCIAL_ACCOUNT_ASSOCIATES
+		( ACCOUNT_ASSOCIATES_CODE , WORKPLACE_CODE , ACCOUNT_ASSOCIATES_NAME ,
+		ACCOUNT_ASSOCIATES_TYPE , ACCOUNT_NUMBER , ACCOUNT_OPEN_PLACE ,
+		CARD_NUMBER , CARD_TYPE , CARD_MEMBER_NAME ,
+		CARD_OPEN_PLACE , BUSINESS_LICENSE_NUMBER , FINANCIAL_INSTITUTE_CODE ,
+		FINANCIAL_INSTITUTE_NAME , DIVISION_CODE_NO )
+	values ( #{accountAssociatesCode} ,
+	 		 #{workplaceCode} , 
+	 		 #{accountAssociatesName} , 
+	 		 #{accountAssociatesType} , 
+	 		 #{accountNumber} , 
+	 		 #{cardOpenPlace} , 
+	 		 #{cardNumber} , 
+	 		 #{cardType} , 
+	 		 #{cardMemberName} , 
+	 		 #{cardOpenPlace} , 
+	 		 #{businessLicenseNumber} , 
+	 		 #{financialInstituteCode} , 
+	 		 #{financialInstituteName} , 
+	 		 #{divisionCodeNo}
+	 		)
+	</insert>
+	
+	<update id="updateFinancialAccountAssociates" parameterType="financialAccountAssociatesTO">
+	UPDATE FINANCIAL_ACCOUNT_ASSOCIATES 
+		SET
+			WORKPLACE_CODE = #{workplaceCode} , 
+			ACCOUNT_ASSOCIATES_NAME = #{accountAssociatesName} , 
+			ACCOUNT_ASSOCIATES_TYPE = #{accountAssociatesType} ,
+			ACCOUNT_NUMBER = #{accountNumber} , 
+			ACCOUNT_OPEN_PLACE = #{cardOpenPlace} , 
+			CARD_NUMBER = #{cardNumber} ,
+			CARD_TYPE = #{cardType} , 
+			CARD_MEMBER_NAME = #{cardMemberName} , 
+			CARD_OPEN_PLACE = #{cardOpenPlace} ,
+			BUSINESS_LICENSE_NUMBER = #{businessLicenseNumber} , 
+			FINANCIAL_INSTITUTE_CODE = #{financialInstituteCode} ,
+			FINANCIAL_INSTITUTE_NAME = #{financialInstituteName} , 
+			DIVISION_CODE_NO = #{divisionCodeNo}
+		WHERE ACCOUNT_ASSOCIATES_CODE = #{accountAssociatesCode}
+	</update>
+	
+	<delete id="deleteFinancialAccountAssociates" parameterType="financialAccountAssociatesTO">
+	DELETE FROM FINANCIAL_ACCOUNT_ASSOCIATES WHERE ACCOUNT_ASSOCIATES_CODE = #{accountAssociatesCode}
+	</delete>
+	
+	
+</mapper>

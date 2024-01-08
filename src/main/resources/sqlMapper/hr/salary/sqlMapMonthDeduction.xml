@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.salary.dao.MonthDeductionDAO">
+
+	
+	
+	<resultMap type="kr.co.seoulit.erp.hr.salary.to.MonthDeductionTO" id="baseSalaryResult">
+		<result property="empCode" column="EMP_CODE" />
+		<result property="applyYearMonth" column="APPLY_YEAR_MONTH" />
+		<result property="deductionCode" column="DEDUCTION_CODE" />
+		<result property="deductionName" column="DEDUCTION_NAME" />
+		<result property="price" column="PRICE" />
+	</resultMap>
+	
+<select id="selectMonthDeductionList" resultMap="baseSalaryResult" parameterType="map">
+		SELECT EMP_CODE
+		, APPLY_YEAR_MONTH
+		, DEDUCTION_CODE
+		, DEDUCTION_NAME
+		, PRICE
+		FROM MONTH_DEDUCTION 
+		WHERE APPLY_YEAR_MONTH = #{applyYearMonth} 
+		AND EMP_CODE = #{empCode}  
+	</select>
+</mapper>

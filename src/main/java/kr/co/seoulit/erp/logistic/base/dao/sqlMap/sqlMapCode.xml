@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.logistic.base.dao.LogiCodeDAO">
+<!-- 받음 to 객체위치를 적어줌 --><!-- 
+	 -->
+	<resultMap id="CodeResult" type="LogicodeTO">
+		<result property="divisionCodeNo" column="DIVISION_CODE_NO" />
+		<result property="codeType" column="CODE_TYPE" />
+		<result property="divisionCodeName" column="DIVISION_CODE_NAME"  />
+		<result property="codeChangeAvailable" column="CODE_CHANGE_AVAILABLE"  />
+		<result property="description" column="DESCRIPTION"  />
+	</resultMap>
+
+	<select id="selectCodeList" parameterType="String" resultMap="CodeResult">
+		SELECT * FROM CODE ORDER BY DIVISION_CODE_NO
+	</select>	
+	
+	<select id="createDivisionCodeNo" resultType="String">
+		SELECT
+			CASE
+				WHEN code_type ='공통' THEN 'CO' ||'-'|| (COUNT(CODE_TYPE)+1)
+				WHEN code_type ='회계' THEN 'ACC' ||'-'|| (COUNT(CODE_TYPE)+1)
+				WHEN code_type ='구매' THEN 'PUR' ||'-'|| (COUNT(CODE_TYPE)+1)
+				WHEN code_type ='영업' THEN 'SAL' ||'-'|| (COUNT(CODE_TYPE)+1)
+			END codeNo
+		FROM CODE c
+		WHERE c.CODE_TYPE=#{codeType}
+		GROUP BY c.CODE_TYPE
+	</select>
+	
+	<insert id="insertCode" parameterType="LogiCodeTO" > 
+		Insert into CODE
+		( DIVISION_CODE_NO , CODE_TYPE , DIVISION_CODE_NAME , CODE_CHANGE_AVAILABLE , DESCRIPTION )
+		values ( #{divisionCodeNo} , #{codeType} , #{divisionCodeName} , #{codeChangeAvailable} , #{description} )
+	</insert>
+
+	<update id="updateCode" parameterType="LogiCodeTO">
+		UPDATE CODE SET
+		CODE_TYPE = #{codeType} , DIVISION_CODE_NAME = #{divisionCodeName} ,
+		CODE_CHANGE_AVAILABLE = #{codeChangeAvailable} , DESCRIPTION = #{description}
+		WHERE DIVISION_CODE_NO = #{divisionCodeNo}
+	</update>
+	
+	<delete id="deleteCode" parameterType="LogiCodeTO"> 
+		DELETE FROM CODE WHERE DIVISION_CODE_NO = #{divisionCodeNo}
+	</delete>
+	 		
+</mapper>

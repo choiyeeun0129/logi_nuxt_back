@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.logistic.outsourcing.dao.OutInspectionDAO">
+
+	
+	<resultMap id="OutInspectionInfoListA" type="OutInspectionTO">
+		<result property="claimDate" column="CLAIM_DATE"  />
+		<result property="dueDate" column="DUE_DATE"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="mrpGatheringNo" column="MRP_GATHERING_NO"  />
+		<result property="mrpGatheringSeq" column="MRP_GATHERING_SEQ"  />
+		<result property="necessaryAmount" column="NECESSARY_AMOUNT"  />
+		<result property="orderOrProductionStatus" column="ORDER_OR_PRODUCTION_STATUS"  />
+		<result property="outSourcAmount" column="OUTSOURC_AMOUNT"  />
+		<result property="sumPriceOfOutsourc" column="SUM_PRICE_OF_OUTSOURC"  />
+		<result property="unitOfMrpGathering" column="UNIT_OF_MRP_GATHERING"  />
+		<result property="unitPriceOfOutsourc" column="UNIT_PRICE_OF_OUTSOURC"  />
+		<result property="outsourcNo" column="OUTSOURC_NO"  />
+		<result property="forwardStatus" column="FORWARD_STATUS"  />
+		<result property="completionStatus" column="COMPLETION_STATUS"  />
+		
+	</resultMap>
+	
+	<select id="selectOutInspectionInfoList" resultMap="OutInspectionInfoListA">
+	SELECT*FROM OUTSOURC_INFO
+	WHERE 
+	FORWARD_STATUS = 'Y' 
+	AND 
+	COMPLETION_STATUS IS NULL
+	</select>
+	
+	
+	<parameterMap type="map" id="outInspectionCompletionParam">
+		<parameter property="outsourcNo" mode="IN"/>
+		<parameter property="actualCompletionAmount" mode="IN"/>
+		<parameter property="errorCode" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="errorMsg" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+	</parameterMap>
+	
+	<select id="outInspectionCompletion" parameterMap="outInspectionCompletionParam" statementType="CALLABLE">
+	{call P_OUTSOURC_COMPLETION(?,?,?,?)}
+	</select>
+	
+	
+	
+</mapper>

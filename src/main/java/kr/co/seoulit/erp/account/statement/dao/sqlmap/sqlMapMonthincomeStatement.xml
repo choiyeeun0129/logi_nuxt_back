@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:31 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.statement.dao.MonthIncomeStatementDAO">
+    <!--
+		Sorry, I can`t migrate	incomeStatementBean
+		See console output for further details 
+	-->
+
+    <resultMap id="incomeStatementResult" type="kr.co.seoulit.erp.account.statement.to.MonthIncomeStatementBean">
+        <result property="year" column="YEAR"/>
+        <result property="month" column="MONTH"/>
+        <result property="salesSummary" column="SALES_SUMMARY"/>
+        <result property="salesCostSummary" column="SALES_COST_SUMMARY"/>
+        <result property="grossMargin" column="GROSS_MARGIN"/>
+        <result property="salesManageCostSummary" column="SALES_MANAGE_COST_SUMMARY"/>
+        <result property="operatingProfit" column="OPERATING_PROFIT"/>
+        <result property="nonOperatingProfitSummary" column="NON_OPERATING_PROFIT_SUMMARY"/>
+        <result property="nonOperatingCostSummary" column="NON_OPERATING_COST_SUMMARY"/>
+        <result property="ordinaryProfit" column="ORDINARY_PROFIT"/>
+        <result property="corporateTaxSummary" column="CORPORATE_TAX_SUMMARY"/>
+        <result property="netIncome" column="NET_INCOME"/>
+    </resultMap>
+
+     <parameterMap id="incomeStatementParams" type="java.util.HashMap">
+        <parameter property="year" jdbcType="VARCHAR" javaType="String" mode="IN"/>
+        <parameter property="ERROR_CODE" jdbcType="DECIMAL" javaType="int" mode="OUT"/>
+        <parameter property="ERROR_MSG" jdbcType="VARCHAR" javaType="String" mode="OUT"/>
+       <parameter property="RESULT" jdbcType="CURSOR" javaType="java.sql.ResultSet" mode="OUT" resultMap="incomeStatementResult"/>
+    </parameterMap>
+    
+    <select id="callMonthIncomeStatement" parameterMap="incomeStatementParams" statementType="CALLABLE">
+    <![CDATA[
+        {call P_MONTH_INCOME_STATEMENT(?,?,?,?)}
+    ]]>
+    </select>
+
+</mapper>

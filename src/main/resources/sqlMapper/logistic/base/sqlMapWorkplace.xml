@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.logistic.base.dao.WorkplaceInfoDAO">
+
+	<resultMap id="getWorkplaceList" type="WorkplaceInfoTO">
+		<result property="workplaceCode" 				column="WORKPLACE_CODE"/>
+		<result property="companyCode" 					column="COMPANY_CODE"/>
+		<result property="workplaceName" 				column="WORKPLACE_NAME"/>
+		<result property="businessLicenseNumber" 		column="BUSINESS_LICENSE_NUMBER"/>
+		<result property="corporationLicenseNumber" 	column="CORPORATION_LICENSE_NUMBER"/>
+		<result property="workplaceCeoName" 			column="WORKPLACE_CEO_NAME"/>
+		<result property="workplaceBusinessConditions"  column="WORKPLACE_BUSINESS_CONDITIONS"/>
+		<result property="workplaceBusinessItems" 		column="WORKPLACE_BUSINESS_ITEMS"/>
+		<result property="workplaceZipCode" 			column="WORKPLACE_ZIP_CODE"/>
+		<result property="workplaceBasicAddress" 		column="WORKPLACE_BASIC_ADDRESS"/>
+		<result property="workplaceDetailAddress" 		column="WORKPLACE_DETAIL_ADDRESS"/>
+		<result property="workplaceTelNumber" 			column="WORKPLACE_TEL_NUMBER"/>
+		<result property="workplaceFaxNumber" 			column="WORKPLACE_FAX_NUMBER"/>
+		<result property="workplaceEstablishmentDate" 	column="WORKPLACE_ESTABLISH_DATE"/>
+		<result property="workplaceOpenDate" 			column="WORKPLACE_OPEN_DATE"/>
+		<result property="workplaceCloseDate" 			column="WORKPLACE_CLOSE_DATE"/>
+		<result property="approvalStatus" 				column="APPROVAL_STATUS"/>
+	</resultMap>
+
+	<select id="getWorkplaceDetailList" parameterType="java.lang.String" resultMap="getWorkplaceList">
+		SELECT * FROM WORKPLACE WHERE WORKPLACE_CODE = #{workplaceCode}
+	</select>
+
+	<select id="getWorkplaceList" resultMap="getWorkplaceList">
+		SELECT * FROM WORKPLACE
+	</select>
+
+	<delete id="deleteWorkplaceCode">
+		DELETE
+		FROM WORKPLACE
+		WHERE WORKPLACE_CODE=#{workplaceCode}
+	</delete>
+
+	<insert id="insertWorkplace" parameterType="workplaceInfoTO">
+		INSERT INTO WORKPLACE
+		( WORKPLACE_CODE
+		, COMPANY_CODE
+		, WORKPLACE_NAME
+		, BUSINESS_LICENSE_NUMBER
+		, CORPORATION_LICENSE_NUMBER
+		, WORKPLACE_CEO_NAME
+		, WORKPLACE_BUSINESS_CONDITIONS
+		, WORKPLACE_BUSINESS_ITEMS
+		, WORKPLACE_ZIP_CODE
+		, WORKPLACE_BASIC_ADDRESS
+		, WORKPLACE_DETAIL_ADDRESS
+		, WORKPLACE_TEL_NUMBER
+		, WORKPLACE_FAX_NUMBER
+		, WORKPLACE_ESTABLISH_DATE
+		, WORKPLACE_OPEN_DATE
+		, WORKPLACE_CLOSE_DATE
+		, APPROVAL_STATUS)
+		VALUES ( #{workplaceCode:VARCHAR}
+			   , #{companyCode:VARCHAR}
+			   , #{workplaceName:VARCHAR}
+			   , #{businessLicenseNumber:VARCHAR}
+			   , #{corporationLicenseNumber:VARCHAR}
+			   , #{workplaceCeoName:VARCHAR}
+			   , #{workplaceBusinessConditions:VARCHAR}
+			   , #{workplaceBusinessItems:VARCHAR}
+			   , #{workplaceZipCode:VARCHAR}
+			   , #{workplaceBasicAddress:VARCHAR}
+			   , #{workplaceDetailAddress:VARCHAR}
+			   , #{workplaceTelNumber:VARCHAR}
+			   , #{workplaceFaxNumber:VARCHAR}
+			   , #{workplaceEstablishmentDate:VARCHAR}
+			   , #{workplaceOpenDate:VARCHAR}
+			   , #{workplaceCloseDate:VARCHAR}
+			   , #{approvalStatus:VARCHAR})
+	</insert>
+
+	<update id="updateWorkplaceCode" parameterType="workplaceInfoTO">
+		UPDATE WORKPLACE SET
+			WORKPLACE_CODE = #{workplaceCode:VARCHAR}
+						   , COMPANY_CODE = #{companyCode:VARCHAR}
+						   , WORKPLACE_NAME = #{workplaceName:VARCHAR}
+						   , BUSINESS_LICENSE_NUMBER = #{businessLicenseNumber:VARCHAR}
+						   , CORPORATION_LICENSE_NUMBER = #{corporationLicenseNumber:VARCHAR}
+						   , WORKPLACE_CEO_NAME = #{workplaceCeoName:VARCHAR}
+						   , WORKPLACE_BUSINESS_CONDITIONS = #{workplaceBusinessConditions:VARCHAR}
+						   , WORKPLACE_BUSINESS_ITEMS = #{workplaceBusinessItems:VARCHAR}
+						   , WORKPLACE_ZIP_CODE = #{workplaceZipCode:VARCHAR}
+						   , WORKPLACE_BASIC_ADDRESS = #{workplaceBasicAddress:VARCHAR}
+						   , WORKPLACE_DETAIL_ADDRESS = #{workplaceDetailAddress:VARCHAR}
+						   , WORKPLACE_TEL_NUMBER = #{workplaceTelNumber:VARCHAR}
+						   , WORKPLACE_FAX_NUMBER = #{workplaceFaxNumber:VARCHAR}
+						   , WORKPLACE_ESTABLISH_DATE = #{workplaceEstablishmentDate:VARCHAR}
+						   , WORKPLACE_OPEN_DATE = #{workplaceOpenDate:VARCHAR}
+						   , WORKPLACE_CLOSE_DATE = #{workplaceCloseDate:VARCHAR}
+						   , APPROVAL_STATUS = #{approvalStatus:VARCHAR}
+		WHERE WORKPLACE_CODE = #{workplaceCode}
+	</update>
+
+</mapper>

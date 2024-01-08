@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:32 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.slip.dao.JournalDAO">
+
+    <resultMap id="journalResult" type="kr.co.seoulit.erp.account.slip.to.JournalBean">
+        <result property="id" column="ID"/>
+        <result property="slipNo" column="SLIP_NO"/>
+        <result property="journalNo" column="JOURNAL_NO"/>
+        <result property="balanceDivision" column="BALANCE_DIVISION"/>
+        <result property="accountCode" column="ACCOUNT_INNER_CODE"/>
+        <result property="accountName" column="ACCOUNT_NAME"/>
+        <result property="customerCode" column="CUSTOMER_CODE"/>
+        <result property="customerName" column="CUSTOMER_NAME"/>
+        <result property="price" column="PRICE"/>
+        <result property="leftDebtorPrice" column="LEFT_DEBTOR_PRICE"/>
+        <result property="rightCreditsPrice" column="RIGHT_CREDITS_PRICE"/>
+        <result property="price" column="REPORTING_DATE"/>
+        <result property="deptCode" column="DEPT_CODE"/>
+        <result property="accountPeriodNo" column="ACCOUNT_PERIOD_NO"/>
+    </resultMap>
+    <!--  <resultMap id="journalDeadlineResult" type="kr.co.seoulit.erp.acc.account.slip.to.JournalSeparatorBean">
+        <result property="slipNo" column="SLIP_NO"/>
+        <result property="deliveryNo" column="DELIVERY_NO"/>
+        <result property="empCode" column="EMP_CODE"/>
+        <result property="applyYearMonth" column="APPLY_YEAR_MONTH"/>
+    </resultMap>  -->
+    
+   <select id="selectRangedJournalList" parameterType="Map" resultMap="journalResult">
+      <![CDATA[  SELECT J.JOURNAL_NO,
+               J.SLIP_NO,
+               BALANCE_DIVISION,
+               J.ACCOUNT_INNER_CODE,
+               CUSTOMER_CODE,
+               LEFT_DEBTOR_PRICE,
+               RIGHT_CREDITS_PRICE,
+               A.ACCOUNT_NAME
+        FROM SLIP S,
+             JOURNAL J,
+             ACCOUNT A
+        WHERE J.SLIP_NO = S.SLIP_NO
+          AND J.ACCOUNT_INNER_CODE = A.ACCOUNT_INNER_CODE
+          AND S.REPORTING_DATE BETWEEN #{fromDate} AND #{toDate}
+          AND S.SLIP_STATUS = '승인'
+        ORDER BY S.REPORTING_DATE
+        ]]> 
+    </select>
+    
+    <select id="selectGeneralAccountLedgerList" parameterType="Map" resultType="kr.co.seoulit.erp.account.slip.to.GeneralAccountLedgerBean">
+      <![CDATA[  
+      SELECT s.REPORTING_DATE, --작성일자  
+			 a.ACCOUNT_NAME, --회계계정
+             j.LEFT_DEBTOR_PRICE, -- 차변금액
+             j.RIGHT_CREDITS_PRICE, --대변금액
+          (SELECT c.CUSTOMER_NAME
+          FROM CUSTOMER C
+         	WHERE c.CUSTOMER_CODE=j.CUSTOMER_CODE ) CUSTOMER_NAME, --거래처
+          s.EXPENSE_REPORT -- 적요
+  FROM SLIP S
+     , JOURNAL J
+     , ACCOUNT A
+ WHERE S.SLIP_NO = J.SLIP_NO
+       AND J.ACCOUNT_CODE = A.ACCOUNT_INNER_CODE
+       AND S.REPORTING_DATE BETWEEN #{fromDate} AND #{toDate}
+       AND S.SLIP_STATUS = '승인' 
+ORDER BY S.REPORTING_DATE
+        ]]> 
+    </select>
+
+<!-- 조편백 테이블 수정  CUSTOMER추가 -->
+    <select id="selectJournalList" parameterType="String" resultMap="journalResult">   
+        <![CDATA[
+		SELECT J.JOURNAL_NO,       
+               J.SLIP_NO,          
+               BALANCE_DIVISION,
+               J.ACCOUNT_INNER_CODE,
+               SUM(LEFT_DEBTOR_PRICE + RIGHT_CREDITS_PRICE) AS PRICE,
+               LEFT_DEBTOR_PRICE,
+               RIGHT_CREDITS_PRICE,
+               A.ACCOUNT_NAME,
+               C.CUSTOMER_CODE,
+               C.CUSTOMER_NAME
+        FROM SLIP S,
+             JOURNAL J,
+             ACCOUNT A,
+             CUSTOMER C
+        WHERE J.SLIP_NO = S.SLIP_NO
+          AND J.ACCOUNT_INNER_CODE = A.ACCOUNT_INNER_CODE
+          AND S.SLIP_NO = #{slipNo}
+          AND J.CUSTOMER_CODE=C.CUSTOMER_CODE(+)
+          GROUP BY 
+        	J.JOURNAL_NO,       
+               J.SLIP_NO,          
+               BALANCE_DIVISION,
+               J.ACCOUNT_INNER_CODE,
+               C.CUSTOMER_CODE,
+                 C.CUSTOMER_NAME,
+               LEFT_DEBTOR_PRICE,
+               RIGHT_CREDITS_PRICE,
+               A.ACCOUNT_NAME 
+          ORDER BY J.JOURNAL_NO
+          ]]>    
+    </select>
+    
+    <select id="selectJournalDoubleList" parameterType="String" 
+    resultType="kr.co.seoulit.erp.account.slip.to.JournalDoubleBean">   
+         <![CDATA[
+        SELECT
+            A.REPORTING_DATE AS REPORTING_DATE,
+            A.ACCOUNT_NAME AS LEFT_ACCOUNT_NAME,
+            DECODE(A.LEFT_DEBTOR_PRICE-B.RIGHT_CREDITS_PRICE,0, A.LEFT_DEBTOR_PRICE,B.RIGHT_CREDITS_PRICE) AS LEFT_DEBTOR_PRICE,
+            B.ACCOUNT_NAME AS  RIGHT_ACCOUNT_NAME,
+            B.RIGHT_CREDITS_PRICE  AS RIGHT_CREDITS_PRICE,
+            A.CUSTOMER_NAME AS CUSTOMER_NAME,
+            A.EXPENSE_REPORT AS EXPENSE_REPORT
+        FROM
+            (SELECT
+                 S.REPORTING_DATE AS REPORTING_DATE,
+                 J.SLIP_NO AS SLIP_NO,
+                 J.JOURNAL_NO,
+                 BALANCE_DIVISION,
+                 J.ACCOUNT_INNER_CODE,
+                 J.CUSTOMER_CODE,
+                 LEFT_DEBTOR_PRICE,
+                 RIGHT_CREDITS_PRICE,
+                 J.ACCOUNT_NAME AS ACCOUNT_NAME,
+                 C.CUSTOMER_NAME AS CUSTOMER_NAME,
+                 S.EXPENSE_REPORT AS EXPENSE_REPORT
+             FROM SLIP S,
+                  JOURNAL J,
+                  CUSTOMER C
+             WHERE J.SLIP_NO = S.SLIP_NO
+               AND J.CUSTOMER_CODE = C.CUSTOMER_CODE(+)
+               AND S.REPORTING_DATE BETWEEN #{fromDate} AND #{toDate
+               AND S.SLIP_STATUS = '승인'
+             ORDER BY S.REPORTING_DATE) A,
+            (SELECT
+                 S.REPORTING_DATE AS REPORTING_DATE,
+                 J.SLIP_NO AS SLIP_NO,
+                 J.JOURNAL_NO,
+
+                 BALANCE_DIVISION,
+                 J.ACCOUNT_INNER_CODE,
+                 J.CUSTOMER_CODE,
+                 LEFT_DEBTOR_PRICE,
+                 RIGHT_CREDITS_PRICE,
+                 J.ACCOUNT_NAME AS ACCOUNT_NAME,
+                 C.CUSTOMER_NAME AS CUSTOMER_NAME,
+                 S.EXPENSE_REPORT AS EXPENSE_REPORT
+             FROM SLIP S,
+                  JOURNAL J,
+                  CUSTOMER C
+             WHERE J.SLIP_NO = S.SLIP_NO
+               AND J.CUSTOMER_CODE = C.CUSTOMER_CODE(+)
+               AND S.REPORTING_DATE BETWEEN #{fromDate} AND #{toDate
+               AND S.SLIP_STATUS = '승인'
+             ORDER BY S.REPORTING_DATE) B
+        WHERE A.SLIP_NO = B.SLIP_NO
+          AND A.LEFT_DEBTOR_PRICE <>0
+          AND B.RIGHT_CREDITS_PRICE <>0
+        UNION ALL
+        SELECT
+            '합계' AS REPORTING_DATE,
+            NULL AS LEFT_ACCOUNT_NAME,
+            SUM(DECODE(A.LEFT_DEBTOR_PRICE-B.RIGHT_CREDITS_PRICE,0, A.LEFT_DEBTOR_PRICE,B.RIGHT_CREDITS_PRICE)) AS LEFT_DEBTOR_PRICE,
+            NULL AS  RIGHT_ACCOUNT_NAME,
+            SUM(B.RIGHT_CREDITS_PRICE) AS RIGHT_CREDITS_PRICE,
+            NULL AS CUSTOMER_NAME,
+            NULL AS EXPENSE_REPORT
+        FROM
+            (SELECT
+                 S.REPORTING_DATE AS REPORTING_DATE,
+                 J.SLIP_NO AS SLIP_NO,
+                 J.JOURNAL_NO,
+                 BALANCE_DIVISION,
+                 J.ACCOUNT_INNER_CODE,
+                 J.CUSTOMER_CODE,
+                 LEFT_DEBTOR_PRICE,
+                 RIGHT_CREDITS_PRICE,
+                 J.ACCOUNT_NAME AS ACCOUNT_NAME,
+                 C.CUSTOMER_NAME AS CUSTOMER_NAME,
+                 S.EXPENSE_REPORT AS EXPENSE_REPORT
+             FROM SLIP S,
+                  JOURNAL J,
+                  CUSTOMER C
+             WHERE J.SLIP_NO = S.SLIP_NO
+               AND J.CUSTOMER_CODE = C.CUSTOMER_CODE(+)
+               AND S.REPORTING_DATE BETWEEN #{fromDate} AND #{toDate
+               AND S.SLIP_STATUS = '승인'
+             ORDER BY S.REPORTING_DATE) A,
+            (SELECT
+                 S.REPORTING_DATE AS REPORTING_DATE,
+                 J.SLIP_NO AS SLIP_NO,
+                 J.JOURNAL_NO,
+
+                 BALANCE_DIVISION,
+                 J.ACCOUNT_INNER_CODE,
+                 J.CUSTOMER_CODE,
+                 LEFT_DEBTOR_PRICE,
+                 RIGHT_CREDITS_PRICE,
+                 J.ACCOUNT_NAME AS ACCOUNT_NAME,
+                 C.CUSTOMER_NAME AS CUSTOMER_NAME,
+                 S.EXPENSE_REPORT AS EXPENSE_REPORT
+             FROM SLIP S,
+                  JOURNAL J,
+                  CUSTOMER C
+             WHERE J.SLIP_NO = S.SLIP_NO
+               AND J.CUSTOMER_CODE = C.CUSTOMER_CODE(+)
+               AND S.REPORTING_DATE BETWEEN #{fromDate} AND #{toDate
+               AND S.SLIP_STATUS = '승인'
+             ORDER BY S.REPORTING_DATE) B
+        WHERE A.SLIP_NO = B.SLIP_NO
+          AND A.LEFT_DEBTOR_PRICE <>0
+          AND B.RIGHT_CREDITS_PRICE <>0
+        ]]> 
+    </select>
+
+    <select id="selectJournalName" parameterType="String" resultType="String">
+    <![CDATA[    
+        SELECT #{slipNo} || 'JOURNAL' || (NVL(COUNT(*) + 1,0))
+        FROM JOURNAL
+        WHERE SLIP_NO = #{slipNo}
+        ]]> 
+    </select>
+
+    <insert id="insertJournal" parameterType="kr.co.seoulit.erp.account.slip.to.JournalBean">
+    <![CDATA[    
+      INSERT INTO JOURNAL(JOURNAL_NO,SLIP_NO,BALANCE_DIVISION,ACCOUNT_INNER_CODE,CUSTOMER_CODE,LEFT_DEBTOR_PRICE,RIGHT_CREDITS_PRICE,ACCOUNT_NAME)
+        VALUES (#{journalNo}, #{slipNo}, #{balanceDivision}, #{accountInnerCode}, #{customerCode},#{leftDebtorPrice}, #{rightCreditsPrice}, #{accountName}
+                )
+                ]]> 
+    </insert>
+
+    <select id="selectIsChangeAccountCode" parameterType="kr.co.seoulit.erp.account.slip.to.JournalBean" resultType="int">
+   <![CDATA[     SELECT DECODE(ACCOUNT_INNER_CODE, #{accountCode}, 0, 1)
+        FROM JOURNAL
+        WHERE JOURNAL_NO = #{journalNo}
+]]> 
+    </select>
+<!-- =====================================  일반전표  분개삭제생성  XML까지 (XML은 수정 ) 2020-09-07 조편백   시작 ==================================== -->    
+       <delete id="deleteJournal" >
+        DELETE
+        FROM JOURNAL
+        WHERE JOURNAL_NO=#{journalNo}
+    </delete>
+<!-- =====================================  일반전표  분개삭제생성  XML까지 (XML은 수정 ) 2020-09-07 조편백   끝 ==================================== -->  
+
+<!-- ===================================  일반전표  분개update 생성 2020-09-12 조편백   시작 ====================================  -->
+    <update id="updateJournal" parameterType="kr.co.seoulit.erp.account.slip.to.JournalBean">
+  <![CDATA[      UPDATE JOURNAL
+        SET BALANCE_DIVISION    = #{balanceDivision},
+            ACCOUNT_INNER_CODE  = #{accountCode},
+            CUSTOMER_CODE       = #{customerCode},
+            RIGHT_CREDITS_PRICE = #{rightCreditsPrice},
+            LEFT_DEBTOR_PRICE   = #{leftDebtorPrice}
+        WHERE SLIP_NO = #{slipNo}
+          AND JOURNAL_NO = #{journalNo}
+          ]]> 
+    </update>
+<!-- ===================================  일반전표  분개update 생성 2020-09-12 조편백   끝 ====================================  -->
+<!-- ===================================  일반전표  분개 임금/납품구분 생성 2020-11-24 박미노   끝 ====================================  -->
+    <insert id="insertJournalSeparator" parameterType="Map" >
+    <![CDATA[    
+      INSERT INTO JOURNAL_SEPARATOR(SLIP_NO,DELIVERY_NO,EMP_CODE,APPLY_YEAR_MONTH)
+        VALUES (#{SlipNo},#{deliveryNo},#{empCode},#{applyYearMonth} 
+                )
+                ]]> 
+    </insert>
+    
+        <select id="selectJournalSeparator" parameterType="String" resultType="kr.co.seoulit.erp.account.slip.to.JournalSeparatorBean">
+    <![CDATA[    
+        SELECT * 
+        FROM JOURNAL_SEPARATOR
+        WHERE SLIP_NO = #{slipNo}
+        ]]> 
+    </select>
+</mapper>

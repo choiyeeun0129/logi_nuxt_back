@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.logistic.sales.dao.ClientDeliveryDAO">
+
+
+    <resultMap id="ClientDeliveryResult" type="ClientDeliveryTO" >
+        <result property="outputNumber" column="OUTPUT_NUMBER" />
+        <result property="deliveryNumber" column="DELIVERY_NUMBER" />
+        <result property="itemName" column="ITEM_NAME" />
+        <result property="Name" column="NAME" />
+        <result property="Tel" column="TEL" />
+        <result property="deliveryDate" column="DELIVERY_DATE" />
+        <result property="warehouseCode" column="WAREHOUSE_CODE" />
+        <result property="endingRoute" column="ENDING_ROUTE" />
+        <result property="deliveryStatus" column="DELIVERY_STATUS" />
+    </resultMap>
+
+    <select id="getClientDeliveryList" resultMap="ClientDeliveryResult">
+        SELECT * FROM DELIVERY ORDER BY DELIVERY_NUMBER
+    </select>
+
+    <insert id="addNewClientDelivery" parameterType="map">
+        INSERT INTO DELIVERY
+        (OUTPUT_NUMBER, DELIVERY_NUMBER, ITEM_NAME, NAME, TEL, DELIVERY_DATE, WAREHOUSE_CODE, ENDING_ROUTE, DELIVERY_STATUS)
+        VALUES
+            (#{outputNumber}, #{deliveryNumber}, #{itemName}, #{name}, #{tel}, #{deliveryDate}, #{warehouseCode}, #{endingRoute}, #{deliveryStatus})
+    </insert>
+
+    <!-- 최신번호 조회 -->
+    <select id="getClientDeliveryMaxNo" resultType="String">
+        SELECT MAX(OUTPUT_NUMBER)
+        FROM DELIVERY
+    </select>
+
+    <update id="updateClientDelivery" parameterType="ClientDelivery">
+        UPDATE DELIVERY SET
+                            OUTPUT_NUMBER = #{outputNumber} ,
+                            DELIVERY_NUMBER = #{deliveryNumber},
+                            ITEM_NAME = #{itemName},
+                            NAME = #{name},
+                            TEL = #{tel},
+                            DELIVERY_DATE = #{deliveryDate},
+                            WAREHOUSE_CODE = #{warehouseCode},
+                            ENDING_ROUTE = #{endingRoute},
+                            DELIVERY_STATUS = #{deliveryStatus}
+        WHERE DELIVERY_NUMBER = #{deliveryNumber}
+    </update>
+
+    <delete id="deleteClientDelivery" parameterType="String">
+        DELETE FROM DELIVERY WHERE DELIVERY_NUMBER = #{deliveryNumber}
+    </delete>
+
+</mapper>

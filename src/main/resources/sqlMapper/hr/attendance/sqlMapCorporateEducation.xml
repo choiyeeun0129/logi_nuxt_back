@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="kr.co.seoulit.erp.hr.attendance.dao.CorporateEduDAO">
+
+	<resultMap type="kr.co.seoulit.erp.hr.attendance.to.CorporateEduTO" id="corporateEduResult">
+		<result property="classCode" column="CLASS_CODE" />
+		<result property="className" column="CLASS_NAME" />
+		<result property="startDate" column="START_DATE" />
+		<result property="endDate" column="END_DATE" />
+		<result property="instructor" column="INSTRUCTOR" />	
+		<result property="cost" column="COST" />
+		<result property="classTime" column="CLASS_TIME" />	
+	</resultMap>
+	
+	<resultMap id="classListResult" type="kr.co.seoulit.erp.hr.attendance.to.CorporateEduTO">
+		<result property="classCode" column="CONTRACT_DETAIL_NO" jdbcType="VARCHAR" javaType="string" />
+		<result property="className" column="CLASS_NAME" />
+		<result property="startDate" column="START_DATE" />
+		<result property="endDate" column="END_DATE" />
+	</resultMap>
+
+	<select id="selectClassList" resultMap="corporateEduResult">
+		SELECT * FROM CORPORATE_EDUCATION
+	</select> 
+
+	
+	<select id="selectClass" resultMap="corporateEduResult" parameterType="java.lang.String">
+		SELECT * FROM CORPORATE_EDUCATION
+		WHERE CLASS_CODE= #{classCode}
+	</select>
+
+ 	<update id="updateClass" parameterType="kr.co.seoulit.erp.hr.attendance.to.CorporateEduTO">
+		UPDATE CORPORATE_EDUCATION SET
+			CLASS_NAME = #{className}
+			, START_DATE = #{startDate}
+			, END_DATE = #{endDate}
+			, INSTRUCTOR = #{instructor}
+			, COST = #{cost}
+			, CLASS_TIME = #{classTime}
+		WHERE CLASS_CODE = #{classCode}
+	</update>
+
+	<insert id="insertClass" parameterType="kr.co.seoulit.erp.hr.attendance.to.CorporateEduTO">
+		INSERT INTO CORPORATE_EDUCATION VALUES (
+			  #{classCode}
+			, #{className}
+			, #{startDate}
+			, #{endDate}
+			, #{instructor}
+			, #{cost}
+			, #{classTime}
+        )		
+	</insert>
+	
+	<delete id="deleteClass"  parameterType="java.lang.String">
+		DELETE FROM	CORPORATE_EDUCATION
+		WHERE CLASS_CODE = #{classCode}
+	</delete>
+
+</mapper>

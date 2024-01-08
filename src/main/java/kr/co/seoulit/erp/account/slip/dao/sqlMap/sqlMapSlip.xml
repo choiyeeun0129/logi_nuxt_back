@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:32 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.slip.dao.SlipDAO">
+
+    <resultMap id="slipResult" type="kr.co.seoulit.erp.account.slip.to.SlipBean">
+        <result property="slipNo" column="SLIP_NO"/>
+        <result property="accountPeriodNo" column="ACCOUNT_PERIOD_NO"/>
+        <result property="deptCode" column="DEPT_CODE"/>
+        <result property="deptName" column="DEPT_NAME"/>
+        <result property="slipType" column="SLIP_TYPE"/>
+        <result property="expenseReport" column="EXPENSE_REPORT" />
+        <result property="authorizationStatus" column="AUTHORIZATION_STATUS"/>
+        <result property="reportingEmpCode" column="REPORTING_EMP_CODE"/>
+        <result property="reportingEmpName" column="REPORTING_EMP_NAME"/>
+        <result property="reportingDate" column="REPORTING_DATE"/>
+        <result property="approvalEmpCode" column="APPROVAL_EMP_CODE"/>
+        <result property="approvalDate" column="APPROVAL_DATE"/>
+        <result property="slipStatus" column="SLIP_STATUS"/>
+        <result property="balanceDivision" column="BALANCE_DIVISION"/>
+        <result property="positionCode" column="POSITION_CODE"/>
+        <result property="slipStatus" column="SLIP_STATUS"/>
+    </resultMap>
+      
+   <select id="selectSlipDataList" parameterType="String" resultMap="slipResult">
+   <![CDATA[
+   SELECT 
+   SLIP_NO,
+   ACCOUNT_PERIOD_NO,
+   DEPT_CODE,
+   SLIP_TYPE,
+   EXPENSE_REPORT,
+   AUTHORIZATION_STATUS,
+   REPORTING_EMP_CODE,
+   REPORTING_DATE,
+   APPROVAL_EMP_CODE,
+   APPROVAL_DATE,
+   SLIP_DESCRIPTION,
+   SLIP_STATUS
+   FROM SLIP 
+   WHERE REPORTING_DATE =#{slipDate}
+   ORDER BY SLIP_NO
+   ]]>
+   </select>
+   
+   <delete id="deleteSlip" parameterType="String">
+   <![CDATA[
+   DELETE 
+   FROM SLIP 
+   WHERE SLIP_NO = #{slipNo}
+   ]]>
+   </delete>
+   
+   <update id="updateSlip"   parameterType="kr.co.seoulit.erp.account.slip.to.SlipBean">
+   <![CDATA[
+   UPDATE 
+   SLIP 
+   SET SLIP_TYPE=#{slipType}, 
+   EXPENSE_REPORT=#{expenseReport} 
+   WHERE SLIP_NO=#{slipNo}
+   ]]>
+   </update>
+   
+   <insert id="insertSlip" parameterType="kr.co.seoulit.erp.account.slip.to.SlipBean">
+   <![CDATA[
+   INSERT INTO SLIP(SLIP_NO,ACCOUNT_PERIOD_NO,DEPT_CODE,SLIP_TYPE,EXPENSE_REPORT,SLIP_STATUS,REPORTING_EMP_CODE,REPORTING_EMP_NAME
+   ,REPORTING_DATE,APPROVAL_EMP_CODE,APPROVAL_DATE)
+   VALUES (#{slipNo}, #{accountPeriodNo}, #{deptCode}, #{slipType}, #{expenseReport},#{slipStatus}, #{reportingEmpCode}, #{reportingEmpName},
+                #{reportingDate}, #{approvalEmpCode}, #{approvalDate})
+                ]]>
+   </insert>
+   
+   <update id="approveSlip" parameterType="kr.co.seoulit.erp.account.slip.to.SlipBean">
+   <![CDATA[
+   UPDATE SLIP 
+   SET APPROVAL_DATE=#{approvalDate},
+   SLIP_STATUS=#{slipStatus},
+   APPROVAL_EMP_CODE=#{approvalEmpCode} 
+   WHERE SLIP_NO=#{slipNo}
+   ]]>
+   </update>
+   
+     <select id="selectRangedSlipList" parameterType="map" resultMap="slipResult">
+  
+        SELECT DISTINCT S.SLIP_NO,
+                        S.REPORTING_EMP_CODE,
+                        S.REPORTING_EMP_NAME,
+                        S.APPROVAL_EMP_CODE,
+                        S.EXPENSE_REPORT,
+                        S.SLIP_TYPE,
+                        S.SLIP_STATUS,
+                        S.APPROVAL_DATE,
+                        S.REPORTING_DATE,
+                        S.DEPT_CODE,
+                        S.ACCOUNT_PERIOD_NO
+        FROM SLIP S,
+             JOURNAL J
+        WHERE S.SLIP_NO = J.SLIP_NO
+          AND S.REPORTING_DATE BETWEEN #{startDate} AND #{endDate}
+          <if test="slipStatus!='전체'">
+          AND S.SLIP_STATUS = #{slipStatus}
+        </if>
+        ORDER BY S.REPORTING_DATE
+       
+    </select>
+   
+   <select id="selectDisApprovalSlipList" resultMap="slipResult">
+   <![CDATA[
+   SELECT SLIP_NO as slipNo,
+               ACCOUNT_PERIOD_NO as accountPeriodNo,
+               DEPT_CODE as deptCode,
+               SLIP_TYPE as slipType,
+               EXPENSE_REPORT as expenseReport,
+               AUTHORIZATION_STATUS as authorizationStatus,
+               REPORTING_EMP_CODE as reportingEmpCode,
+               REPORTING_DATE as reportingDate,
+               APPROVAL_EMP_CODE as approvalEmpCode,
+               APPROVAL_DATE as approvalDate,
+               SLIP_DESCRIPTION as slipDescription,
+               SLIP_STATUS as slipStatus
+        FROM SLIP
+        ]]>
+   </select>
+   
+  <select id="selectSlipCount" parameterType="String" resultType="int">
+  <![CDATA[
+  SELECT 
+  COUNT(*) 
+  FROM SLIP 
+  WHERE SLIP_NO LIKE '%'||#{today}||'%'
+  ]]>
+  </select>
+   
+</mapper>

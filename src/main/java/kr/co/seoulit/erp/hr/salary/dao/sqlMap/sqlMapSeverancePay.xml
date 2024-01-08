@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.salary.dao.SeverancePayDAO">
+	
+	<resultMap type="kr.co.seoulit.erp.hr.salary.to.SeveranceTO" id="severancePayResult">
+		<result property="empCode" column="EMP_CODE" />
+		<result property="empName" column="EMP_NAME" />
+		<result property="hireDate" column="HIRE_DATE" />
+		<result property="sysDate" column="SYS_DATE" />
+		<result property="severancePay" column="SEVERANCE_PAY" />
+	</resultMap>
+
+	
+	<select id="selectSeverancePayList" resultMap="severancePayResult">
+	
+    select emp_code 
+    	 , emp_name
+         , hire_date 
+         , to_char(sysdate, 'YYYY-MM-DD') as sys_date
+         , (select 
+         		(
+         			select abs(
+        				(
+        				select to_number(to_char(sysdate, 'yy'))
+        				from employee_basic
+        				where emp_code = #{empName}
+        				)
+        				-
+        				(
+        				select to_number(substr(regexp_replace(hire_date , '-' , ''),3,2)) 
+        				from employee_basic
+        				where emp_code = #{empName}
+        					)
+        				) as min_date 
+    					from employee_basic
+    					where emp_code = #{empName}
+    					)
+    			*
+    			(
+    				select trunc(avg(salary)) 
+    				from (
+        				select salary
+        				from month_salary
+        				where emp_code = #{empName}
+        				and rownum <![CDATA[<]]> 4
+        				order by apply_year_month desc
+    				)) 
+    				from dual )as severance_pay
+    				from employee_basic
+    				where rownum <![CDATA[<]]> 2
+    				and emp_code = #{empName}
+    
+	</select>
+
+</mapper>

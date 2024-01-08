@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.logistic.transvehicle.dao.TransVehicleDAO">
+
+    <resultMap id="transInfoResult" type="TransVehicleTO">
+        <result property="vehicleNumber" column="VEHICLE_NUMBER"  />
+        <result property="type" column="TYPE"  />
+        <result property="manufacturingCompany" column="MANUFACTURING_COMPANY"  />
+        <result property="yearOfManufacture" column="YEAR_OF_MANUFACTURE"  />
+        <result property="loadCapacity" column="LOAD_CAPACITY"  />
+        <result property="maintenanceDate" column="MAINTENANCE_DATE"  />
+        <result property="operator" column="OPERATOR"  />
+        <result property="fuelType" column="FUEL_TYPE"  />
+        <result property="transportationStatus" column="TRANSPORTATION_STATUS"  />
+    </resultMap>
+
+    <!--    운송수단 전체 조회-->
+    <select id="allTransVehicleList" resultMap="transInfoResult">
+        SELECT * FROM TRANSVEHICLE
+    </select>
+
+    <!--    운송수단 type별 조회-->
+    <select id="getTransVehicleList" parameterType="String" resultMap="transInfoResult">
+        SELECT * FROM TRANSVEHICLE
+        WHERE TYPE = #{type}
+    </select>
+
+    <!-- 최신차량번호 조회 -->
+    <select id="getTransVehicleMaxNo" resultType="String">
+        SELECT MAX(VEHICLE_NUMBER)
+        FROM TRANSVEHICLE
+    </select>
+
+    <!-- 운송수단 등록 -->
+    <insert id="addNewVehicle" parameterType="map">
+        INSERT INTO TRANSVEHICLE (VEHICLE_NUMBER, TYPE, MANUFACTURING_COMPANY, YEAR_OF_MANUFACTURE, LOAD_CAPACITY, MAINTENANCE_DATE, OPERATOR, FUEL_TYPE, TRANSPORTATION_STATUS)
+        VALUES (#{vehicleNumber}, #{type}, #{manufacturingCompany}, #{yearOfManufacture}, #{loadCapacity},#{maintenanceDate},#{operator},#{fuelType},#{transportationStatus})
+    </insert>
+
+    <!--    운송수단 수정-->
+    <update id="updateTransVehicle" parameterType="TransVehicleTO">
+        UPDATE TRANSVEHICLE SET
+                                LOAD_CAPACITY = #{loadCapacity} ,
+                                MAINTENANCE_DATE = #{maintenanceDate},
+                                OPERATOR = #{operator},
+                                FUEL_TYPE = #{fuelType},
+                                TRANSPORTATION_STATUS = #{transportationStatus}
+        WHERE VEHICLE_NUMBER = #{vehicleNumber}
+    </update>
+
+    <!--    운송수단 삭제-->
+    <delete id="deleteTransVehicle" parameterType="String">
+        DELETE FROM TRANSVEHICLE WHERE VEHICLE_NUMBER = #{vehicleNumber}
+    </delete>
+
+</mapper>

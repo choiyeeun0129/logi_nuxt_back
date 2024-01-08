@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:31 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.slip.dao.JournalDetailDAO">
+
+    <resultMap id="journalDetailResult" type="kr.co.seoulit.erp.account.slip.to.JournalDetailBean">
+        <result property="journalDetailNo" column="JOURNAL_DETAIL_NO"/>
+        <result property="accountControlName" column="ACCOUNT_CONTROL_NAME"/>
+        <result property="accountControlType" column="ACCOUNT_CONTROL_TYPE"/>
+        <result property="journalDescription" column="JOURNAL_DESCRIPTION"/>
+        <result property="accountControlDescription" column="ACCOUNT_CONTROL_DESCRIPTION"/> 
+     </resultMap>
+      
+ <select id="selectJournalDetailList" parameterType="String" resultMap="journalDetailResult">
+  <![CDATA[
+               SELECT
+				J.JOURNAL_DETAIL_NO
+				,J.DESCRIPTION AS JOURNAL_DESCRIPTION
+				,A.ACCOUNT_CONTROL_TYPE
+				,A.ACCOUNT_CONTROL_NAME
+                ,A.DESCRIPTION AS ACCOUNT_CONTROL_DESCRIPTION
+                ,C.DETAIL_CODE_NAME
+			FROM JOURNAL_DETAIL J
+				,ACCOUNT_CONTROL_DETAIL A
+				,CODE_DETAIL C
+			WHERE JOURNAL_NO = #{journalNo}
+            AND J.ACCOUNT_CONTROL_CODE = A.ACCOUNT_CONTROL_CODE
+            AND J.DESCRIPTION = C.DETAIL_CODE(+)
+      ]]> 
+    </select>
+    
+<select id="selectJournalDetailName" parameterType="String" resultType="String">
+             <![CDATA[      SELECT #{slipNo} || 'JOURNAL' || "
+                   NVL(SUBSTR(MAX(JOURNAL_NO), INSTR(MAX(JOURNAL_NO), 'JOURNAL') + 7) + 1, 0)
+                   FROM JOURNAL
+                   WHERE SLIP_NO =  #{slipNo}]]> 
+    </select>    
+
+    <delete id="deleteJournalDetailByJournalNo" parameterType="String">
+   <![CDATA[
+        DELETE
+        FROM JOURNAL_DETAIL
+        WHERE JOURNAL_NO = #{journalNo}
+       ]]> 
+    </delete>
+
+
+    <update id="updateJournalDetail" parameterType="kr.co.seoulit.erp.account.slip.to.JournalDetailBean">
+   <![CDATA[
+        UPDATE JOURNAL_DETAIL
+        SET DESCRIPTION = #{journalDescription}
+        WHERE JOURNAL_DETAIL_NO = #{journalDetailNo}
+       ]]> 
+    </update>
+
+    <insert id="insertJournalDetailList" parameterType="String">
+    <![CDATA[   
+         INSERT INTO JOURNAL_DETAIL (
+            SELECT 
+            J.JOURNAL_NO, 
+            JOURNAL_DETAIL_NO_SEQUENCE.NEXTVAL, 
+            ACC.ACCOUNT_CONTROL_CODE, 
+            NULL
+            FROM JOURNAL J,
+                 ACCOUNT_CONTROL_CODE ACC,
+                 ACCOUNT_CONTROL_DETAIL ACD
+            WHERE J.JOURNAL_NO = #{journalNo}
+              AND J.ACCOUNT_INNER_CODE = ACC.ACCOUNT_CODE
+              AND ACC.ACCOUNT_CONTROL_CODE = ACD.ACCOUNT_CONTROL_CODE)
+              ]]> 
+    </insert>
+ 
+ 
+   
+</mapper>

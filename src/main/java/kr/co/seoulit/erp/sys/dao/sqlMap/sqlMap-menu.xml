@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.sys.dao.MenuDao">
+	<select id="selectMenuList" resultType="MenuTo">
+<!-- 		SELECT 
+			MENU_CODE , 
+			SUPER_MENU_CODE , 
+			MENU_NAME , 
+			MENU_URL , 
+			USING_STATUS , 
+			ICON 
+		FROM MENU
+		
+		WHERE USING_STATUS != 'N' OR USING_STATUS IS NULL
+		START WITH SUPER_MENU_CODE IS NULL
+		CONNECT BY PRIOR
+		MENU_CODE=SUPER_MENU_CODE -->
+		SELECT * FROM 
+		(SELECT MENU_CODE , 
+			    SUPER_MENU_CODE , 
+				MENU_NAME , 
+				MENU_URL , 
+				USING_STATUS , 
+				ICON,
+		        AUTHORITY_CODE_NUMBER
+		FROM MENU
+		WHERE USING_STATUS != 'N' OR USING_STATUS IS NULL
+		START WITH SUPER_MENU_CODE IS NULL
+		CONNECT BY PRIOR
+		MENU_CODE=SUPER_MENU_CODE) A, AUTHORITY B
+		WHERE A.AUTHORITY_CODE_NUMBER = B.AUTHORITY_CODE_NUMBER(+)	
+	</select>
+</mapper>

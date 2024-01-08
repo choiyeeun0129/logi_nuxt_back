@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.sys.dao.SysCodeDao">
+	<resultMap type="SyscodeTo" id="codeResult">
+		<result property="code" column="CODE"/>
+		<result property="codeName" column="CODE_NAME"/>
+		<result property="codeGroup" column="CODE_GROUP"/>
+		<result property="editStatus" column="EDIT_STATUS"/>
+		<collection property="codeDetailList" select="kr.co.seoulit.erp.sys.dao.CodeDetailDao.selectCodeDetailList" column="CODE" />
+	</resultMap>
+	<select id="selectCodeList" resultMap="codeResult">
+		SELECT 
+			CODE,
+			CODE_NAME,   
+			EDIT_STATUS,
+			CODE_GROUP   
+		FROM CODE ORDER BY CODE
+	</select>
+</mapper>

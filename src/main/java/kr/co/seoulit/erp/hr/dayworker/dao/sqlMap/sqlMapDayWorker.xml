@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <mapper namespace="kr.co.seoulit.erp.hr.dayworker.dao.DayWorkerDAO">
+
+	<resultMap type="kr.co.seoulit.erp.hr.dayworker.to.DayWorkerTO" id="dayworkerResult">
+      <result property="empCode" column="EMP_CODE" />
+      <result property="empName" column="EMP_NAME" />
+      <result property="joinDate" column="JOIN_DATE" />
+      <result property="dept" column="DEPT" />
+      <result property="phoneNumber" column="PHONE_NUMBER" />
+      <result property="accountNumber" column="ACCOUNT_NUMBER" />
+      <result property="accountHolder" column="ACCOUNT_HOLDER" />
+      <result property="salary" column="SALARY" />
+      <result property="timeSalary" column="TIME_SALARY" />
+   </resultMap>	
+    
+    
+    <select id="selectDayWorkerList" parameterType="map" resultMap="dayworkerResult">
+      SELECT 
+        *
+      FROM NEW_DAY_WORKER 
+      WHERE EMP_CODE = #{empCode}
+        AND EMP_NAME = #{empName}
+   	</select>
+   	
+   	    <parameterMap type="map" id="DayWorker">
+      <parameter property="empCode" mode="IN"/>
+      <parameter property="empName" mode="IN"/>
+      <parameter property="joinDate" mode="IN"/>
+     <parameter property="dept" mode="IN"/>
+     <parameter property="phoneNumber" mode="IN"/>
+     <parameter property="accountNumber" mode="IN"/>
+     <parameter property="accountHolder" mode="IN"/>
+     <parameter property="salary" mode="IN"/>
+          <parameter property="timeSalary" mode="IN"/>
+   </parameterMap>
+   
+   
+   	<select id="insertDayWorker" parameterMap="DayWorker" statementType="CALLABLE">
+     <![CDATA[ 
+      {call P_INSERT_DAY_WORKER(
+      			#{empCode, mode=IN, jdbcType=VARCHAR}
+      			,#{empName, mode=IN, jdbcType=VARCHAR}
+      			,#{joinDate, mode=IN, jdbcType=DATE}
+      			,#{dept, mode=IN, jdbcType=VARCHAR}
+      			,#{phoneNumber, mode=IN, jdbcType=VARCHAR}
+      			,#{accountNumber, mode=IN, jdbcType=NUMERIC}
+      			,#{accountHolder, mode=IN, jdbcType=VARCHAR}
+      			,#{timeSalary, mode=IN, jdbcType=NUMERIC}
+      )}
+      ]]>
+   </select>
+   
+   <delete id="deleteDayWorker" parameterType="kr.co.seoulit.erp.hr.dayworker.to.DayWorkerTO">
+      DELETE FROM NEW_DAY_WORKER 
+        WHERE EMP_CODE = #{empCode}
+        AND EMP_NAME = #{empName}
+   </delete>
+</mapper>

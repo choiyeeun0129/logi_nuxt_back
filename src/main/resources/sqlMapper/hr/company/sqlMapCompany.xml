@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="kr.co.seoulit.erp.hr.company.dao.CompanyDAO">
+	
+	<resultMap id="companyResult" type="companyTO">
+		<result property="companyTelNumber" column="COMPANY_TEL_NUMBER"  />
+		<result property="companyDivision" column="COMPANY_DIVISION"  />
+		<result property="companyBasicAddress" column="COMPANY_BASIC_ADDRESS"  />
+		<result property="companyOpenDate" column="COMPANY_OPEN_DATE"  />
+		<result property="companyBusinessItems" column="COMPANY_BUSINESS_ITEMS"  />
+		<result property="businessLicenseNumber" column="BUSINESS_LICENSE_NUMBER"  />
+		<result property="companyName" column="COMPANY_NAME"  />
+		<result property="companyDetailAddress" column="COMPANY_DETAIL_ADDRESS"  />
+		<result property="companyFaxNumber" column="COMPANY_FAX_NUMBER"  />
+		<result property="companyCeoName" column="COMPANY_CEO_NAME"  />
+		<result property="companyEstablishmentDate" column="COMPANY_ESTABLISHMENT_DATE"  />
+		<result property="companyCode" column="COMPANY_CODE"  />
+		<result property="homepage" column="HOMEPAGE"  />
+		<result property="corporationLicenseNumber" column="CORPORATION_LICENSE_NUMBER"  />
+		<result property="companyBusinessConditions" column="COMPANY_BUSINESS_CONDITIONS"  />
+		<result property="companyZipCode" column="COMPANY_ZIP_CODE"  />
+	</resultMap>
+	
+	<select id="selectCompanyList" resultMap="companyResult">
+		SELECT * FROM COMPANY ORDER BY COMPANY_CODE
+	</select>
+	
+	<insert id="insertCompany" parameterType="companyTO">
+	Insert into COMPANY
+	(COMPANY_CODE , COMPANY_NAME , COMPANY_DIVISION , BUSINESS_LICENSE_NUMBER ,
+	CORPORATION_LICENSE_NUMBER , COMPANY_CEO_NAME , COMPANY_BUSINESS_CONDITIONS ,
+	COMPANY_BUSINESS_ITEMS , COMPANY_ZIP_CODE , COMPANY_BASIC_ADDRESS , COMPANY_DETAIL_ADDRESS ,
+	COMPANY_TEL_NUMBER , COMPANY_FAX_NUMBER , COMPANY_ESTABLISHMENT_DATE ,
+	COMPANY_OPEN_DATE , HOMEPAGE)
+	values ( #{companyCode} , #{companyName} , #{companyDivision} , #{businessLicenseNumber}
+	, #{corporationLicenseNumber} , #{companyCeoName} , #{companyBusinessConditions} , 
+	#{companyBusinessItems} , #{companyZipCode} , #{companyBasicAddress} , #{companyDetailAddress} 
+	, #{companyTelNumber} , #{companyFaxNumber} , #{companyEstablishmentDate} , #{companyOpenDate} , #{homepage} )
+	</insert>
+	
+	<update id="updateCompany" parameterType="companyTO">
+	UPDATE COMPANY SET
+	COMPANY_NAME = #{companyName} , 
+	COMPANY_DIVISION = #{companyDivision} , 
+	BUSINESS_LICENSE_NUMBER = #{businessLicenseNumber} ,
+	CORPORATION_LICENSE_NUMBER = #{corporationLicenseNumber} , 
+	COMPANY_CEO_NAME = #{companyCeoName} , 
+	COMPANY_BUSINESS_CONDITIONS = #{companyBusinessConditions} ,
+	COMPANY_BUSINESS_ITEMS = #{companyBusinessItems} , 
+	COMPANY_ZIP_CODE = #{companyZipCode} , 
+	COMPANY_BASIC_ADDRESS = #{companyBasicAddress} ,
+	COMPANY_DETAIL_ADDRESS = #{companyDetailAddress} , 
+	COMPANY_TEL_NUMBER = #{companyTelNumber} , 
+	COMPANY_FAX_NUMBER = #{companyFaxNumber} ,
+	COMPANY_ESTABLISHMENT_DATE = #{companyEstablishmentDate} ,
+	COMPANY_OPEN_DATE = #{companyOpenDate} ,
+	HOMEPAGE = #{homepage}
+	WHERE COMPANY_CODE = #{companyCode}
+	</update>
+
+	<delete id="deleteCompany" parameterType="companyTO">
+	DELETE FROM COMPANY WHERE COMPANY_CODE = #{companyCode}
+	</delete>
+	
+</mapper>

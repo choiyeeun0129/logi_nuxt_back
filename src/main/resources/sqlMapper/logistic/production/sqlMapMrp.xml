@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.logistic.production.dao.MrpDAO">
+
+	<!-- Mps 조회 -->
+	<!--Mps.xml에서 Mrp.xml로 이동 -->
+	<resultMap id="mpsList" type="mpsTO">
+		<result property="mpsPlanDate" 				column="MPS_PLAN_DATE"  />
+		<result property="mpsNo" 					column="MPS_NO"  />
+		<result property="contractDetailNo"		 	column="CONTRACT_DETAIL_NO"  />
+		<result property="dueDateOfMps"				column="DUE_DATE_OF_MPS"  />
+		<result property="salesPlanNo"				column="SALES_PLAN_NO"  />
+		<result property="itemCode" 				column="ITEM_CODE"  />
+		<result property="itemName" 				column="ITEM_NAME"  />
+		<result property="mpsPlanAmount"			column="MPS_PLAN_AMOUNT"  />
+		<result property="mrpApplyStatus" 			column="MRP_APPLY_STATUS"  />
+		<result property="description" 				column="DESCRIPTION"  />
+		<result property="unitOfMps" 				column="UNIT_OF_MPS"  />
+		<result property="mpsPlanClassification" 	column="MPS_PLAN_CLASSIFICATION"  />
+		<result property="scheduledEndDate" 		column="SCHEDULED_END_DATE"  />
+	</resultMap>
+
+	<select id="getMpsList" parameterType="String" resultMap="mpsList">
+		SELECT * FROM MPS
+		WHERE TO_DATE(MPS_PLAN_DATE, 'YYYY-MM-DD')
+		BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD') AND TO_DATE(#{endDate},'YYYY-MM-DD')
+		AND MRP_APPLY_STATUS IS NULL
+	</select>
+	<!-- Mps 조회 끝-->
+
+	<!-- Mps 수정 -->
+	<update id="updateMps" parameterType="MpsTO">
+		UPDATE MPS
+		SET  			 MPS_PLAN_DATE			  = #{mpsPlanDate}
+						,MPS_NO					  = #{mpsNo}
+						,CONTRACT_DETAIL_NO		  = #{contractDetailNo}
+						,DUE_DATE_OF_MPS		  = #{dueDateOfMps}
+						,SALES_PLAN_NO			  = #{salesPlanNo}
+						,ITEM_CODE				  = #{itemCode}
+						,ITEM_NAME				  = #{itemName}
+						,MPS_PLAN_AMOUNT		  = #{mpsPlanAmount}
+						,MRP_APPLY_STATUS		  = #{mrpApplyStatus}
+						,DESCRIPTION			  = #{description}
+						,UNIT_OF_MPS			  = #{unitOfMps}
+						,MPS_PLAN_CLASSIFICATION  = #{mpsPlanClassification}
+						,SCHEDULED_END_DATE		  = #{scheduledEndDate}
+		WHERE			 MPS_NO = #{mpsNo}
+	</update>
+	<!-- Mps 수정 끝-->
+
+
+	<!-- MRP 모의전개 -->
+	<resultMap id="openMrplist" type="openMrpTO">
+		<result property="mpsNo" column="MPS_NO"  />
+		<result property="bomNo" column="BOM_NO"  />
+		<result property="itemClassification" column="ITEM_CLASSIFICATION"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="unitOfMrp" column="UNIT_OF_MRP"  />
+		<result property="orderDate" column="ORDER_DATE"  />
+		<result property="requiredDate" column="REQUIRED_DATE"  />
+		<result property="planAmount" column="PLAN_AMOUNT"  />
+		<result property="totalLossRate" column="TOTAL_LOSS_RATE"  />
+		<result property="caculatedAmount" column="CACULATED_AMOUNT"  />
+		<result property="requiredAmount" column="REQUIRED_AMOUNT"/>
+	</resultMap>
+
+
+	<parameterMap type="map" id="openMrpParam">
+		<parameter property="mpsNo" mode="IN" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="ERROR_CODE" mode="OUT" javaType="java.lang.Integer" jdbcType="DECIMAL"/>
+		<parameter property="ERROR_MSG" mode="OUT" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<parameter property="RESULT" javaType="java.sql.ResultSet" jdbcType="CURSOR" mode="OUT" resultMap="openMrplist"/>
+	</parameterMap>
+
+	<select id="openMrp" parameterMap="openMrpParam" statementType="CALLABLE" >
+				<![CDATA[
+		{call P_MRP_OPEN(?,?,?,?) }
+		]]>
+	</select>
+	<!-- MRP 모의전개 끝 -->
+
+	<!-- MRP 등록 -->
+	<resultMap id="mrpNoResult" type="mrpTO">
+		<result property="mrpNo" column="MRP_NO" />
+	</resultMap>
+
+	<select id="selectMrpCount" parameterType="String" resultMap="mrpNoResult">
+		SELECT MRP_NO
+		FROM MRP
+		WHERE INSTR(MRP_NO, REPLACE( #{mrpRegisterDate} , '-' , '' ) ) &gt; 0
+	</select>
+
+	<insert id="insertMrp" parameterType="mrpTO">
+		INSERT INTO MRP
+		( MRP_NO, MPS_NO, MRP_GATHERING_NO, ITEM_CLASSIFICATION,
+		  ITEM_CODE, ITEM_NAME, UNIT_OF_MRP,
+		  REQUIRED_AMOUNT, ORDER_DATE, REQUIRED_DATE,
+		  MRP_GATHERING_STATUS, PLAN_AMOUNT)
+		VALUES ( #{mrpNo}, #{mpsNo},
+				 #{mrpGatheringNo}, #{itemClassification},
+				 #{itemCode}, #{itemName},
+				 #{unitOfMrp}, #{requiredAmount},
+				 to_char(to_date(#{orderDate}),'yyyy-mm-dd') ,
+				 to_char(to_date(#{requiredDate}),'yyyy-mm-dd'),
+				 #{mrpGatheringStatus}, #{planAmount}
+			   )
+	</insert>
+	<!-- MRP 등록 끝 -->
+
+
+    <!-- 품목별 조달계획 디폴트 테이블 + ? -->
+	<resultMap id="mrpList" type="mrpTO">
+		<result property="mrpNo" column="MRP_NO"  />
+		<result property="mpsNo" column="MPS_NO"  />
+		<result property="mrpGatheringNo" column="MRP_GATHERING_NO"  />
+		<result property="itemClassification" column="ITEM_CLASSIFICATION"  />
+		<result property="itemCode" column="ITEM_CODE"  />
+		<result property="itemName" column="ITEM_NAME"  />
+		<result property="orderDate" column="ORDER_DATE"  />
+		<result property="requiredAmount" column="REQUIRED_AMOUNT" />
+		<result property="requiredDate" column="REQUIRED_DATE"  />
+		<result property="unitOfMrp" column="UNIT_OF_MRP"  />
+		<result property="mrpGatheringStatus" column="MRP_GATHERING_STATUS"  />
+	</resultMap>
+
+	<select id="selectMrpListAll" parameterType="String" resultMap="mrpList">
+
+		SELECT * FROM MRP
+		<where>
+			<if test='mrpGatheringStatusCondition == "null"'>
+				MRP_GATHERING_STATUS IS NULL
+			</if>
+
+			<if test='mrpGatheringStatusCondition == ""'>
+				MRP_GATHERING_STATUS IS NULL
+			</if>
+
+			<if test='mrpGatheringStatusCondition == "notNull"'>
+				MRP_GATHERING_STATUS IS NOT NULL
+			</if>
+		</where>
+		order by MRP_NO
+	</select>
+
+	<select id="selectMrpList" parameterType="map" resultMap="mrpList">
+	SELECT * FROM MRP WHERE ( CASE #{dateSearchCondition} WHEN 'orderDate' THEN
+	TO_DATE(ORDER_DATE, 'YYYY-MM-DD') WHEN 'requiredDate' THEN
+	TO_DATE(REQUIRED_DATE, 'YYYY-MM-DD') END )
+	BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD') AND TO_DATE(#{endDate},'YYYY-MM-DD')
+	</select>
+	<!-- 품목별 조달계획 디폴트 테이블 + ? 끝 -->
+
+	<select id="selectMrpListAsMrpGatheringNo" parameterType="String" resultMap="mrpList">
+	SELECT * FROM MRP WHERE MRP_GATHERING_NO = #{mrpGatheringNo}
+	</select>
+
+
+
+
+	<update id="updateMrp" parameterType="mrpTO">
+	UPDATE MRP
+	SET
+	MPS_NO = #{mpsNo} ,
+	MRP_GATHERING_NO = #{mrpGatheringNo} ,
+	ITEM_CLASSIFICATION = #{itemClassification} ,
+	ITEM_CODE = #{itemCode} ,
+	ITEM_NAME = #{itemName} ,
+	UNIT_OR_MRP = #{unitOfMrp} ,
+	REQUIRED_AMOUNT = #{requiredAmount} ,
+	ORDER_DATE = #{orderDate} ,
+	REQUIRED_DATE = #{requiredDate} ,
+	MRP_GATHERING_STATUS = #{mrpGatheringStatus}
+
+	WHERE MRP_NO = #{mrpNo}
+	</update>
+
+	<update id="changeMrpApplyStatus" parameterType="map">
+		UPDATE MPS SET MRP_APPLY_STATUS = #{mrpStatus} WHERE MPS_NO = #{mpsNo}
+	</update>
+
+	<update id="changeMrpGatheringStatus" parameterType="map">
+	UPDATE MRP SET MRP_GATHERING_NO = #{mrpGatheringNo} , MRP_GATHERING_STATUS = #{mrpGatheringStatus} WHERE MRP_NO = #{mrpNo}
+	</update>
+
+	<delete id="deleteMrp" parameterType="mrpTO">
+	DELETE FROM MRP WHERE MRP_NO = #{mrpNo}
+	</delete>
+
+
+
+</mapper>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+		namespace="kr.co.seoulit.erp.logistic.purchase.dao.BomDAO">
+
+	<resultMap id="bomDeployResult" type="kr.co.seoulit.erp.logistic.purchase.to.BomDeployTO">
+		<result property="bomNo" column="BOM_NO" />
+		<result property="bomLevel" column="BOM_LEVEL" />
+		<result property="parentItemCode" column="PARENT_ITEM_CODE" />
+		<result property="itemCode" column="ITEM_CODE" />
+		<result property="itemName" column="ITEM_NAME" />
+		<result property="unitOfStock" column="UNIT_OF_STOCK" />
+		<result property="netAmount" column="NET_AMOUNT" />
+		<result property="lossRate" column="LOSS_RATE" />
+		<result property="necessaryAmount" column="NECESSARY_AMOUNT" />
+		<result property="leadTime" column="LEAD_TIME" />
+		<result property="isLeaf" column="IS_LEAF" />
+		<result property="description" column="DESCRIPTION" />
+	</resultMap>
+
+	<resultMap id="bomInfoResult" type="kr.co.seoulit.erp.logistic.purchase.to.BomInfoTO">
+		<result property="itemCode" column="ITEM_CODE" />
+		<result property="parentItemCode" column="PARENT_ITEM_CODE" />
+		<result property="no" column="NO" />
+		<result property="itemName" column="ITEM_NAME" />
+		<result property="itemClassification"
+				column="ITEM_CLASSIFICATION" />
+		<result property="itemClassificationName"
+				column="ITEM_CLASSIFICATION_NAME" />
+		<result property="netAmount" column="NET_AMOUNT" />
+		<result property="description" column="DESCRIPTION" />
+	</resultMap>
+
+	<select id="selectBomDeployList" parameterType="map" resultMap="bomDeployResult">
+		<![CDATA[
+         SELECT
+            T1.BOM_NO, T1.BOM_LEVEL,
+            T1.PARENT_ITEM_CODE,
+            T1.ITEM_CODE, T2.ITEM_NAME,
+            T2.UNIT_OF_STOCK,
+            T1.NET_AMOUNT,
+            TO_NUMBER(NVL(LOSS_RATE,0))                                  AS LOSS_RATE,
+         TO_CHAR(T1.NET_AMOUNT*(1 + TO_NUMBER(NVL(LOSS_RATE,0)) ))          AS NECESSARY_AMOUNT,
+         T2.LEAD_TIME,
+         T1.IS_LEAF,
+          T1.DESCRIPTION
+      FROM (
+         SELECT
+            CONNECT_BY_ROOT ITEM_CODE || ' -' || TO_CHAR(ROWNUM, '00')       AS BOM_NO,
+            ( LEVEL-1 ) AS BOM_LEVEL,
+            PARENT_ITEM_CODE,
+            ITEM_CODE AS ITEM_CODE,
+            ( CASE CONNECT_BY_ISLEAF WHEN 0 THEN 'false' WHEN 1 THEN 'true' END ) AS IS_LEAF, NET_AMOUNT,
+            DESCRIPTION
+         FROM BOM
+            START WITH ITEM_CODE = #{itemCode}
+         ]]>
+		<trim prefix="AND">
+			<choose>
+				<when test='deployCondition=="forward"'>
+					<choose>
+						<when test='itemClassificationCondition=="IT-CI"'>
+							PARENT_ITEM_CODE = 'NULL' CONNECT BY PARENT_ITEM_CODE = PRIOR ITEM_CODE
+						</when>
+
+						<when test='itemClassificationCondition=="IT-SI"'>
+							PARENT_ITEM_CODE = 'DK-01' CONNECT BY PARENT_ITEM_CODE = PRIOR ITEM_CODE
+						</when>
+
+						<when test='itemClassificationCondition=="IT-MA"'>
+							PARENT_ITEM_CODE != 'NULL' CONNECT BY PARENT_ITEM_CODE = PRIOR ITEM_CODE
+						</when>
+
+						<when test='itemCode=="DK-AP02"'>
+							PARENT_ITEM_CODE = 'DK-01' CONNECT BY PARENT_ITEM_CODE = PRIOR ITEM_CODE
+						</when>
+
+						<when test='itemCode=="DK-AP02"'>
+							PARENT_ITEM_CODE = 'DK-02' CONNECT BY PARENT_ITEM_CODE = PRIOR ITEM_CODE
+						</when>
+					</choose>
+				</when>
+				<otherwise>
+					PARENT_ITEM_CODE != 'NULL' CONNECT BY PRIOR PARENT_ITEM_CODE = ITEM_CODE
+				</otherwise>
+			</choose>
+		</trim>
+		<![CDATA[
+         ORDER SIBLINGS BY NO ) T1,
+         ( SELECT
+             ITEM_CODE,
+             ITEM_NAME,
+             ITEM_CLASSIFICATION,
+             UNIT_OF_STOCK,
+             LOSS_RATE,
+             LEAD_TIME
+         FROM ITEM ) T2
+      WHERE TRIM(T1.ITEM_CODE) = T2.ITEM_CODE
+      ORDER BY BOM_NO
+      ]]>
+	</select>
+
+	<select id="selectBomInfoList" parameterType="String"
+			resultMap="bomInfoResult">
+		SELECT B.PARENT_ITEM_CODE, B.ITEM_CODE, B.NO, I.ITEM_NAME,
+			   I.ITEM_CLASSIFICATION,
+			   C.DETAIL_CODE_NAME AS ITEM_CLASSIFICATION_NAME,
+			   B.NET_AMOUNT, B.DESCRIPTION
+		FROM
+			( SELECT * FROM BOM B WHERE ( ITEM_CODE
+											  = #{itemCode} AND
+										  PARENT_ITEM_CODE = 'NULL' ) OR PARENT_ITEM_CODE =
+																		 #{parentItemCode} )
+				B,
+			ITEM I, CODE_DETAIL C
+		WHERE B.ITEM_CODE =
+			  I.ITEM_CODE
+		  AND I.ITEM_CLASSIFICATION = C.DETAIL_CODE
+		ORDER BY NO
+	</select>
+
+	<select id="selectAllItemWithBomRegisterAvailable"
+			resultMap="bomInfoResult">
+		WITH ALL_REGISTERED_BOM AS
+				 ( SELECT ITEM_CODE
+				   FROM ( SELECT *
+						  FROM BOM WHERE PARENT_ITEM_CODE = 'NULL' )
+				   GROUP BY ITEM_CODE ) ,
+
+			 ALL_ITEM_AS_PRODUCT AS
+				 ( SELECT ITEM_CLASSIFICATION, ITEM_CODE,
+						  ITEM_NAME
+				   FROM ITEM WHERE ITEM_CLASSIFICATION IN ( 'IT-CI', 'IT-SI' ) )
+
+		SELECT T2.DETAIL_CODE_NAME AS ITEM_CLASSIFICATION_NAME,
+			   T1.ITEM_CODE,
+			   T1.ITEM_NAME
+		FROM ALL_ITEM_AS_PRODUCT T1, CODE_DETAIL T2
+		WHERE
+			T1.ITEM_CLASSIFICATION = T2.DETAIL_CODE
+		  AND T1.ITEM_CODE NOT IN
+			  ( SELECT
+					ITEM_CODE FROM ALL_REGISTERED_BOM )
+	</select>
+
+	<insert id="insertBom" parameterType="bomTO">
+		Insert into BOM
+		( ITEM_CODE,
+		  PARENT_ITEM_CODE, NO, NET_AMOUNT, DESCRIPTION )
+		values ( #{itemCode} ,
+				 #{parentItemCode} , #{no} , #{netAmount} ,
+				 #{description} )
+	</insert>
+
+	<update id="updateBom" parameterType="bomTO">
+		UPDATE BOM SET
+					   NO = #{no} ,
+					   NET_AMOUNT = #{netAmount} , DESCRIPTION = #{description}
+		WHERE
+			PARENT_ITEM_CODE = #{parentItemCode} AND ITEM_CODE = #{itemCode}
+	</update>
+
+	<delete id="deleteBom" parameterType="bomTO">
+		DELETE FROM BOM
+		WHERE PARENT_ITEM_CODE = #{parentItemCode}
+		AND ITEM_CODE = #{itemCode}
+	</delete>
+</mapper>

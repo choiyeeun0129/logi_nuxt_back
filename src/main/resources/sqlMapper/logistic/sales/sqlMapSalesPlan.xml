@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.logistic.sales.dao.SalesPlanDAO">
+
+
+	<resultMap id="salesPlanResult" type="salesPlanTO" >
+		<result property="salesPlanNo" column="SALES_PLAN_NO" />
+		<result property="itemCode" column="ITEM_CODE" />
+		<result property="itemName" column="ITEM_NAME" />
+		<result property="unitOfSales" column="UNIT_OF_SALES" />
+		<result property="salesPlanDate" column="SALES_PLAN_DATE" />
+		<result property="dueDateOfSales" column="DUE_DATE_OF_SALES" />
+		<result property="salesAmount" column="SALES_AMOUNT" />
+		<result property="unitPriceOfSales" column="UNIT_PRICE_OF_SALES" />
+		<result property="sumPriceOfSales" column="SUM_PRICE_OF_SALES" />
+		<result property="mpsApplyStatus" column="MPS_APPLY_STATUS" />
+		<result property="description" column="DESCRIPTION" />
+	</resultMap>
+
+	<select id="selectSalesPlanList" parameterType="map" resultMap="salesPlanResult">
+		SELECT *
+		FROM SALES_PLAN
+		WHERE ( CASE #{dateSearchCondition}
+					WHEN 'salesPlanDate' THEN TO_DATE(SALES_PLAN_DATE, 'YYYY-MM-DD')
+					WHEN 'dueDateOfSales' THEN TO_DATE(DUE_DATE_OF_SALES, 'YYYY-MM-DD')
+			END )
+				  BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD')
+				  AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+	</select>
+
+
+	<select id="selectSalesPlan" parameterType="map" resultMap="salesPlanResult">
+		SELECT *
+		FROM SALES_PLAN
+	</select>
+
+	<select id="selectSalesPlanCount" parameterType="string" resultType="integer">
+		SELECT COUNT(*)
+		FROM SALES_PLAN
+		WHERE TO_DATE(SALES_PLAN_DATE, 'YYYY-MM-DD') =
+			  TO_DATE(#{salesPlanDate}, 'YYYY-MM-DD')
+	</select>
+
+
+	<resultMap id="salesPlanInMpsAvailableResult" type="salesPlanInMpsAvailableTO">
+		<result property="salesPlanNo" column="SALES_PLAN_NO" />
+		<!-- 	<result property="planClassification" column="PLAN_CLASSIFICATION"  /> -->
+		<result property="itemCode" column="ITEM_CODE" />
+		<result property="itemName" column="ITEM_NAME" />
+		<result property="unitOfSales" column="UNIT_OF_SALES" />
+		<result property="salesPlanDate" column="SALES_PLAN_DATE" />
+		<!-- 	<result property="mpsPlanDate" column="MPS_PLAN_DATE" /> -->
+		<!-- 	<result property="scheduledEndDate" column="SCHEDULED_END_DATE" /> -->
+		<result property="dueDateOfSales" column="DUE_DATE_OF_SALES" />
+		<result property="salesAmount" column="SALES_AMOUNT" />
+		<result property="unitPriceOfSales" column="UNIT_PRICE_OF_SALES" />
+		<result property="sumPriceOfSales" column="SUM_PRICE_OF_SALES" />
+		<result property="mpsApplyStatus" column="MPS_APPLY_STATUS" />
+		<result property="description" column="DESCRIPTION" />
+	</resultMap>
+
+	<select id="selectSalesPlanListInMpsAvailable" parameterType="map" resultMap="salesPlanInMpsAvailableResult">
+		SELECT *
+		FROM SALES_PLAN
+		WHERE MPS_APPLY_STATUS IS NULL
+		  AND ( CASE #{searchCondition}
+					WHEN 'salesPlanDate' THEN TO_DATE(SALES_PLAN_DATE, 'YYYY-MM-DD')
+					WHEN 'dueDateOfSales' THEN TO_DATE(DUE_DATE_OF_SALES, 'YYYY-MM-DD')
+			END )
+			BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate},'YYYY-MM-DD')
+	</select>
+	<select id="getSalesPlan" parameterType="salesPlanTO" resultMap="salesPlanResult">
+		SELECT *
+		FROM SALES_PLAN
+	</select>
+
+	<insert id="insertSalesPlan" parameterType="salesPlanTO">
+		Insert into SALES_PLAN
+		( SALES_PLAN_NO, ITEM_CODE, ITEM_NAME,
+		  SALES_PLAN_DATE, UNIT_OF_SALES, DUE_DATE_OF_SALES,
+		  SALES_AMOUNT, UNIT_PRICE_OF_SALES, SUM_PRICE_OF_SALES,
+		  MPS_APPLY_STATUS, DESCRIPTION)
+		values ( #{salesPlanNo:VARCHAR} , #{itemCode:VARCHAR} , #{itemName:NVARCHAR} ,
+				 #{salesPlanDate:VARCHAR} , #{unitOfSales:VARCHAR} , #{dueDateOfSales:VARCHAR} ,
+				 #{salesAmount:INTEGER} , #{unitPriceOfSales:INTEGER} , #{sumPriceOfSales:INTEGER} ,
+				 #{mpsApplyStatus:CHAR} , #{description:NVARCHAR} )
+	</insert>
+
+	<update id="updateSalesPlan" parameterType="salesPlanTO">
+		UPDATE SALES_PLAN SET
+							  ITEM_CODE = #{itemCode:VARCHAR} ,
+							  ITEM_NAME = #{itemName:NVARCHAR} ,
+							  SALES_PLAN_DATE = #{salesPlanDate:VARCHAR} ,
+							  UNIT_OF_SALES = #{unitOfSales:VARCHAR} ,
+							  DUE_DATE_OF_SALES = #{dueDateOfSales:VARCHAR} ,
+							  SALES_AMOUNT = #{salesAmount:INTEGER} ,
+							  UNIT_PRICE_OF_SALES = #{unitPriceOfSales:INTEGER} ,
+							  SUM_PRICE_OF_SALES = #{sumPriceOfSales:INTEGER} ,
+							  MPS_APPLY_STATUS = #{mpsApplyStatus:CHAR} ,
+							  DESCRIPTION = #{description:NVARCHAR}
+		WHERE SALES_PLAN_NO = #{salesPlanNo}
+	</update>
+
+	<update id="changeMpsStatusOfSalesPlan" parameterType="map">
+		UPDATE SALES_PLAN SET
+			MPS_APPLY_STATUS = #{mpsStatus:CHAR}
+		WHERE SALES_PLAN_NO = #{salesPlanNo}
+	</update>
+
+	<delete id="deleteSalesPlan" parameterType="salesPlanTO">
+		DELETE FROM SALES_PLAN
+		WHERE SALES_PLAN_NO = #{salesPlanNo}
+	</delete>
+
+</mapper>

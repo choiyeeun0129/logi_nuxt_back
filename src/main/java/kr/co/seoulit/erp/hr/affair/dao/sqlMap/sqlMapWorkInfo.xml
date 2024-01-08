@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.affair.dao.WorkInfoDAO">
+
+
+	<resultMap type="kr.co.seoulit.erp.hr.affair.to.WorkInfoTO" id="workInfoResult">
+		<result property="empCode" column="EMP_CODE"></result>
+		<result property="empName" column="EMP_NAME"></result>
+		<result property="hiredate" column="HIREDATE"></result>
+		<result property="retireDate" column="RETIRE_DATE"></result>
+		<result property="occupation" column="OCCUPATION"></result>
+		<result property="employmentType" column="EMPLOYMENT_TYPE"></result>
+		<result property="hobong" column="HOBONG"></result>
+		<result property="workInfoDays" column="WORK_INFO_DAYS"></result>
+		<result property="position" column="POSITION"></result>
+		<result property="deptName" column="DEPT_NAME"></result>
+		<result property="userOrNot" column="USER_OR_NOT"></result>
+	</resultMap>
+
+	<select id="selectWorkInfoList" resultMap="workInfoResult"
+		parameterType="string">
+    SELECT B.EMP_NAME, B.EMP_CODE, B.HIRE_DATE AS HIREDATE, B.RETIREMENT_DATE AS RETIRE_DATE, B.USER_OR_NOT,
+		W.position, W.DEPT_NAME, W.OCCUPATION, W.EMPLOYMENT_TYPE,W.HOBONG
+		FROM EMPLOYEE_BASIC B, WORK_INFO W
+		WHERE B.EMP_CODE=W.EMP_CODE
+		AND B.EMP_CODE= #{empCode}
+		ORDER BY B.EMP_CODE
+		
+	</select>
+
+
+	<select id="selectWorkList" resultMap="workInfoResult"
+		parameterType="string">
+		SELECT EMP_CODE
+		, TO_CHAR(HIREDATE, 'YYYY/MM/DD') HIREDATE
+		, TO_CHAR(RETIRE_DATE, 'YYYY/MM/DD') RETIRE_DATE
+		, OCCUPATION
+		, EMPLOYMENT_TYPE
+		, HOBONG
+		, WORK_INFO_DAYS
+		, POSITION
+		, DEPT_NAME
+		FROM WORK_INFO 
+		WHERE EMP_CODE = #{code}	</select>
+
+	<insert id="insertWorkInfo" parameterType="kr.co.seoulit.erp.hr.affair.to.WorkInfoTO">
+		INSERT INTO WORK_INFO VALUES (
+		#{empCode}
+		, TO_DATE(#{hiredate}, 'YYYY/MM/DD')
+		, TO_DATE(#{retireDate}, 'YYYY/MM/DD')
+		, #{occupation}
+		, #{employmentType}
+		, #{hobong}
+		, TO_NUMBER(#{workInfoDays})
+		, #{position}
+		, #{deptName}
+		)
+
+	</insert>
+
+	<update id="updateWorkInfo" parameterType="kr.co.seoulit.erp.hr.affair.to.WorkInfoTO">
+		UPDATE WORK_INFO SET
+		HIREDATE = TO_DATE(#{hiredate}, 'YYYY/MM/DD')
+		, RETIRE_DATE= TO_DATE(#{retireDate}, 'YYYY/MM/DD') 
+		, OCCUPATION = #{occupation}
+		, EMPLOYMENT_TYPE = #{employmentType}
+		, HOBONG = #{hobong}
+		, POSITION = #{position}
+		, DEPT_NAME = #{deptName}
+		WHERE EMP_CODE = #{empCode} 
+		AND WORK_INFO_DAYS = TO_NUMBER(#{workInfoDays})
+	</update>
+
+	<delete id="deleteWorkInfo" parameterType="kr.co.seoulit.erp.hr.affair.to.WorkInfoTO">
+		DELETE FROM WORK_INFO
+		WHERE EMP_CODE = #{empCode}
+		AND WORK_INFO_DAYS = #{workInfoDays}
+	</delete>
+
+</mapper>

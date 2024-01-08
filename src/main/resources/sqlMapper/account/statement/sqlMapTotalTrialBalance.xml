@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:33 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.account.statement.dao.TotalTrialBalanceDAO">
+    <resultMap id="totalTrialBalanceResult" type="kr.co.seoulit.erp.account.statement.to.TotalTrialBalanceBean">
+        <result property="lev" column="LEV"/>
+        <result property="accountName" column="ACCOUNT_NAME"/>
+        <result property="accountInnerCode" column="CODE"/>
+        <result property="debitsSumBalance" column="DEBITS_SUM_BALANCE"/>
+        <result property="debitsSum" column="DEBITS_SUM"/>
+        <result property="creditsSum" column="CREDITS_SUM"/>
+        <result property="creditsSumBalance" column="CREDITS_SUM_BALANCE"/>
+    </resultMap>
+
+    <parameterMap id="totalTrialBalanceParams" type="java.util.HashMap">
+        <parameter property="toDate" jdbcType="VARCHAR" javaType="String" mode="IN"/>
+        <parameter property="ERROR_CODE" jdbcType="DECIMAL" javaType="int" mode="OUT"/>
+        <parameter property="ERROR_MSG" jdbcType="VARCHAR" javaType="String" mode="OUT"/>
+        <parameter property="RESULT" jdbcType="CURSOR" javaType="java.sql.ResultSet" mode="OUT" resultMap="totalTrialBalanceResult"/>
+    </parameterMap>
+    
+    <parameterMap id="addEarlyStatementsParams" type="java.util.HashMap">
+        <parameter property="toDate" jdbcType="VARCHAR" javaType="String" mode="IN"/>
+        <parameter property="ERROR_CODE" jdbcType="DECIMAL" javaType="int" mode="OUT"/>
+        <parameter property="ERROR_MSG" jdbcType="VARCHAR" javaType="String" mode="OUT"/>
+    </parameterMap>
+
+   <select id="callTotalTrialBalance" parameterMap="totalTrialBalanceParams" statementType="CALLABLE" >
+   			<![CDATA[
+   				{call P_TOTAL_TRIAL_BALANCE (?,?,?,?)}
+   			]]>   									 
+    </select>
+    
+    <select id="addEarlyStatements" parameterMap="addEarlyStatementsParams" statementType="CALLABLE"> 
+      <![CDATA[
+        {call P_COMPUTE_EARLY_STATEMENTS(?,?,?)}
+    ]]>   
+    </select>
+</mapper>

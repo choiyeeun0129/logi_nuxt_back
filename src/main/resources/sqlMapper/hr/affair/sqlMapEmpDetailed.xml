@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.affair.dao.EmpDAO">
+
+   <resultMap type="EmpTO" id="empDetailedResult">
+
+      <result property="empCode" column="EMP_CODE" />
+      <result property="empName" column="EMP_NAME" />
+      <result property="birthDate" column="BIRTH_DATE" />
+      <result property="gender" column="GENDER" />
+      <result property="detailAddress" column="DETAIL_ADDRESS" />
+      <result property="mobileNumber" column="PHONE_NUMBER" />
+      <result property="email" column="EMAIL" />
+      <result property="address" column="BASIC_ADDRESS" />
+      <result property="companyName" column="COMPANY_NAME" />
+      <result property="workPlace" column="WORKPLACE_NAME" />
+      <result property="position" column="POSITION_NAME" />
+      <result property="deptName" column="DEPT_NAME" />
+      <result property="deptCode" column="DEPT_CODE" />
+      <result property="detailCodeName" column="DETAIL_CODE_NAME" />
+
+   </resultMap>
+  
+   
+   <select id="selectEmp]List" resultMap="empDetailedResult">
+			SELECT *
+			FROM EMPLOYEE_BASIC
+			ORDER BY DEPT_CODE
+		</select>
+   
+   
+      <select id="selectEmpList" resultMap="empDetailedResult" parameterType="String">
+	SELECT*FROM(
+  SELECT D.DEPT_NAME, 
+		B.EMP_NAME,
+        P.POSITION_NAME,
+        B.EMP_CODE
+		FROM DEPARTMENT D, EMPLOYEE_BASIC B, EMPLOYEE_DETAIL E, POSITION P
+		WHERE D.DEPT_CODE=B.DEPT_CODE
+		AND B.EMP_CODE=E.EMP_CODE
+		AND E.POSITION_CODE=P.POSITION_CODE
+    ORDER BY B.EMP_NAME
+		)
+GROUP BY DEPT_NAME,	EMP_NAME,POSITION_NAME,EMP_CODE
+ORDER BY DEPT_NAME
+	</select>
+
+
+	<select id="selectEmpAllList" resultMap="empDetailedResult">
+		SELECT e.COMPANY_CODE, e.EMP_CODE, e.EMP_NAME,
+		e.HIRE_DATE, e.RETIREMENT_DATE, e.USER_OR_NOT, e.BIRTH_DATE,
+		e.GENDER, e.DEPT_CODE, e.COLOR, c.DETAIL_CODE_NAME
+		FROM EMPLOYEE_BASIC e, CODE_DETAIL c WHERE e.DEPT_CODE = c.DETAIL_CODE
+		ORDER BY e.EMP_CODE
+	</select>
+	
+   
+   <select id="selectEmpListD" resultMap="empDetailedResult" parameterType="String">
+	SELECT*FROM(
+  SELECT D.DEPT_NAME, 
+				B.EMP_NAME,
+        P.POSITION_NAME,
+        B.EMP_CODE
+		FROM DEPARTMENT D, EMPLOYEE_BASIC B, EMPLOYEE_DETAIL E, POSITION P
+		WHERE D.DEPT_CODE=B.DEPT_CODE
+		AND B.EMP_CODE=E.EMP_CODE
+		AND E.POSITION_CODE=P.POSITION_CODE
+		AND D.DEPT_CODE= #{dept}
+		ORDER BY B.EMP_NAME)
+GROUP BY DEPT_NAME,	EMP_NAME,POSITION_NAME,EMP_CODE
+	</select>
+	
+	
+	   <select id="selectEmpListN" resultMap="empDetailedResult" parameterType="String">
+	SELECT*FROM(
+  SELECT D.DEPT_NAME, 
+				B.EMP_NAME,
+        P.POSITION_NAME,
+        B.EMP_CODE
+		FROM DEPARTMENT D, EMPLOYEE_BASIC B, EMPLOYEE_DETAIL E, POSITION P
+		WHERE D.DEPT_CODE=B.DEPT_CODE
+		AND B.EMP_CODE=E.EMP_CODE
+		AND E.POSITION_CODE=P.POSITION_CODE
+		AND B.EMP_NAME= #{dept}
+		ORDER BY B.EMP_NAME)
+GROUP BY DEPT_NAME,	EMP_NAME,POSITION_NAME,EMP_CODE
+	</select>
+	
+
+   <select id="selectEmployee" resultMap="empDetailedResult"
+      parameterType="map">
+      SELECT EMP_CODE
+      , COMPANY_CODE
+      , COMPANY_NAME
+      , EMP_NAME
+      , EMP_ENG_NAME
+      ,
+      HIRE_DATE
+      , RETIREMENT_DATE
+      , USER_OR_NOT
+      , SOCIAL_SECURITY_NUMBER
+      ,
+      BIRTH_DATE
+      , GENDER
+      , SEQ
+      , UPDATE_HISTORY
+      , UPDATE_DATE
+      , USER_ID
+      ,
+      WORKPLACE_CODE
+      , WORKPLACE_NAME
+      , DEPT_CODE
+      , PHONE_NUMBER
+      , EMAIL
+      ,
+      ZIP_CODE
+      , BASIC_ADDRESS
+      , DETAIL_ADDRESS
+      , LEVEL_OF_EDUCATION
+      , IMAGE
+      ,
+      POSITION_CODE
+      , POSITION_NAME
+      , DEPT_NAME
+      ,AUTHORITY_CODE
+      FROM
+      (SELECT
+      E1.EMP_CODE
+      , E1.COMPANY_CODE
+      , C.COMPANY_NAME
+      , E1.EMP_NAME
+      ,
+      E1.EMP_ENG_NAME
+      , E1.HIRE_DATE
+      , E1.RETIREMENT_DATE
+      , E1.USER_OR_NOT
+      ,
+      E1.SOCIAL_SECURITY_NUMBER
+      , E1.BIRTH_DATE
+      , E1.GENDER
+      , E2.EMAIL
+      , E2.SEQ
+      , E2.UPDATE_HISTORY
+      , E2.UPDATE_DATE
+      , E2.USER_ID
+      , E2.WORKPLACE_CODE
+      ,
+      W.WORKPLACE_NAME
+      , E2.DEPT_CODE
+      , E2.PHONE_NUMBER
+      , E2.ZIP_CODE
+      ,
+      E2.BASIC_ADDRESS
+      , E2.DETAIL_ADDRESS
+      , E2.LEVEL_OF_EDUCATION
+      , E2.IMAGE
+      ,
+      E2.POSITION_CODE
+      , E2.AUTHORITY_CODE
+      , P.POSITION_NAME
+      , D.DEPT_NAME
+      FROM
+      EMPLOYEE_BASIC E1
+      , EMPLOYEE_DETAIL E2
+      , WORKPLACE W
+      , POSITION P
+      ,
+      DEPARTMENT D
+      , COMPANY C
+      WHERE E1.EMP_CODE = E2.EMP_CODE
+      AND
+      E1.COMPANY_CODE = W.COMPANY_CODE
+      AND E2.WORKPLACE_CODE =
+      W.WORKPLACE_CODE
+      AND E2.WORKPLACE_CODE = P.WORKPLACE_CODE
+      AND
+      E2.DEPT_CODE = P.DEPT_CODE
+      AND E2.POSITION_CODE = P.POSITION_CODE
+      AND
+      E2.WORKPLACE_CODE = D.WORKPLACE_CODE
+      AND E2.DEPT_CODE = D.DEPT_CODE
+      AND
+      E2.COMPANY_CODE= C.COMPANY_CODE
+      AND E2.POSITION_CODE = P.POSITION_CODE
+      AND
+      (
+      E2.EMP_CODE
+      , E2.SEQ
+      )
+      IN
+      (SELECT EMP_CODE
+      , MAX(SEQ)
+      FROM
+      EMPLOYEE_DETAIL
+      GROUP BY EMP_CODE
+      )
+      )
+      WHERE COMPANY_NAME = #{company}
+      
+      <if test=' workPlace != null and workPlace != "" '>
+         AND WORKPLACE_NAME = #{workPlace}
+      </if>
+      <if test=' position != null and position != "" '>
+         AND POSITION_NAME= #{position}
+      </if>
+      <if test=' empName != null and empName != "" '>
+         AND EMP_NAME = #{empName}
+      </if>
+      ORDER BY EMP_CODE
+   </select>
+
+      <update id="updateEmp" parameterType="kr.co.seoulit.erp.hr.affair.to.EmpUpdateTO"
+      statementType="CALLABLE">
+      {CALL P_UPDATE_MAP(
+      #{empCode mode=IN jdbcType=VARCHAR 30},
+      #{empName},
+      #{gender mode=IN jdbcType=VARCHAR30},
+      #{birhtDate mode=IN jdbcType=VARCHAR 30},
+      #{deptCode mode=IN jdbcType=VARCHAR 30},
+      #{authorityCodeNumber mode=IN jdbcType=VARCHAR 30},
+      #{basicAddress mode=IN jdbcType=VARCHAR30},
+      #{email mode=IN jdbcType=VARCHAR30},
+      #{levelOfEducation mode=IN jdbcType=VARCHAR 30},
+      #{phoneNumber mode=IN jdbcType=VARCHAR 30},
+      #{positionCode mode=IN jdbcType=VARCHAR 30},
+      #{userId mode=IN jdbcType=VARCHAR 30},
+      #{workplaceCode mode=IN jdbcType=VARCHAR 30},
+      #{workplaceCode mode=IN jdbcType=VARCHAR 30},
+      #{zipCode mode=OUT jdbcType=VARCHAR},
+      #{errorMsg mode=OUT jdbcType=VARCHAR} ) }
+   </update>
+
+   <update id="updateEmployee" parameterType="kr.co.seoulit.erp.hr.affair.to.EmployeeDetailTO"
+      statementType="CALLABLE">
+      {CALL P_EMPLOYEE_UPDATE( 
+      #{empCode mode=IN jdbcType=VARCHAR 30}, 
+      #{address mode=IN jdbcType=VARCHAR 30},
+      #{birthDate mode=IN jdbcType=VARCHAR30},
+      #{detailAddress mode=IN jdbcType=VARCHAR 30}, 
+      #{email mode=IN jdbcType=VARCHAR 30},
+      #{gender mode=IN jdbcType=VARCHAR 30},
+      #{mobileNumber mode=IN jdbcType=VARCHAR30}, 
+      #{workPlace mode=IN jdbcType=VARCHAR30}, 
+      #{position mode=IN jdbcType=VARCHAR 30}, 
+      #{empName mode=IN jdbcType=VARCHAR 30},
+      #{errorCode mode=OUT jdbcType=VARCHAR}, 
+      #{errorMsg mode=OUT jdbcType=VARCHAR} ) }
+   </update>
+<!-- //******************************************************08-26 손유찬 **************************************************** */ -->
+   <parameterMap type="map" id="RegistEMP" >
+      <parameter property="companyCode" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="userPassword" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+       <parameter property="updateDate" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="workplaceCode" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="deptCode" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="positionCode" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="userId" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="phoneNumber" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="email" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="zipCode" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="basicAddress" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="detailAddress" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="levelOfEducation" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="image" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="empName" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="empEngName" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="socialSecurityNumber" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="hireDate" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="retirementDate" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="userOrNot" jdbcType="CHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="birthDate" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="gender" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="authorityCode" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+      <parameter property="accessCode" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN" />
+   </parameterMap>   
+   
+   
+<insert id="registEmployee" parameterMap="RegistEMP" statementType="CALLABLE">
+<![CDATA[
+{CALL P_EMP_REGISTER(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? )}
+       ]]>   
+</insert>
+<!-- //******************************************************08-26 손유찬 **************************************************** */ -->
+
+<!-- //******************************************************11-20 신수녕 **************************************************** */ -->
+<resultMap type="kr.co.seoulit.erp.hr.affair.to.EmployeeBasicTO" id="employeeInfoResult">
+      <result property="companyCode" column="COMPANY_CODE" />
+      <result property="empCode" column="EMP_CODE" />
+      <result property="empName" column="EMP_NAME" />
+      <result property="empEngName" column="EMP_ENG_NAME" />
+      <result property="socialSecurityNumber" column="SOCIAL_SECURITY_NUMBER" />
+      <result property="hireDate" column="HIRE_DATE" />
+      <result property="retirementDate" column="RETIREMENT_DATE" />
+      <result property="userOrNot" column="USER_OR_NOT" />
+      <result property="birthDate" column="BIRTH_DATE" />
+      <result property="gender" column="GENDER" />
+      <result property="deptCode" column="DEPT_CODE" />
+      <result property="deptName" column="DEPT_NAME" />
+   </resultMap>
+
+<!-- <select id="selectEmpListD" parameterType="STRING" resultMap="employeeInfoResult">
+   SELECT * FROM EMPLOYEE_BASIC WHERE DEPT_CODE=#{dept}
+   </select> -->
+   
+   <select id="selectEmpMemberListD" parameterType="STRING" resultMap="employeeInfoResult">
+   SELECT EM.*, DM.DEPT_NAME
+FROM EMPLOYEE_BASIC EM, DEPARTMENT DM
+WHERE EM.DEPT_CODE=DM.DEPT_CODE
+AND EM.DEPT_CODE=#{dept}
+   
+   
+   </select>
+
+</mapper>

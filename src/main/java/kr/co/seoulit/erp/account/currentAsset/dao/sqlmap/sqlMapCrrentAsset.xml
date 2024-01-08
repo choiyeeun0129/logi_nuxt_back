@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed Feb 26 09:48:32 KST 2020-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.acc.account.currentAsset.dao.CurrentAssetDAO">
+
+    <resultMap id="assetResult" type="kr.co.seoulit.erp.account.currentAsset.to.CurrentAssetBean">
+	    <result property="accountCode" column="ACCOUNT_CODE"/>
+	    <result property="accountName" column="ACCOUNT_NAME"/>
+	    <result property="assetCode" column="ASSET_CODE"/>
+	    <result property="assetName" column="ASSET_NAME"/>
+	    <result property="progress" column="PROGRESS"/>
+	    <result property="finalizeStatus" column="FINALIZE_STATUS"/>
+	    <collection property="currentAssetDetailBean" column="ASSET_CODE" javaType="ArrayList"  ofType="CurrentAssetDetailBean" 
+		select="kr.co.seoulit.erp.account.currentAsset.dao.CurrentAssetDetailDAO.selectAssetDetail" />
+  	</resultMap>
+  	
+	
+	<select id="selectCurrentAssetList" parameterType="map" resultMap="assetResult">
+		<![CDATA[
+		SELECT*
+		FROM CURRENT_asset 
+		WHERE ACCOUNT_CODE=#{accountCode}
+		AND ACCOUNT_NAME=#{accountName} 
+		]]>
+	</select>
+   <insert id="insertCurrentAsset" parameterType="Map" >
+    <![CDATA[    
+      INSERT INTO CURRENT_asset(ACCOUNT_CODE,ACCOUNT_NAME,Asset_CODE,Asset_NAME,Progress,FINALIZE_STATUS)
+        VALUES (#{accountCode},#{accountName},#{assetCode},#{assetName},#{progress},#{finalizeStatus} 
+                )
+      ]]> 
+    </insert>
+  
+     <select id="selectNoncurrentAssetCount" parameterType="Map" resultType="int">
+  <![CDATA[
+	SELECT
+  	COUNT(*)
+	FROM CURRENT_asset 
+    WHERE ACCOUNT_CODE=#{accountCode}
+  ]]>
+  </select>
+   <delete id="deleteCrrentAsset" parameterType="String">
+   <![CDATA[
+   DELETE 
+   FROM CURRENT_ASSET
+   WHERE asset_code = #{asset_code}
+   ]]>
+   </delete>
+   <update id="updateCurrentAsset" parameterType="Map" >
+    <![CDATA[    
+      UPDATE  CURRENT_asset SET 
+      ACCOUNT_NAME= #{accountName}
+      ,Asset_NAME=#{assetName}
+      ,Progress=#{progress}
+      ,FINALIZE_STATUS=#{finalizeStatus}
+      where asset_code=#{assetCode}        
+      ]]> 
+    </update>
+   
+</mapper> 

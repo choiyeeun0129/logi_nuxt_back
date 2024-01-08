@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.hr.salary.dao.BaseDeductionDAO">
+	
+	
+	
+	<resultMap type="kr.co.seoulit.erp.hr.salary.to.BaseDeductionTO" id="baseDeductionResult">
+		<result property="deductionCode" column="DEDUCTION_CODE" />
+		<result property="deductionName" column="DEDUCTION_NAME" />
+		<result property="ratio" column="RATIO" />
+	</resultMap>
+	
+	
+	
+	<select id="selectBaseDeductionList" resultMap="baseDeductionResult">
+		SELECT DEDUCTION_CODE
+		, DEDUCTION_NAME
+		, RATIO		
+		FROM BASE_DEDUCTION
+	</select>
+	
+	
+	
+	<insert id="insertBaseDeduction" parameterType="kr.co.seoulit.erp.hr.salary.to.BaseDeductionTO">
+		INSERT INTO BASE_DEDUCTION VALUES (
+		#{deductionCode}, 
+		#{deductionName}, 
+		#{ratio}
+		)
+	</insert>
+	
+	<update id="updateBaseDeduction" parameterType="kr.co.seoulit.erp.hr.salary.to.BaseDeductionTO">
+		UPDATE BASE_DEDUCTION SET 
+		DEDUCTION_NAME = #{deductionName}
+		, RATIO = #{ratio} 
+		WHERE DEDUCTION_CODE = #{deductionCode}
+	</update>
+	
+	<delete id="deleteBaseDeduction" parameterType="kr.co.seoulit.erp.hr.salary.to.BaseDeductionTO">
+		DELETE FROM BASE_DEDUCTION
+		WHERE DEDUCTION_CODE = #{deductionCode}
+	</delete>
+	
+</mapper>

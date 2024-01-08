@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.seoulit.erp.logistic.sales.dao.ReturnStockDAO">
+
+    <resultMap id="returnStockResult" type="kr.co.seoulit.erp.logistic.sales.to.ReturnStockTO">
+        <result property="rtrnRecNo" column="RTRN_REC_NO"  />
+        <result property="returnNo" column="RETURN_NO"  />
+        <result property="rtrnItemCode" column="RTRN_ITEM_CODE"  />
+        <result property="rtrnItemName" column="RTRN_ITEM_NAME"  />
+        <result property="returnQty" column="RETURN_QTY"  />
+        <result property="recWrhsCode" column="REC_WRHS_CODE"  />
+        <result property="recWrhsName" column="REC_WRHS_NAME"  />
+        <result property="recDate" column="REC_DATE"  />
+    </resultMap>
+
+    <!--    반품재고입고요청 품목별 조회-->
+    <select id="searchReturnStockList" parameterType="String" resultMap="returnStockResult">
+       SELECT RTRN_REC_NO, RETURN_NO, RTRN_ITEM_CODE, RTRN_ITEM_NAME,
+              RETURN_QTY, REC_WRHS_CODE, REC_WRHS_NAME, REC_DATE
+       FROM RETURN_INVENTORY
+       WHERE RTRN_ITEM_CODE = #{itemCode}
+       ORDER BY REC_DATE DESC
+    </select>
+
+<!--    &lt;!&ndash;    반품요청 전체조회&ndash;&gt;-->
+<!--    <select id="returnListForStock" parameterType="map" resultMap="returnResult">-->
+<!--        SELECT * FROM RETURN-->
+<!--    </select>-->
+
+<!--    &lt;!&ndash; 반품요청 수정 &ndash;&gt;-->
+<!--    <update id="updateReturnResult" parameterType="map">-->
+<!--        UPDATE RETURN-->
+<!--        SET-->
+<!--            DELIVERY_NUMBER = #{deliveryNumber},-->
+<!--            ITEM_NAME = #{itemName},-->
+<!--            ITEM_CODE = #{itemCode},-->
+<!--            RCVD_DATE = #{rcvdDate},-->
+<!--            RETURN_REASON = #{returnReason},-->
+<!--            RETURN_QTY = #{returnQty},-->
+<!--            RETURN_PROCESSOR = #{returnProcessor},-->
+<!--            RETURN_STAT = #{returnStat},-->
+<!--            RETURN_NOTE = #{returnNote}-->
+<!--        WHERE RETURN_NO = #{returnNo}-->
+<!--    </update>-->
+
+    <!-- 반품요청 삭제 -->
+    <delete id="deleteReturnStock" parameterType="String">
+        DELETE FROM RETURN_INVENTORY
+        WHERE RTRN_REC_NO = #{rtrnRecNo}
+    </delete>
+
+
+    <!-- ReturnNo 최신값 조회 -->
+    <select id="getRtrnRecMaxNo" resultType="String">
+        SELECT MAX(RTRN_REC_NO) FROM RETURN_INVENTORY
+    </select>
+
+
+    <!-- 반품요청 등록 -->
+  <insert id="addReturnStock" parameterType="map">
+      INSERT INTO RETURN_INVENTORY (RTRN_REC_NO, RETURN_NO, RTRN_ITEM_CODE, RTRN_ITEM_NAME, RETURN_QTY, REC_WRHS_CODE, REC_WRHS_NAME, REC_DATE)
+      VALUES (#{rtrnRecNo}, #{returnNo}, #{rtrnItemCode}, #{rtrnItemName}, #{returnQty}, #{recWrhsCode}, #{recWrhsName}, #{recDate})
+  </insert>
+
+</mapper>

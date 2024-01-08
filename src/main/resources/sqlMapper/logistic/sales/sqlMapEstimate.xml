@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.seoulit.erp.logistic.sales.dao.EstimateDAO">
+	
+	<resultMap id="estimateResult" type="estimateTO" >
+	  <result property="contractStatus" column="CONTRACT_STATUS"/>
+	  <result property="customerCode" column="CUSTOMER_CODE"/>
+	  <result property="description" column="DESCRIPTION"/>
+	  <result property="effectiveDate" column="EFFECTIVE_DATE"/>
+	  <result property="estimateDate" column="ESTIMATE_DATE"/>
+	  <result property="estimateNo" column="ESTIMATE_NO"/>
+	  <result property="estimateRequester" column="ESTIMATE_REQUESTER"/>
+	  <result property="personCodeInCharge" column="PERSON_CODE_IN_CHARGE"/>
+<!-- 	  <result property="estimateDetailTOList" resultMap="estimateDetail.estimateDetailResult" javaType="java.util.ArrayList" />   -->
+	</resultMap>
+	
+	<select id="selectEstimateList" parameterType="map" resultMap="estimateResult">
+		SELECT * 
+		FROM ESTIMATE 
+		WHERE ( CASE #{dateSearchCondition}
+				WHEN 'estimateDate' THEN TO_DATE(ESTIMATE_DATE, 'YYYY-MM-DD') 
+				WHEN 'effectiveDate' THEN TO_DATE(EFFECTIVE_DATE, 'YYYY-MM-DD') END )
+			BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD') AND TO_DATE(#{endDate},'YYYY-MM-DD')
+	</select>
+	
+	<select id="selectEstimate" parameterType="String" resultMap="estimateResult">
+		SELECT * FROM ESTIMATE WHERE ESTIMATE_NO =#{estimateNo}
+	</select>
+	
+	
+	<select id="selectEstimateCount" parameterType="String" resultType="integer">
+		SELECT COUNT(*) FROM ESTIMATE WHERE ESTIMATE_DATE =TO_DATE(#{estimateDate},'YYYY-MM-DD')
+	</select>
+	
+	<insert id="insertEstimate" parameterType="estimateTO" >
+		Insert into ESTIMATE 
+		( ESTIMATE_NO , CUSTOMER_CODE , ESTIMATE_DATE , 
+			CONTRACT_STATUS , ESTIMATE_REQUESTER , EFFECTIVE_DATE , 
+			PERSON_CODE_IN_CHARGE , DESCRIPTION) 
+		values ( #{estimateNo:VARCHAR} , #{customerCode:VARCHAR} , #{estimateDate:VARCHAR} , 
+		#{contractStatus:VARCHAR} , #{estimateRequester:NVARCHAR} , #{effectiveDate:VARCHAR} , 
+		#{personCodeInCharge:VARCHAR} , #{description:NVARCHAR} )
+	</insert>
+	
+	<update id="updateEstimate" parameterType="estimateTO" >
+		UPDATE ESTIMATE SET 
+			CUSTOMER_CODE = #{customerCode:VARCHAR} , 
+			ESTIMATE_DATE = #{estimateDate:VARCHAR} ,
+			CONTRACT_STATUS = #{contractStatus:VARCHAR} , 
+			ESTIMATE_REQUESTER = #{estimateRequester:NVARCHAR} ,
+			EFFECTIVE_DATE = #{effectiveDate:VARCHAR} , 
+			PERSON_CODE_IN_CHARGE = #{personCodeInCharge:VARCHAR} ,
+			DESCRIPTION = #{description:NVARCHAR} 
+		WHERE ESTIMATE_NO = #{estimateNo}
+	</update>
+	
+	<update id="changeContractStatusOfEstimate" parameterType="map" >
+		UPDATE ESTIMATE SET 
+			CONTRACT_STATUS = #{contractStatus:VARCHAR}
+		WHERE ESTIMATE_NO = #{estimateNo}
+	</update> 
+
+
+</mapper>
